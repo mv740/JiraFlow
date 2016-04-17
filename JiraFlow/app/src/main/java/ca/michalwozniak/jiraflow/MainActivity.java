@@ -1,17 +1,11 @@
 package ca.michalwozniak.jiraflow;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
-
-import com.mikepenz.materialdrawer.AccountHeader;
-import com.mikepenz.materialdrawer.AccountHeaderBuilder;
-import com.mikepenz.materialdrawer.DrawerBuilder;
-import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
-import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -43,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        connectJira("mv740","Wozm__06");
     }
 
     private void connectJira(String username, final String password) {
@@ -54,29 +50,36 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call<User> call, Response<User> response) {
                 if(response.isSuccessful())
                 {
-                    Log.e("success", String.valueOf(response.raw()));
-                    // Create the AccountHeader
-                    AccountHeader headerResult = new AccountHeaderBuilder()
-                            .withActivity(MainActivity.this)
-                            .addProfiles(
-                                    new ProfileDrawerItem()
-                                            .withName("Mike Penz")
-                                            .withEmail("mikepenz@gmail.com")
-                            ).withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
-                                @Override
-                                public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
-                                    return false;
-                                }
-                            })
-                            .build();
 
-                    //Now create your drawer and pass the AccountHeader.Result
-                    new DrawerBuilder()
-                            .withActivity(MainActivity.this)
-                            .withAccountHeader(headerResult)
-                            //additional Drawer setup as shown above
+                    Intent startHome = new Intent(MainActivity.this,HomeActivity.class);
+                    startHome.putExtra("name",response.body().getName());
+                    startHome.putExtra("email",response.body().getEmailAddress());
+                    startActivity(startHome);
 
-                            .build();
+
+//                    Log.e("success", String.valueOf(response.raw()));
+//                    // Create the AccountHeader
+//                    AccountHeader headerResult = new AccountHeaderBuilder()
+//                            .withActivity(MainActivity.this)
+//                            .addProfiles(
+//                                    new ProfileDrawerItem()
+//                                            .withName("Mike Penz")
+//                                            .withEmail("mikepenz@gmail.com")
+//                            ).withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
+//                                @Override
+//                                public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
+//                                    return false;
+//                                }
+//                            })
+//                            .build();
+//
+//                    //Now create your drawer and pass the AccountHeader.Result
+//                    new DrawerBuilder()
+//                            .withActivity(MainActivity.this)
+//                            .withAccountHeader(headerResult)
+//                            //additional Drawer setup as shown above
+//
+//                            .build();
                 }else
                 {
                     _password.setError("Wrong password");

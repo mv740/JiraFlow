@@ -1,7 +1,10 @@
 package ca.michalwozniak.jiraflow.service;
 
+import java.util.List;
+
 import ca.michalwozniak.jiraflow.model.Board;
 import ca.michalwozniak.jiraflow.model.BoardList;
+import ca.michalwozniak.jiraflow.model.Project;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
@@ -27,5 +30,13 @@ public interface JiraService {
 
     @DELETE("/rest/agile/1.0/board/{boardId}")
     Call<Board> deleteBoard(@Body Board board);
+
+    //project query
+    @GET("/rest/api/2/project")
+    Call<List<Project>> getAllProjects();
+
+    @GET("/rest/api/2/project/{projectIdOrKey}")
+    Call<Project> getProject();
+
 
 }

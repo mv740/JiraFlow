@@ -1,5 +1,7 @@
 package ca.michalwozniak.jiraflow.model;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+
 import java.util.ArrayList;
 
 /**
@@ -7,14 +9,14 @@ import java.util.ArrayList;
  */
 public class BoardList {
 
-    private int maxResult;
+    private int maxResults;
     private int startAt;
     private int total;
     private boolean isLast;
     private ArrayList<Board> values;
 
-    public int getMaxResult() {
-        return maxResult;
+    public int getMaxResults() {
+        return maxResults;
     }
 
     public int getStartAt() {
@@ -23,6 +25,12 @@ public class BoardList {
 
     public int getTotal() {
         return total;
+    }
+
+    @JsonSetter("isLast")
+    public void setLast(String last) {
+
+        isLast = Boolean.parseBoolean(last);
     }
 
     public boolean isLast() {

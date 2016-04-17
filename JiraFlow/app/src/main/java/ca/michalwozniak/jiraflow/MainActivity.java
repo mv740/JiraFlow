@@ -56,30 +56,6 @@ public class MainActivity extends AppCompatActivity {
                     startHome.putExtra("email",response.body().getEmailAddress());
                     startActivity(startHome);
 
-
-//                    Log.e("success", String.valueOf(response.raw()));
-//                    // Create the AccountHeader
-//                    AccountHeader headerResult = new AccountHeaderBuilder()
-//                            .withActivity(MainActivity.this)
-//                            .addProfiles(
-//                                    new ProfileDrawerItem()
-//                                            .withName("Mike Penz")
-//                                            .withEmail("mikepenz@gmail.com")
-//                            ).withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
-//                                @Override
-//                                public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
-//                                    return false;
-//                                }
-//                            })
-//                            .build();
-//
-//                    //Now create your drawer and pass the AccountHeader.Result
-//                    new DrawerBuilder()
-//                            .withActivity(MainActivity.this)
-//                            .withAccountHeader(headerResult)
-//                            //additional Drawer setup as shown above
-//
-//                            .build();
                 }else
                 {
                     _password.setError("Wrong password");

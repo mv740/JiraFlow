@@ -30,4 +30,6 @@ dependencies {
         transitive = true
     }
     compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'com.jakewharton:butterknife:7.0.1'
+    compile 'com.github.maksim88:PasswordEditText:v0.6'
 }

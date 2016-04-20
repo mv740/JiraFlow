@@ -13,6 +13,17 @@
     tools:showIn="@layout/activity_home"
     android:background="@color/md_grey_200">
 
+    <com.github.ybq.android.spinkit.SpinKitView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/spin_kit"
+        style="@style/SpinKitView.FadingCircle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        app:SpinKit_Color="@color/atlassianNavy"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
     <com.dexafree.materialList.view.MaterialListView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"

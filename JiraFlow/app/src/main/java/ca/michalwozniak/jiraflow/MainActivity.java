@@ -37,7 +37,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-
+     //   DownloadResourceManager downloadResourceManager = new DownloadResourceManager(getApplicationContext());
+     //   downloadResourceManager.add("https://ewok390.atlassian.net/secure/projectavatar?size=xsmall&pid=10001&avatarId=10011", "project_icon.png");
+     //   downloadResourceManager.add("https://ewok390.atlassian.net/secure/projectavatar?size=xsmall&pid=10001&avatarId=10011", "museum_ex_1.svg");
         connectJira("mv740","Wozm__06");
     }
 

@@ -48,8 +48,12 @@ public class HomeActivity extends AppCompatActivity {
     private List<Project> projectList = null;
     private Activity myActivity;
     private boolean firstCard = true;
-    @Bind(R.id.refresh) MaterialRefreshLayout materialRefreshLayout;
-    @Bind(R.id.progressBar) CircleProgressBar circleProgressBar;
+    @Bind(R.id.refresh)
+    MaterialRefreshLayout materialRefreshLayout;
+    @Bind(R.id.progressBar)
+    CircleProgressBar circleProgressBar;
+    @Bind(R.id.material_listview)
+    MaterialListView mListView;
     private List<Card> cards;
 
     @Override
@@ -63,7 +67,7 @@ public class HomeActivity extends AppCompatActivity {
         cards = new ArrayList<>();
 
         //loading
-         circleProgressBar.setColorSchemeColors(ContextCompat.getColor(getApplicationContext(),R.color.atlassianNavy));
+        circleProgressBar.setColorSchemeColors(ContextCompat.getColor(getApplicationContext(), R.color.atlassianNavy));
 
         String name = getIntent().getStringExtra("name");
         String email = getIntent().getStringExtra("email");
@@ -108,21 +112,16 @@ public class HomeActivity extends AppCompatActivity {
         });
 
 
-
         getAllboards();
 
 
     }
 
 
+    private boolean alreadyExist(String title) {
 
-    private boolean alreadyExist(String title)
-    {
-
-        for(Card currentCard : cards)
-        {
-            if(Objects.equals(title, currentCard.getProvider().getTitle()))
-            {
+        for (Card currentCard : cards) {
+            if (Objects.equals(title, currentCard.getProvider().getTitle())) {
                 return true;
             }
         }
@@ -132,6 +131,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private void getAllboards() {
 
+        final List<Card> refreshedCardList = new ArrayList<>();
         JiraService jiraService = ServiceGenerator.createService(JiraService.class, "mv740", "Wozm__06");
         Call<List<Project>> call = jiraService.getAllProjects();
         call.enqueue(new Callback<List<Project>>() {
@@ -141,68 +141,72 @@ public class HomeActivity extends AppCompatActivity {
                     projectList = response.body();
                     Log.e("card", "success");
 
-                    final MaterialListView mListView = (MaterialListView) findViewById(R.id.material_listview);
 
-                    for (Project project : response.body()) {
+                    for (final Project project : response.body())
+                    {
+
 
                         OkHttpClient httpClient = new OkHttpClient();
                         okhttp3.Request request = new okhttp3.Request.Builder().url(project.getAvatarUrls().getExtraSmall()).build();
 
-                        if(!alreadyExist(project.getName()))
-                        {
-                            final Card.Builder cardB = new Card.Builder(HomeActivity.this)
-                                    .setTag("project")
-                                    .withProvider(new CardProvider())
-                                    .setLayout(R.layout.material_project_card)
-                                    .setTitle(project.getName())
-                                    .setTitleColor(Color.BLACK)
-                                    .setSubtitle(project.getProjectTypeKey())
-                                    .setSubtitleColor(Color.DKGRAY).endConfig();
 
-                            // cards.add(cardB.build());
+                        final Card.Builder cardB = new Card.Builder(HomeActivity.this)
+                                .setTag("project")
+                                .withProvider(new CardProvider())
+                                .setLayout(R.layout.material_project_card)
+                                .setTitle(project.getName())
+                                .setTitleColor(Color.BLACK)
+                                .setSubtitle(project.getProjectTypeKey())
+                                .setSubtitleColor(Color.DKGRAY).endConfig();
 
+                        // cards.add(cardB.build());
+                        refreshedCardList.add(cardB.build());
 
-                            okhttp3.Call call1 = httpClient.newCall(request);
-                            call1.enqueue(new okhttp3.Callback() {
-                                @Override
-                                public void onFailure(okhttp3.Call call, IOException e) {
+                        okhttp3.Call call1 = httpClient.newCall(request);
+                        call1.enqueue(new okhttp3.Callback() {
+                            @Override
+                            public void onFailure(okhttp3.Call call, IOException e) {
 
-                                }
+                            }
 
-                                @Override
-                                public void onResponse(okhttp3.Call call, okhttp3.Response response) throws IOException {
-                                    Log.e("wtf", response.headers().get("Content-Type"));
-                                    Log.e("wtf", String.valueOf(ResourceManager.getImageType(response.headers().get("Content-Type"))));
-                                    if (ResourceManager.getImageType(response.headers().get("Content-Type")) == ImageType.SVG) {
-                                        DownloadResourceManager downloadResourceManager = new DownloadResourceManager(HomeActivity.this, "mv740", "Wozn__06");
-                                        downloadResourceManager.add("https://ewok390.atlassian.net/secure/projectavatar?size=xsmall&pid=10001&avatarId=10011", "museum_ex_1.svg");
+                            @Override
+                            public void onResponse(final okhttp3.Call call, okhttp3.Response response) throws IOException {
+                                Log.e("wtf", response.headers().get("Content-Type"));
+                                Log.e("wtf", String.valueOf(ResourceManager.getImageType(response.headers().get("Content-Type"))));
+                                if (ResourceManager.getImageType(response.headers().get("Content-Type")) == ImageType.SVG) {
+                                    DownloadResourceManager downloadResourceManager = new DownloadResourceManager(HomeActivity.this, "mv740", "Wozn__06");
 
-                                        final Drawable drawable = ResourceManager.getDrawableFromSVG("museum_ex_1.svg",getApplicationContext());
-                                        runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                cardB.build().getProvider().setDrawable(drawable);
-                                                cards.add(cardB.build());
-                                                mListView.getAdapter().add(cardB.build());
-                                                if(firstCard)
-                                                {
-                                                    circleProgressBar.setVisibility(View.GONE);
-                                                    firstCard =false;
-                                                }
+                                    String destinationName = project.getKey()+".svg";
+                                    downloadResourceManager.add("https://ewok390.atlassian.net/secure/projectavatar?size=xsmall&pid=10001&avatarId=10011",destinationName);
+
+                                    final Drawable drawable = ResourceManager.getDrawableFromSVG(destinationName, getApplicationContext());
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Card card = cardB.build().getProvider().setDrawable(drawable).endConfig().build();
+                                            if (!alreadyExist(card.getProvider().getTitle())) {
+                                                mListView.getAdapter().add(card);
+                                                cards.add(card);
                                             }
-                                        });
-                                    } else {
-                                        String url = myActivity.getFilesDir() + "/" + "museum_ex_1.png";
-                                        cardB.build().getProvider().setDrawable(url);
-                                    }
+                                            if (firstCard) {
+                                                circleProgressBar.setVisibility(View.GONE);
+                                                firstCard = false;
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    String url = myActivity.getFilesDir() + "/" + "museum_ex_1.png";
+                                    cardB.build().getProvider().setDrawable(url);
                                 }
-                            });
-                        }
+                            }
+                        });
 
 
                     }
 
+
                     //mListView.getAdapter().addAll(cards);
+
                     mListView.addOnItemTouchListener(new RecyclerItemClickListener.OnItemClickListener() {
 
                         @Override
@@ -216,11 +220,14 @@ public class HomeActivity extends AppCompatActivity {
                             Log.d("LONG_CLICK", card.getTag().toString());
                         }
                     });
+                    removeDeleteCards(refreshedCardList);
+
                 } else {
                     Log.e("card", "fail");
+                    materialRefreshLayout.finishRefresh();
                 }
 
-                materialRefreshLayout.finishRefresh();
+
             }
 
             @Override
@@ -229,6 +236,47 @@ public class HomeActivity extends AppCompatActivity {
                 Log.e("card", t.toString());
             }
         });
+    }
+
+    private void removeDeleteCards(List<Card> refreshedCardList) {
+
+        Log.e("oldList", String.valueOf(cards.size()));
+        Log.e("newList", String.valueOf(refreshedCardList.size()));
+
+        //// TODO: 4/20/2016 need to make this better, also cn only delete last project in the list
+        for (Card card : cards) {
+
+            boolean exist = false;
+            for (Card card1 : refreshedCardList) {
+
+                if(card.getProvider().getTitle().equals(card1.getProvider().getTitle()))
+                {
+                    exist = true;
+                }
+            }
+            if(!exist)
+            {
+                int index = mListView.getAdapter().getItemCount();
+                Log.e("itemCount", String.valueOf(index));
+                for (int i = 0; i < index; i++) {
+
+                    Log.e("index", String.valueOf(i));
+                    if(mListView.getAdapter().getCard(i).getProvider().getTitle().equals(card.getProvider().getTitle()))
+                    {
+                        Card toDetele = mListView.getAdapter().getCard(i);
+                        toDetele.setDismissible(true);
+                        mListView.getAdapter().remove(toDetele,false);
+                        cards.remove(toDetele);
+                    }
+                }
+            }
+        }
+
+        mListView.getAdapter().notifyDataSetChanged();
+        materialRefreshLayout.finishRefresh();
+
+       // cards = refreshedCardList;
+
     }
 
     @Override

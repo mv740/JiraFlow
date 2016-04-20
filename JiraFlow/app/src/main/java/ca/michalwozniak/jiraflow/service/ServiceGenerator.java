@@ -1,7 +1,6 @@
 package ca.michalwozniak.jiraflow.service;
 
 import android.util.Base64;
-import android.util.Log;
 
 import java.io.IOException;
 
@@ -46,7 +45,6 @@ public class ServiceGenerator {
                             .header("Accept", "application/json")
                             .method(original.method(), original.body());
                     Request request = requestBuilder.build();
-                    Log.e("requestLog", request.toString());
                     return chain.proceed(request);
                 }
             });

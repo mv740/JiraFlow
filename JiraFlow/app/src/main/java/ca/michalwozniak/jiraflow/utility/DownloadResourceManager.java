@@ -85,5 +85,5 @@ public class DownloadResourceManager {
             //Log.e(TAG, "progress " + downloadRequest.getUri() + ": " + downloadRequest.getUri() + "progress :" + progress);
         }
     }
-    
+
 }

@@ -15,4 +15,9 @@
         completions."
     </string>
     <string name="title_activity_home">HomeActivity</string>
+
+    <integer-array name="refreshColor">
+        <item>@color/atlassianNavy</item>
+        <item>@color/atlassianNavy</item>
+    </integer-array>
 </resources>

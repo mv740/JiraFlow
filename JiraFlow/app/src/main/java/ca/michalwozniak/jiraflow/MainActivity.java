@@ -37,13 +37,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-     //   DownloadResourceManager downloadResourceManager = new DownloadResourceManager(getApplicationContext());
-     //   downloadResourceManager.add("https://ewok390.atlassian.net/secure/projectavatar?size=xsmall&pid=10001&avatarId=10011", "project_icon.png");
-     //   downloadResourceManager.add("https://ewok390.atlassian.net/secure/projectavatar?size=xsmall&pid=10001&avatarId=10011", "museum_ex_1.svg");
+
+        //for testing
         connectJira("mv740","Wozm__06");
     }
 
-    private void connectJira(String username, final String password) {
+    private void connectJira(String username, String password) {
 
         LoginService loginService = ServiceGenerator.createService(LoginService.class, username, password);
         Call<User> call = loginService.basicLogin();

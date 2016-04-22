@@ -1,8 +1,8 @@
 package ca.michalwozniak.jiraflow.service;
 
 import ca.michalwozniak.jiraflow.model.User;
-import retrofit2.Call;
 import retrofit2.http.GET;
+import rx.Observable;
 
 /**
  * Created by michal on 4/10/2016.
@@ -10,5 +10,5 @@ import retrofit2.http.GET;
 public interface LoginService {
 
     @GET("/rest/api/2/myself")
-    Call<User> basicLogin();
+    Observable<User> basicLogin();
 }

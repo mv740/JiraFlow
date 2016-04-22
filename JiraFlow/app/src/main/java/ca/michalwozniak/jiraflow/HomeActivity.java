@@ -34,14 +34,14 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import ca.michalwozniak.jiraflow.model.ImageType;
 import ca.michalwozniak.jiraflow.model.Project;
-import ca.michalwozniak.jiraflow.service.JiraService;
+import ca.michalwozniak.jiraflow.service.JiraSoftwareService;
 import ca.michalwozniak.jiraflow.service.ServiceGenerator;
 import ca.michalwozniak.jiraflow.utility.DownloadResourceManager;
 import ca.michalwozniak.jiraflow.utility.ResourceManager;
 import okhttp3.OkHttpClient;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -133,119 +133,119 @@ public class HomeActivity extends AppCompatActivity {
     private void getAllboards() {
 
         final List<Card> refreshedCardList = new ArrayList<>();
-        JiraService jiraService = ServiceGenerator.createService(JiraService.class, "mv740", "Wozm__06");
-        Call<List<Project>> call = jiraService.getAllProjects();
-
-
-        call.enqueue(new Callback<List<Project>>() {
-            @Override
-            public void onResponse(Call<List<Project>> call, Response<List<Project>> response) {
-                if (response.isSuccessful()) {
-                    projectList = response.body();
-                    Log.e("card", "success");
-
-                    final DownloadResourceManager downloadResourceManager = new DownloadResourceManager(HomeActivity.this, "mv740", "Wozn__06");
-                    for (final Project project : response.body()) {
-
-
-                        OkHttpClient httpClient = new OkHttpClient();
-                        okhttp3.Request request = new okhttp3.Request.Builder().url(project.getAvatarUrls().getExtraSmall()).build();
-
-
-                        final Card.Builder cardB = new Card.Builder(HomeActivity.this)
-                                .setTag("project")
-                                .withProvider(new CardProvider())
-                                .setLayout(R.layout.material_project_card)
-                                .setTitle(project.getName())
-                                .setTitleColor(Color.BLACK)
-                                .setSubtitle(project.getProjectTypeKey())
-                                .setSubtitleColor(Color.DKGRAY).endConfig();
-
-                        // cards.add(cardB.build());
-                        refreshedCardList.add(cardB.build());
-
-                        okhttp3.Call call1 = httpClient.newCall(request);
-                        call1.enqueue(new okhttp3.Callback() {
-                            @Override
-                            public void onFailure(okhttp3.Call call, IOException e) {
-
-                            }
-
-                            @Override
-                            public void onResponse(final okhttp3.Call call, okhttp3.Response response) throws IOException {
-
-                                //// TODO: 4/22/2016 do each condition for each imageType
-                                if (ResourceManager.getImageType(response.headers().get("Content-Type")) == ImageType.SVG) {
-
-
-                                    if (!alreadyExist(cardB.build().getProvider().getTitle())) {
-                                        String destinationName = project.getKey() + ".svg";
-                                        String name = project.getAvatarUrls().getSmall();
-                                        downloadResourceManager.add(name, destinationName);
-
-                                        final Drawable drawable = ResourceManager.getDrawableFromSVG(destinationName, getApplicationContext());
-
-                                        runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                Card card = cardB.build().getProvider().setDrawable(drawable).endConfig().build();
-                                                mListView.getAdapter().add(card);
-                                                cards.add(card);
-
-                                                if (firstCard) {
-                                                    circleProgressBar.setVisibility(View.GONE);
-                                                    firstCard = false;
-                                                }
-                                            }
-                                        });
-                                    }
-
-                                } else {
-                                    String url = myActivity.getFilesDir() + "/" + "museum_ex_1.png";
-                                    cardB.build().getProvider().setDrawable(url);
-                                }
-
-                                response.body().close();
-                            }
-                        });
-
-
+        JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, "mv740", "Wozm__06");
+        jiraService.getAllProjects()
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<Project>>() {
+                    @Override
+                    public void onCompleted() {
+                        //do nothing
                     }
 
-                    mListView.addOnItemTouchListener(new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e("errorSubscriber",e.getMessage());
+                    }
 
-                        @Override
-                        public void onItemClick(final Card card, final int position) {
-                            new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void onNext(List<Project> projects) {
+                        if(!projects.isEmpty())
+                        {
+                            final DownloadResourceManager downloadResourceManager = new DownloadResourceManager(HomeActivity.this, "mv740", "Wozn__06");
+                            for (final Project project : projects) {
+
+
+                                OkHttpClient httpClient = new OkHttpClient();
+                                okhttp3.Request request = new okhttp3.Request.Builder().url(project.getAvatarUrls().getExtraSmall()).build();
+
+
+                                final Card.Builder cardB = new Card.Builder(HomeActivity.this)
+                                        .setTag("project")
+                                        .withProvider(new CardProvider())
+                                        .setLayout(R.layout.material_project_card)
+                                        .setTitle(project.getName())
+                                        .setTitleColor(Color.BLACK)
+                                        .setSubtitle(project.getProjectTypeKey())
+                                        .setSubtitleColor(Color.DKGRAY).endConfig();
+
+                                // cards.add(cardB.build());
+                                refreshedCardList.add(cardB.build());
+
+                                okhttp3.Call call1 = httpClient.newCall(request);
+                                call1.enqueue(new okhttp3.Callback() {
+                                    @Override
+                                    public void onFailure(okhttp3.Call call, IOException e) {
+
+                                    }
+
+                                    @Override
+                                    public void onResponse(final okhttp3.Call call, okhttp3.Response response) throws IOException {
+
+                                        //// TODO: 4/22/2016 do each condition for each imageType
+                                        if (ResourceManager.getImageType(response.headers().get("Content-Type")) == ImageType.SVG) {
+
+
+                                            if (!alreadyExist(cardB.build().getProvider().getTitle())) {
+                                                String destinationName = project.getKey() + ".svg";
+                                                String name = project.getAvatarUrls().getSmall();
+                                                downloadResourceManager.add(name, destinationName);
+                                                
+
+                                                final Drawable drawable = ResourceManager.getDrawableFromSVG(destinationName, getApplicationContext());
+
+                                                runOnUiThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        Card card = cardB.build().getProvider().setDrawable(drawable).endConfig().build();
+                                                        mListView.getAdapter().add(card);
+                                                        cards.add(card);
+
+                                                        if (firstCard) {
+                                                            circleProgressBar.setVisibility(View.GONE);
+                                                            firstCard = false;
+                                                        }
+                                                    }
+                                                });
+                                            }
+
+                                        } else {
+                                            String url = myActivity.getFilesDir() + "/" + "museum_ex_1.png";
+                                            cardB.build().getProvider().setDrawable(url);
+                                        }
+
+                                        response.body().close();
+                                    }
+                                });
+
+
+                            }
+
+                            mListView.addOnItemTouchListener(new RecyclerItemClickListener.OnItemClickListener() {
+
                                 @Override
-                                public void run() {
-                                    Log.d("CARD_TYPE", card.getProvider().getTitle() + " - position :" + position);
-                                    
+                                public void onItemClick(final Card card, final int position) {
+                                    new Handler().postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Log.d("CARD_TYPE", card.getProvider().getTitle() + " - position :" + position);
+
+                                        }
+                                    },250);
                                 }
-                            },250);
+
+                                @Override
+                                public void onItemLongClick(Card card, int position) {
+                                    Log.d("LONG_CLICK", card.getTag().toString());
+                                }
+                            });
+                            removeDeleteCards(refreshedCardList);
                         }
-
-                        @Override
-                        public void onItemLongClick(Card card, int position) {
-                            Log.d("LONG_CLICK", card.getTag().toString());
-                        }
-                    });
-                    removeDeleteCards(refreshedCardList);
-
-                } else {
-                    Log.e("card", "fail");
-                    materialRefreshLayout.finishRefresh();
-                }
+                    }
+                });
 
 
-            }
 
-            @Override
-            public void onFailure(Call<List<Project>> call, Throwable t) {
-                Log.e("card", "failure");
-                Log.e("card", t.toString());
-            }
-        });
     }
 
     private void removeDeleteCards(List<Card> refreshedCardList) {

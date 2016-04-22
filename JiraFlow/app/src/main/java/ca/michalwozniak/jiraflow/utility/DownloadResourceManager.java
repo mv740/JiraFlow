@@ -13,6 +13,8 @@ import com.thin.downloadmanager.ThinDownloadManager;
 import java.util.ArrayList;
 import java.util.List;
 
+import rx.Observable;
+
 /**
  * Created by michal on 4/19/2016.
  */
@@ -25,6 +27,7 @@ public class DownloadResourceManager {
     private String username;
     private String password;
     private boolean basicAuthentication = false;
+    private Observable observable;
 
     public DownloadResourceManager(Activity activity) {
         this.thinDownloadManager = new ThinDownloadManager();

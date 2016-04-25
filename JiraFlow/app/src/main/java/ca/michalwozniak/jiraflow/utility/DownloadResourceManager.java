@@ -13,6 +13,7 @@ import com.thin.downloadmanager.ThinDownloadManager;
 import java.util.ArrayList;
 import java.util.List;
 
+import ca.michalwozniak.jiraflow.HomeActivity;
 import rx.Observable;
 
 /**
@@ -27,7 +28,11 @@ public class DownloadResourceManager {
     private String username;
     private String password;
     private boolean basicAuthentication = false;
+
+
     private Observable observable;
+    private HomeActivity.imageIcon imageIcon;
+
 
     public DownloadResourceManager(Activity activity) {
         this.thinDownloadManager = new ThinDownloadManager();
@@ -45,10 +50,15 @@ public class DownloadResourceManager {
     }
 
 
-    public void add(String url, String destination) {
+    public void add(String url, String destination, HomeActivity.imageIcon imageIcon) {
         if (!url.isEmpty() && !destination.isEmpty()) {
             Uri downloadUri = Uri.parse(url);
             Uri destinationUri = Uri.parse(activity.getFilesDir() + "/" + destination);
+
+            //ui
+            this.imageIcon = imageIcon;
+            //
+
             DownloadRequest downloadRequest = new DownloadRequest(downloadUri);
 
             if (basicAuthentication) {
@@ -76,6 +86,7 @@ public class DownloadResourceManager {
         public void onDownloadComplete(DownloadRequest downloadRequest) {
             Log.d(TAG, "complete : " + downloadRequest.getUri());
             downloadQueue.remove(Integer.valueOf(downloadRequest.getDownloadId()));
+            imageIcon.draw();
         }
 
         @Override

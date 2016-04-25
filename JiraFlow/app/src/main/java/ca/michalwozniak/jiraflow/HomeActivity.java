@@ -1,6 +1,7 @@
 package ca.michalwozniak.jiraflow;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -145,14 +146,12 @@ public class HomeActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.e("errorSubscriber",e.getMessage());
+                        Log.e("errorSubscriber", e.getMessage());
                     }
 
                     @Override
                     public void onNext(List<Project> projects) {
-                        if(!projects.isEmpty())
-                        {
-                            final DownloadResourceManager downloadResourceManager = new DownloadResourceManager(HomeActivity.this, "mv740", "Wozn__06");
+                        if (!projects.isEmpty()) {
                             for (final Project project : projects) {
 
 
@@ -189,24 +188,12 @@ public class HomeActivity extends AppCompatActivity {
                                             if (!alreadyExist(cardB.build().getProvider().getTitle())) {
                                                 String destinationName = project.getKey() + ".svg";
                                                 String name = project.getAvatarUrls().getSmall();
-                                                downloadResourceManager.add(name, destinationName);
-                                                
 
-                                                final Drawable drawable = ResourceManager.getDrawableFromSVG(destinationName, getApplicationContext());
+                                                DownloadResourceManager downloadResourceManager = new DownloadResourceManager(HomeActivity.this, "mv740", "Wozn__06");
+                                                imageIcon svg = new imageIcon(destinationName, getApplicationContext(), cardB, mListView, cards, ImageType.SVG);
 
-                                                runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        Card card = cardB.build().getProvider().setDrawable(drawable).endConfig().build();
-                                                        mListView.getAdapter().add(card);
-                                                        cards.add(card);
+                                                downloadResourceManager.add(name, destinationName, svg);
 
-                                                        if (firstCard) {
-                                                            circleProgressBar.setVisibility(View.GONE);
-                                                            firstCard = false;
-                                                        }
-                                                    }
-                                                });
                                             }
 
                                         } else {
@@ -231,7 +218,7 @@ public class HomeActivity extends AppCompatActivity {
                                             Log.d("CARD_TYPE", card.getProvider().getTitle() + " - position :" + position);
 
                                         }
-                                    },250);
+                                    }, 250);
                                 }
 
                                 @Override
@@ -245,7 +232,55 @@ public class HomeActivity extends AppCompatActivity {
                 });
 
 
+    }
 
+
+    /**
+     *  Use to pass loading process to downloadManager as a callback function
+     */
+    public class imageIcon {
+
+        private String destinationName;
+        private Context context;
+        private Card.Builder cardB;
+        private MaterialListView mListView;
+        private List<Card> cards;
+        private ImageType imageType;
+
+        public imageIcon(String destinationName, Context context, Card.Builder cardBuilder, MaterialListView mListView, List<Card> cards, ImageType imageType) {
+            this.destinationName = destinationName;
+            this.context = context;
+            this.cardB = cardBuilder;
+            this.mListView = mListView;
+            this.cards = cards;
+            this.imageType = imageType;
+        }
+
+        public void draw() {
+            Drawable drawable = null;
+            if (imageType == ImageType.SVG) {
+                drawable = ResourceManager.getDrawableFromSVG(destinationName, context);
+            }else if(imageType == ImageType.PNG)
+            {
+                //// TODO: 4/24/2016
+            }
+
+
+            final Drawable finalDrawable = drawable;
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Card card = cardB.build().getProvider().setDrawable(finalDrawable).endConfig().build();
+                    mListView.getAdapter().add(card);
+                    cards.add(card);
+
+                    if (firstCard) {
+                        circleProgressBar.setVisibility(View.GONE);
+                        firstCard = false;
+                    }
+                }
+            });
+        }
     }
 
     private void removeDeleteCards(List<Card> refreshedCardList) {

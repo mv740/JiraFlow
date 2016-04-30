@@ -1,9 +1,7 @@
 package ca.michalwozniak.jiraflow;
 
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
@@ -33,6 +31,7 @@ import java.util.Objects;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import ca.michalwozniak.jiraflow.helper.ImageIcon;
 import ca.michalwozniak.jiraflow.model.ImageType;
 import ca.michalwozniak.jiraflow.model.Project;
 import ca.michalwozniak.jiraflow.service.JiraSoftwareService;
@@ -135,6 +134,8 @@ public class HomeActivity extends AppCompatActivity {
 
         final List<Card> refreshedCardList = new ArrayList<>();
         JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, "mv740", "Wozm__06");
+
+        final DownloadResourceManager downloadResourceManager = new DownloadResourceManager(HomeActivity.this, "mv740", "Wozn__06");
         jiraService.getAllProjects()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -189,23 +190,17 @@ public class HomeActivity extends AppCompatActivity {
                                                 String destinationName = project.getKey() + ".svg";
                                                 String name = project.getAvatarUrls().getSmall();
 
-                                                DownloadResourceManager downloadResourceManager = new DownloadResourceManager(HomeActivity.this, "mv740", "Wozn__06");
-                                                imageIcon svg = new imageIcon(destinationName, getApplicationContext(), cardB, mListView, cards, ImageType.SVG);
-
-                                                downloadResourceManager.add(name, destinationName, svg);
-
+                                                ImageIcon imageIcon = new ImageIcon(destinationName, HomeActivity.this, cardB, mListView, cards, ImageType.SVG, firstCard, circleProgressBar);
+                                                downloadResourceManager.add(name, destinationName, imageIcon);
                                             }
 
                                         } else {
                                             String url = myActivity.getFilesDir() + "/" + "museum_ex_1.png";
                                             cardB.build().getProvider().setDrawable(url);
                                         }
-
                                         response.body().close();
                                     }
                                 });
-
-
                             }
 
                             mListView.addOnItemTouchListener(new RecyclerItemClickListener.OnItemClickListener() {
@@ -234,54 +229,6 @@ public class HomeActivity extends AppCompatActivity {
 
     }
 
-
-    /**
-     *  Use to pass loading process to downloadManager as a callback function
-     */
-    public class imageIcon {
-
-        private String destinationName;
-        private Context context;
-        private Card.Builder cardB;
-        private MaterialListView mListView;
-        private List<Card> cards;
-        private ImageType imageType;
-
-        public imageIcon(String destinationName, Context context, Card.Builder cardBuilder, MaterialListView mListView, List<Card> cards, ImageType imageType) {
-            this.destinationName = destinationName;
-            this.context = context;
-            this.cardB = cardBuilder;
-            this.mListView = mListView;
-            this.cards = cards;
-            this.imageType = imageType;
-        }
-
-        public void draw() {
-            Drawable drawable = null;
-            if (imageType == ImageType.SVG) {
-                drawable = ResourceManager.getDrawableFromSVG(destinationName, context);
-            }else if(imageType == ImageType.PNG)
-            {
-                //// TODO: 4/24/2016
-            }
-
-
-            final Drawable finalDrawable = drawable;
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Card card = cardB.build().getProvider().setDrawable(finalDrawable).endConfig().build();
-                    mListView.getAdapter().add(card);
-                    cards.add(card);
-
-                    if (firstCard) {
-                        circleProgressBar.setVisibility(View.GONE);
-                        firstCard = false;
-                    }
-                }
-            });
-        }
-    }
 
     private void removeDeleteCards(List<Card> refreshedCardList) {
 

@@ -1,6 +1,7 @@
 package ca.michalwozniak.jiraflow;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -63,9 +64,17 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
         ButterKnife.bind(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
         this.myActivity = getParent();
         cards = new ArrayList<>();
+
+        if(toolbar!=null)
+        {
+            setSupportActionBar(toolbar);
+            getSupportActionBar().setTitle("Projects");
+            getSupportActionBar().setHomeButtonEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
 
         //loading
         circleProgressBar.setColorSchemeColors(ContextCompat.getColor(getApplicationContext(), R.color.atlassianNavy));
@@ -103,7 +112,6 @@ public class HomeActivity extends AppCompatActivity {
 
 
         drawerResult.getActionBarDrawerToggle().setDrawerIndicatorEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         materialRefreshLayout.setMaterialRefreshListener(new MaterialRefreshListener() {
             @Override
@@ -211,6 +219,10 @@ public class HomeActivity extends AppCompatActivity {
                                         @Override
                                         public void run() {
                                             Log.d("CARD_TYPE", card.getProvider().getTitle() + " - position :" + position);
+
+                                            Intent project = new Intent(HomeActivity.this,ProjectActivity.class);
+                                            project.putExtra("title",card.getProvider().getTitle());
+                                            startActivity(project);
 
                                         }
                                     }, 250);

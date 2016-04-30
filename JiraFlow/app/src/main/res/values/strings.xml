@@ -20,4 +20,5 @@
         <item>@color/atlassianNavy</item>
         <item>@color/atlassianNavy</item>
     </integer-array>
+    <string name="title_activity_project">ProjectActivity</string>
 </resources>

@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.cjj.MaterialRefreshLayout;
 import com.cjj.MaterialRefreshListener;
@@ -22,8 +23,13 @@ import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
+import com.mikepenz.materialdrawer.model.ProfileSettingDrawerItem;
+import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
+import com.mikepenz.materialdrawer.model.interfaces.Nameable;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -85,11 +91,9 @@ public class HomeActivity extends AppCompatActivity {
         // Create the AccountHeader
         AccountHeader headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
-                .withHeaderBackground(R.drawable.material_drawer_badge)
+                .withHeaderBackground(R.drawable.background_account_header)
                 .addProfiles(
-                        new ProfileDrawerItem()
-                                .withName(name)
-                                .withEmail(email)
+                        new ProfileDrawerItem().withName(name).withEmail(email)
                 )
                 .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
                     @Override
@@ -97,6 +101,8 @@ public class HomeActivity extends AppCompatActivity {
                         return false;
                     }
                 })
+                .withProfileImagesClickable(false)
+                .withSelectionListEnabledForSingleProfile(false)
                 .build();
 
         //Now create your drawer and pass the AccountHeader.Result
@@ -104,9 +110,26 @@ public class HomeActivity extends AppCompatActivity {
                 .withToolbar(toolbar)
                 .withActivity(this)
                 .withSavedInstance(savedInstanceState)
-                .withDisplayBelowStatusBar(false)
-                .withTranslucentStatusBar(false)
+                .withDisplayBelowStatusBar(true)
+                .withTranslucentStatusBar(true)
                 .withAccountHeader(headerResult)
+                .withDrawerLayout(R.layout.material_drawer_fits_not)
+                .addDrawerItems(
+                        new SecondaryDrawerItem().withName("test1"),
+                        new SecondaryDrawerItem().withName("test2"),
+                        new DividerDrawerItem(),
+                        new ProfileSettingDrawerItem().withName("Manage Account").withIcon(R.drawable.ic_settings_grey600_48dp)
+                )
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        if (drawerItem instanceof Nameable) {
+                            Toast.makeText(HomeActivity.this, ((Nameable) drawerItem).getName().getText(HomeActivity.this), Toast.LENGTH_SHORT).show();
+                        }
+
+                        return false;
+                    }
+                })
                 //additional Drawer setup as shown above
                 .build();
 

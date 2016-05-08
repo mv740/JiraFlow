@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import ca.michalwozniak.jiraflow.helper.ImageIcon;
 import ca.michalwozniak.jiraflow.model.ImageType;
@@ -52,17 +52,15 @@ import rx.schedulers.Schedulers;
 
 public class HomeActivity extends AppCompatActivity {
 
+    @BindView(R.id.refresh) MaterialRefreshLayout materialRefreshLayout;
+    @BindView(R.id.progressBar) CircleProgressBar circleProgressBar;
+    @BindView(R.id.material_listview) MaterialListView mListView;
     private Drawer drawerResult = null;
     private List<Project> projectList = null;
     private Activity myActivity;
     private boolean firstCard = true;
-    @Bind(R.id.refresh)
-    MaterialRefreshLayout materialRefreshLayout;
-    @Bind(R.id.progressBar)
-    CircleProgressBar circleProgressBar;
-    @Bind(R.id.material_listview)
-    MaterialListView mListView;
     private List<Card> cards;
+    private boolean emptyProjectList = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -184,6 +182,14 @@ public class HomeActivity extends AppCompatActivity {
                     @Override
                     public void onNext(List<Project> projects) {
                         if (!projects.isEmpty()) {
+
+                            if(emptyProjectList)
+                            {
+                                mListView.getAdapter().getCard(0).setDismissible(true);
+                                mListView.getAdapter().clearAll();
+                                emptyProjectList = false;
+                            }
+
                             for (final Project project : projects) {
 
 
@@ -244,6 +250,7 @@ public class HomeActivity extends AppCompatActivity {
                                             Log.d("CARD_TYPE", card.getProvider().getTitle() + " - position :" + position);
 
                                             Intent project = new Intent(HomeActivity.this,ProjectActivity.class);
+                                            project.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                                             project.putExtra("title",card.getProvider().getTitle());
                                             startActivity(project);
 
@@ -257,11 +264,41 @@ public class HomeActivity extends AppCompatActivity {
                                 }
                             });
                             removeDeleteCards(refreshedCardList);
+                        }else
+                        {
+                            if(circleProgressBar.getVisibility() == View.VISIBLE)
+                            {
+                                circleProgressBar.setVisibility(View.GONE);
+                                materialRefreshLayout.finishRefresh();
+                            }
+                            else
+                            {
+                                materialRefreshLayout.finishRefresh();
+                            }
+                            if(!emptyProjectList)
+                            {
+                                generateEmptyProjectCard();
+                                emptyProjectList = true;
+                            }
                         }
                     }
+
                 });
 
 
+    }
+
+    private void generateEmptyProjectCard() {
+        Card card = new Card.Builder(HomeActivity.this)
+                .setTag("empty")
+                .withProvider(new CardProvider())
+                .setLayout(R.layout.material_project_card)
+                .setTitle("No Available Projects")
+                .setTitleColor(Color.BLACK)
+                .setSubtitle("Please create a project")
+                .setSubtitleColor(Color.DKGRAY).endConfig().build();
+
+        mListView.getAdapter().add(card);
     }
 
 

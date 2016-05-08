@@ -7,19 +7,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import ca.michalwozniak.jiraflow.adapter.ViewPagerAdapter;
 import ca.michalwozniak.jiraflow.fragment.One;
 import ca.michalwozniak.jiraflow.fragment.Two;
 
 public class ProjectActivity extends AppCompatActivity {
-    @Bind(R.id.toolbar)
-    Toolbar toolbar;
-    @Bind(R.id.tabs)
-    TabLayout tabLayout;
-    @Bind(R.id.viewpager)
-    ViewPager viewPager;
+    @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.tabs) TabLayout tabLayout;
+    @BindView(R.id.viewpager) ViewPager viewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

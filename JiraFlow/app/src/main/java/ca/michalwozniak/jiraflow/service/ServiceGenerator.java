@@ -17,7 +17,7 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
  */
 public class ServiceGenerator {
 
-    public static final String API_BASE_URL = "https://ewok390.atlassian.net/rest/api/2/";
+    public static final String API_BASE_URL = "http://173.176.41.65:8000/rest/api/2/";
 
     private static OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 

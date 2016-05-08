@@ -7,7 +7,7 @@ import android.util.Log;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import ca.michalwozniak.jiraflow.model.User;
@@ -19,10 +19,8 @@ import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
 
-    @Bind(R.id.input_username)
-    EditText _username;
-    @Bind(R.id.input_password)
-    EditText _password;
+    @BindView(R.id.input_username) EditText _username;
+    @BindView(R.id.input_password) EditText _password;
 
     @OnClick(R.id.button)
     void logIn() {
@@ -42,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         //for testing
-        connectJira("mv740", "Wozm__06");
+        connectJira("test", "Q1w2e3r4");
     }
 
     private void connectJira(String username, String password) {

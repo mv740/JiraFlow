@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
         //for testing
         connectJira("test", "Q1w2e3r4");
+
     }
 
     private void connectJira(String username, String password) {

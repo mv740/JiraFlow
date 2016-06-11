@@ -1,5 +1,7 @@
 package ca.michalwozniak.jiraflow.model;
 
+import android.graphics.drawable.Drawable;
+
 /**
  * Created by michal on 4/17/2016.
  */
@@ -13,6 +15,7 @@ public class Project {
     private Avatar avatarUrls;
     private String projectTypeKey;
     private Category projectCategory;
+    private Drawable avatar;
 
     public String getExpand() {
         return expand;
@@ -44,5 +47,13 @@ public class Project {
 
     public Category getProjectCategory() {
         return projectCategory;
+    }
+
+    public Drawable getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(Drawable avatar) {
+        this.avatar = avatar;
     }
 }

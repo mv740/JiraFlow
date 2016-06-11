@@ -1,24 +1,17 @@
 package ca.michalwozniak.jiraflow;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.cjj.MaterialRefreshLayout;
-import com.cjj.MaterialRefreshListener;
 import com.dexafree.materialList.card.Card;
-import com.dexafree.materialList.card.CardProvider;
-import com.dexafree.materialList.listeners.RecyclerItemClickListener;
-import com.dexafree.materialList.view.MaterialListView;
-import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -36,8 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import butterknife.BindView;
 import butterknife.ButterKnife;
+import ca.michalwozniak.jiraflow.adapter.CardViewAdapter;
 import ca.michalwozniak.jiraflow.helper.ImageIcon;
 import ca.michalwozniak.jiraflow.model.ImageType;
 import ca.michalwozniak.jiraflow.model.Project;
@@ -52,15 +45,17 @@ import rx.schedulers.Schedulers;
 
 public class HomeActivity extends AppCompatActivity {
 
-    @BindView(R.id.refresh) MaterialRefreshLayout materialRefreshLayout;
-    @BindView(R.id.progressBar) CircleProgressBar circleProgressBar;
-    @BindView(R.id.material_listview) MaterialListView mListView;
+    //@BindView(R.id.refresh) MaterialRefreshLayout materialRefreshLayout;
+    //@BindView(R.id.progressBar) CircleProgressBar circleProgressBar;
     private Drawer drawerResult = null;
     private List<Project> projectList = null;
     private Activity myActivity;
     private boolean firstCard = true;
     private List<Card> cards;
     private boolean emptyProjectList = false;
+
+    //testing
+    private RecyclerView rv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +76,7 @@ public class HomeActivity extends AppCompatActivity {
 
 
         //loading
-        circleProgressBar.setColorSchemeColors(ContextCompat.getColor(getApplicationContext(), R.color.atlassianNavy));
+        //circleProgressBar.setColorSchemeColors(ContextCompat.getColor(getApplicationContext(), R.color.atlassianNavy));
 
         String name = getIntent().getStringExtra("name");
         String email = getIntent().getStringExtra("email");
@@ -134,15 +129,24 @@ public class HomeActivity extends AppCompatActivity {
 
         drawerResult.getActionBarDrawerToggle().setDrawerIndicatorEnabled(true);
 
-        materialRefreshLayout.setMaterialRefreshListener(new MaterialRefreshListener() {
-            @Override
-            public void onRefresh(MaterialRefreshLayout materialRefreshLayout) {
-                getAllboards();
-            }
-        });
+//        materialRefreshLayout.setMaterialRefreshListener(new MaterialRefreshListener() {
+//            @Override
+//            public void onRefresh(MaterialRefreshLayout materialRefreshLayout) {
+//                getAllboards();
+//            }
+//        });
 
 
         getAllboards();
+
+        //testing
+        rv = (RecyclerView) findViewById(R.id.rv);
+        LinearLayoutManager llm = new LinearLayoutManager(this);
+        rv.setLayoutManager(llm);
+        rv.setHasFixedSize(true);
+//        List<Project> projectList = new ArrayList<>();
+//        projectList.add(new Project("name","key","id"));
+//        projectList.add(new Project("name1","key1","id1"));
 
 
     }
@@ -161,7 +165,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private void getAllboards() {
 
-        final List<Card> refreshedCardList = new ArrayList<>();
+        //final List<Card> refreshedCardList = new ArrayList<>();
         JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, "mv740", "Wozm__06");
 
         final DownloadResourceManager downloadResourceManager = new DownloadResourceManager(HomeActivity.this, "mv740", "Wozn__06");
@@ -181,170 +185,126 @@ public class HomeActivity extends AppCompatActivity {
 
                     @Override
                     public void onNext(List<Project> projects) {
-                        if (!projects.isEmpty()) {
-
-                            if(emptyProjectList)
-                            {
-                                mListView.getAdapter().getCard(0).setDismissible(true);
-                                mListView.getAdapter().clearAll();
-                                emptyProjectList = false;
-                            }
-
-                            for (final Project project : projects) {
 
 
-                                OkHttpClient httpClient = new OkHttpClient();
-                                okhttp3.Request request = new okhttp3.Request.Builder().url(project.getAvatarUrls().getExtraSmall()).build();
-
-
-                                final Card.Builder cardB = new Card.Builder(HomeActivity.this)
-                                        .setTag("project")
-                                        .withProvider(new CardProvider())
-                                        .setLayout(R.layout.material_project_card)
-                                        .setTitle(project.getName())
-                                        .setTitleColor(Color.BLACK)
-                                        .setSubtitle(project.getProjectTypeKey())
-                                        .setSubtitleColor(Color.DKGRAY).endConfig();
-
-                                // cards.add(cardB.build());
-                                refreshedCardList.add(cardB.build());
-
-                                okhttp3.Call call1 = httpClient.newCall(request);
-                                call1.enqueue(new okhttp3.Callback() {
-                                    @Override
-                                    public void onFailure(okhttp3.Call call, IOException e) {
-
-                                    }
-
-                                    @Override
-                                    public void onResponse(final okhttp3.Call call, okhttp3.Response response) throws IOException {
-
-                                        //// TODO: 4/22/2016 do each condition for each imageType
-                                        if (ResourceManager.getImageType(response.headers().get("Content-Type")) == ImageType.SVG) {
-
-
-                                            if (!alreadyExist(cardB.build().getProvider().getTitle())) {
-                                                String destinationName = project.getKey() + ".svg";
-                                                String name = project.getAvatarUrls().getSmall();
-
-                                                ImageIcon imageIcon = new ImageIcon(destinationName, HomeActivity.this, cardB, mListView, cards, ImageType.SVG, firstCard, circleProgressBar);
-                                                downloadResourceManager.add(name, destinationName, imageIcon);
-                                            }
-
-                                        } else {
-                                            String url = myActivity.getFilesDir() + "/" + "museum_ex_1.png";
-                                            cardB.build().getProvider().setDrawable(url);
-                                        }
-                                        response.body().close();
-                                    }
-                                });
-                            }
-
-                            mListView.addOnItemTouchListener(new RecyclerItemClickListener.OnItemClickListener() {
-
-                                @Override
-                                public void onItemClick(final Card card, final int position) {
-                                    new Handler().postDelayed(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            Log.d("CARD_TYPE", card.getProvider().getTitle() + " - position :" + position);
-
-                                            Intent project = new Intent(HomeActivity.this,ProjectActivity.class);
-                                            project.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                                            project.putExtra("title",card.getProvider().getTitle());
-                                            startActivity(project);
-
-                                        }
-                                    }, 250);
-                                }
-
-                                @Override
-                                public void onItemLongClick(Card card, int position) {
-                                    Log.d("LONG_CLICK", card.getTag().toString());
-                                }
-                            });
-                            removeDeleteCards(refreshedCardList);
-                        }else
-                        {
-                            if(circleProgressBar.getVisibility() == View.VISIBLE)
-                            {
-                                circleProgressBar.setVisibility(View.GONE);
-                                materialRefreshLayout.finishRefresh();
-                            }
-                            else
-                            {
-                                materialRefreshLayout.finishRefresh();
-                            }
-                            if(!emptyProjectList)
-                            {
-                                generateEmptyProjectCard();
-                                emptyProjectList = true;
-                            }
-                        }
+//                        if (!projects.isEmpty()) {
+//
+//                            if(emptyProjectList)
+//                            {
+//                                mListView.getAdapter().getCard(0).setDismissible(true);
+//                                mListView.getAdapter().clearAll();
+//                                emptyProjectList = false;
+//
+//                            }
+                            generateProjectCards(projects,null, downloadResourceManager);
+//                        }else
+//                        {
+//                            if(circleProgressBar.getVisibility() == View.VISIBLE)
+//                            {
+//                                circleProgressBar.setVisibility(View.GONE);
+//                                materialRefreshLayout.finishRefresh();
+//                            }
+//                            else
+//                            {
+//                                materialRefreshLayout.finishRefresh();
+//                            }
+//                            if(!emptyProjectList)
+//                            {
+//                                generateEmptyProjectCard();
+//                                emptyProjectList = true;
+//                            }
+//                        }
                     }
-
                 });
 
-
     }
-
-    private void generateEmptyProjectCard() {
-        Card card = new Card.Builder(HomeActivity.this)
-                .setTag("empty")
-                .withProvider(new CardProvider())
-                .setLayout(R.layout.material_project_card)
-                .setTitle("No Available Projects")
-                .setTitleColor(Color.BLACK)
-                .setSubtitle("Please create a project")
-                .setSubtitleColor(Color.DKGRAY).endConfig().build();
-
-        mListView.getAdapter().add(card);
-    }
+    private void generateProjectCards(final List<Project> projects, List<Card> refreshedCardList, final DownloadResourceManager downloadResourceManager) {
+        for (final Project project : projects) {
 
 
-    private void removeDeleteCards(List<Card> refreshedCardList) {
+            OkHttpClient httpClient = new OkHttpClient();
+            okhttp3.Request request = new okhttp3.Request.Builder().url(project.getAvatarUrls().getExtraSmall()).build();
 
-        List<Card> tobeRemoved = new ArrayList<>();
 
-        //// TODO: 4/20/2016 need to make this better, also cn only delete last project in the list
-        for (Card card : cards) {
 
-            boolean exist = false;
-            for (Card card1 : refreshedCardList) {
 
-                if (card.getProvider().getTitle().equals(card1.getProvider().getTitle())) {
-                    exist = true;
+            // cards.add(cardB.build());
+
+
+            okhttp3.Call call1 = httpClient.newCall(request);
+            call1.enqueue(new okhttp3.Callback() {
+                @Override
+                public void onFailure(okhttp3.Call call, IOException e) {
+
                 }
-            }
-            if (!exist) {
-                int index = mListView.getAdapter().getItemCount();
-                Log.e("itemCount", String.valueOf(index));
 
-                int size = cards.size();
-                for (int i = 0; i < size; i++) {
-                    Log.e("index", String.valueOf(i));
-                    Card currentCard = mListView.getAdapter().getCard(i);
-                    if (currentCard != null) {
-                        if (currentCard.getProvider().getTitle().equals(card.getProvider().getTitle())) {
-                            currentCard.setDismissible(true);
-                            mListView.getAdapter().remove(currentCard, false);
-                            tobeRemoved.add(currentCard);
-                        }
+                @Override
+                public void onResponse(final okhttp3.Call call, okhttp3.Response response) throws IOException {
+
+                    //// TODO: 4/22/2016 do each condition for each imageType
+                    if (ResourceManager.getImageType(response.headers().get("Content-Type")) == ImageType.SVG) {
+                        String destinationName = project.getKey() + ".svg";
+                        String name = project.getAvatarUrls().getSmall();
+                        ImageIcon imageIcon = new ImageIcon(destinationName, HomeActivity.this, project, cards, ImageType.SVG, firstCard, null);
+                        downloadResourceManager.add(name, destinationName, imageIcon);
+//                        if (!alreadyExist(cardB.build().getProvider().getTitle())) {
+//                            String destinationName = project.getKey() + ".svg";
+//                            String name = project.getAvatarUrls().getSmall();
+//
+//                            ImageIcon imageIcon = new ImageIcon(destinationName, HomeActivity.this, cardB, mListView, cards, ImageType.SVG, firstCard, circleProgressBar);
+//                            downloadResourceManager.add(name, destinationName, imageIcon);
+//                        }
+
+                    } else {
+                        String url = myActivity.getFilesDir() + "/" + "museum_ex_1.png";
+                       // cardB.build().getProvider().setDrawable(url);
                     }
+                    response.body().close();
                 }
-
+            });
+        }
+        if(projects.get(0).getAvatar() == null)
+        {
+            Log.d("errr","WTF");
+        }
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // Do something after 5s = 5000ms
+                Log.d("how many", String.valueOf(projects.size()));
+                CardViewAdapter cardView = new CardViewAdapter(projects);
+                rv.setAdapter(cardView);
             }
-        }
-
-        for (Card card : tobeRemoved) {
-            cards.remove(card);
-        }
-
-        mListView.getAdapter().notifyDataSetChanged();
-        materialRefreshLayout.finishRefresh();
+        }, 5000);
 
 
+//        rv.addOnItemTouchListener(new RecyclerItemClickListener.OnItemClickListener() {
+//
+//            @Override
+//            public void onItemClick(final Card card, final int position) {
+//                new Handler().postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        Log.d("CARD_TYPE", card.getProvider().getTitle() + " - position :" + position);
+//
+//                        Intent project = new Intent(HomeActivity.this,ProjectActivity.class);
+//                        project.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+//                        project.putExtra("title",card.getProvider().getTitle());
+//                        startActivity(project);
+//
+//                    }
+//                }, 250);
+//            }
+//
+//            @Override
+//            public void onItemLongClick(Card card, int position) {
+//                Log.d("LONG_CLICK", card.getTag().toString());
+//            }
+//        });
+//        removeDeleteCards(refreshedCardList);
     }
+    
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {

@@ -80,6 +80,7 @@ public class DownloadResourceManager {
             Log.d(TAG, "complete : " + downloadRequest.getUri());
             ImageIcon imageIcon = downloadMap.get(downloadRequest.getDownloadId());
             imageIcon.draw();
+
             downloadMap.remove(downloadRequest.getDownloadId());
         }
 

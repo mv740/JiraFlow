@@ -33,7 +33,11 @@
         <!--app:wave_color="@color/md_grey_200"-->
         <!--app:progress_colors="@array/refreshColor"-->
         <!--app:wave_show="true">-->
-
+    <android.support.v4.widget.SwipeRefreshLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/swiperefresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <android.support.v7.widget.RecyclerView
             android:layout_height="match_parent"
@@ -42,6 +46,8 @@
             >
 
         </android.support.v7.widget.RecyclerView>
+    </android.support.v4.widget.SwipeRefreshLayout>
+
 
     <!--</com.cjj.MaterialRefreshLayout>-->
 

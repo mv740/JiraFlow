@@ -3,6 +3,7 @@ package ca.michalwozniak.jiraflow;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import ca.michalwozniak.jiraflow.adapter.CardViewAdapter;
 import ca.michalwozniak.jiraflow.helper.ImageIcon;
@@ -43,9 +45,10 @@ import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
-    //@BindView(R.id.refresh) MaterialRefreshLayout materialRefreshLayout;
+    @BindView(R.id.swiperefresh)
+    SwipeRefreshLayout swipeRefreshLayout;;
     //@BindView(R.id.progressBar) CircleProgressBar circleProgressBar;
     private Drawer drawerResult = null;
     private List<Project> projectList = null;
@@ -54,6 +57,9 @@ public class HomeActivity extends AppCompatActivity {
     private List<Card> cards;
     private boolean emptyProjectList = false;
 
+    //
+    private List<Project> projects;
+    CardViewAdapter cardView;
     //testing
     private RecyclerView rv;
 
@@ -137,18 +143,26 @@ public class HomeActivity extends AppCompatActivity {
 //        });
 
 
-        getAllboards();
 
         //testing
         rv = (RecyclerView) findViewById(R.id.rv);
         LinearLayoutManager llm = new LinearLayoutManager(this);
         rv.setLayoutManager(llm);
         rv.setHasFixedSize(true);
-//        List<Project> projectList = new ArrayList<>();
-//        projectList.add(new Project("name","key","id"));
-//        projectList.add(new Project("name1","key1","id1"));
 
+        projects = new ArrayList<>();
+        cardView = new CardViewAdapter(projects);
+        rv.setAdapter(cardView);
+        swipeRefreshLayout.setOnRefreshListener(this);
+        swipeRefreshLayout.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        swipeRefreshLayout.setRefreshing(true);
 
+                                        getAllboards();
+                                    }
+                                }
+        );
     }
 
 
@@ -263,20 +277,18 @@ public class HomeActivity extends AppCompatActivity {
                 }
             });
         }
-        if(projects.get(0).getAvatar() == null)
-        {
-            Log.d("errr","WTF");
-        }
+
+        updateCardList(projects);
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                // Do something after 5s = 5000ms
-                Log.d("how many", String.valueOf(projects.size()));
-                CardViewAdapter cardView = new CardViewAdapter(projects);
-                rv.setAdapter(cardView);
+
+                cardView.notifyDataSetChanged();
+                // stopping swipe refresh
+                swipeRefreshLayout.setRefreshing(false);
             }
-        }, 5000);
+        }, 1000);
 
 
 //        rv.addOnItemTouchListener(new RecyclerItemClickListener.OnItemClickListener() {
@@ -304,7 +316,7 @@ public class HomeActivity extends AppCompatActivity {
 //        });
 //        removeDeleteCards(refreshedCardList);
     }
-    
+
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -325,4 +337,48 @@ public class HomeActivity extends AppCompatActivity {
     public List<Project> getProjectList() {
         return projectList;
     }
+
+    @Override
+    public void onRefresh() {
+        getAllboards();
+    }
+
+    public void updateCardList(List<Project> projectList)
+    {
+        //remove deleted projects
+        for(Project oldProject : projects)
+        {
+            boolean stillExist = false;
+            for(Project currentProject : projectList)
+            {
+
+                if(Objects.equals(currentProject.getName(), oldProject.getName()))
+                {
+                    stillExist = true;
+                }
+            }
+            if(!stillExist)
+            {
+                projects.remove(oldProject);
+            }
+        }
+
+//        //add only new project
+        for(Project newProject : projectList)
+        {
+            boolean duplicate = false;
+            for(Project currentProject: projects)
+            {
+                if(Objects.equals(currentProject.getName(), newProject.getName()))
+                {
+                    duplicate = true;
+                }
+            }
+            if(!duplicate)
+            {
+                projects.add(newProject);
+            }
+        }
+    }
 }
+

@@ -2,6 +2,7 @@ package ca.michalwozniak.jiraflow.service;
 
 import java.util.List;
 
+import ca.michalwozniak.jiraflow.model.Feed.ActivityFeed;
 import ca.michalwozniak.jiraflow.model.Project;
 import retrofit2.http.GET;
 import rx.Observable;
@@ -20,5 +21,8 @@ public interface JiraSoftwareService {
 
     @GET("/rest/api/2/project/{projectIdOrKey}")
     Observable<Project> getProject();
+
+    @GET("/activity")
+    Observable<ActivityFeed> getActivityFeed();
 
 }

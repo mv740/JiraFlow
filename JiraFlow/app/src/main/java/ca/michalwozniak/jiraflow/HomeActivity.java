@@ -48,20 +48,11 @@ import rx.schedulers.Schedulers;
 public class HomeActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
     @BindView(R.id.swiperefresh)
-    SwipeRefreshLayout swipeRefreshLayout;;
-    //@BindView(R.id.progressBar) CircleProgressBar circleProgressBar;
+    SwipeRefreshLayout swipeRefreshLayout;
     private Drawer drawerResult = null;
-    private List<Project> projectList = null;
     private Activity myActivity;
-    private boolean firstCard = true;
-    private List<Card> cards;
-    private boolean emptyProjectList = false;
-
-    //
     private List<Project> projects;
-    CardViewAdapter cardView;
-    //testing
-    private RecyclerView rv;
+    private CardViewAdapter cardView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,10 +61,9 @@ public class HomeActivity extends AppCompatActivity implements SwipeRefreshLayou
         ButterKnife.bind(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         this.myActivity = getParent();
-        cards = new ArrayList<>();
 
-        if(toolbar!=null)
-        {
+
+        if (toolbar != null) {
             setSupportActionBar(toolbar);
             getSupportActionBar().setTitle("Projects");
             getSupportActionBar().setHomeButtonEnabled(true);
@@ -135,17 +125,7 @@ public class HomeActivity extends AppCompatActivity implements SwipeRefreshLayou
 
         drawerResult.getActionBarDrawerToggle().setDrawerIndicatorEnabled(true);
 
-//        materialRefreshLayout.setMaterialRefreshListener(new MaterialRefreshListener() {
-//            @Override
-//            public void onRefresh(MaterialRefreshLayout materialRefreshLayout) {
-//                getAllboards();
-//            }
-//        });
-
-
-
-        //testing
-        rv = (RecyclerView) findViewById(R.id.rv);
+        RecyclerView rv = (RecyclerView) findViewById(R.id.rv);
         LinearLayoutManager llm = new LinearLayoutManager(this);
         rv.setLayoutManager(llm);
         rv.setHasFixedSize(true);
@@ -166,20 +146,8 @@ public class HomeActivity extends AppCompatActivity implements SwipeRefreshLayou
     }
 
 
-    private boolean alreadyExist(String title) {
-
-        for (Card currentCard : cards) {
-            if (Objects.equals(title, currentCard.getProvider().getTitle())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
     private void getAllboards() {
 
-        //final List<Card> refreshedCardList = new ArrayList<>();
         JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, "mv740", "Wozm__06");
 
         final DownloadResourceManager downloadResourceManager = new DownloadResourceManager(HomeActivity.this, "mv740", "Wozn__06");
@@ -200,50 +168,18 @@ public class HomeActivity extends AppCompatActivity implements SwipeRefreshLayou
                     @Override
                     public void onNext(List<Project> projects) {
 
-
-//                        if (!projects.isEmpty()) {
-//
-//                            if(emptyProjectList)
-//                            {
-//                                mListView.getAdapter().getCard(0).setDismissible(true);
-//                                mListView.getAdapter().clearAll();
-//                                emptyProjectList = false;
-//
-//                            }
-                            generateProjectCards(projects,null, downloadResourceManager);
-//                        }else
-//                        {
-//                            if(circleProgressBar.getVisibility() == View.VISIBLE)
-//                            {
-//                                circleProgressBar.setVisibility(View.GONE);
-//                                materialRefreshLayout.finishRefresh();
-//                            }
-//                            else
-//                            {
-//                                materialRefreshLayout.finishRefresh();
-//                            }
-//                            if(!emptyProjectList)
-//                            {
-//                                generateEmptyProjectCard();
-//                                emptyProjectList = true;
-//                            }
-//                        }
+                        generateProjectCards(projects, null, downloadResourceManager);
                     }
                 });
 
     }
+
     private void generateProjectCards(final List<Project> projects, List<Card> refreshedCardList, final DownloadResourceManager downloadResourceManager) {
         for (final Project project : projects) {
 
 
             OkHttpClient httpClient = new OkHttpClient();
             okhttp3.Request request = new okhttp3.Request.Builder().url(project.getAvatarUrls().getExtraSmall()).build();
-
-
-
-
-            // cards.add(cardB.build());
-
 
             okhttp3.Call call1 = httpClient.newCall(request);
             call1.enqueue(new okhttp3.Callback() {
@@ -259,19 +195,12 @@ public class HomeActivity extends AppCompatActivity implements SwipeRefreshLayou
                     if (ResourceManager.getImageType(response.headers().get("Content-Type")) == ImageType.SVG) {
                         String destinationName = project.getKey() + ".svg";
                         String name = project.getAvatarUrls().getSmall();
-                        ImageIcon imageIcon = new ImageIcon(destinationName, HomeActivity.this, project, cards, ImageType.SVG, firstCard, null);
+                        ImageIcon imageIcon = new ImageIcon(destinationName, HomeActivity.this, project, ImageType.SVG);
                         downloadResourceManager.add(name, destinationName, imageIcon);
-//                        if (!alreadyExist(cardB.build().getProvider().getTitle())) {
-//                            String destinationName = project.getKey() + ".svg";
-//                            String name = project.getAvatarUrls().getSmall();
-//
-//                            ImageIcon imageIcon = new ImageIcon(destinationName, HomeActivity.this, cardB, mListView, cards, ImageType.SVG, firstCard, circleProgressBar);
-//                            downloadResourceManager.add(name, destinationName, imageIcon);
-//                        }
+
 
                     } else {
                         String url = myActivity.getFilesDir() + "/" + "museum_ex_1.png";
-                       // cardB.build().getProvider().setDrawable(url);
                     }
                     response.body().close();
                 }
@@ -289,32 +218,6 @@ public class HomeActivity extends AppCompatActivity implements SwipeRefreshLayou
                 swipeRefreshLayout.setRefreshing(false);
             }
         }, 1000);
-
-
-//        rv.addOnItemTouchListener(new RecyclerItemClickListener.OnItemClickListener() {
-//
-//            @Override
-//            public void onItemClick(final Card card, final int position) {
-//                new Handler().postDelayed(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        Log.d("CARD_TYPE", card.getProvider().getTitle() + " - position :" + position);
-//
-//                        Intent project = new Intent(HomeActivity.this,ProjectActivity.class);
-//                        project.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-//                        project.putExtra("title",card.getProvider().getTitle());
-//                        startActivity(project);
-//
-//                    }
-//                }, 250);
-//            }
-//
-//            @Override
-//            public void onItemLongClick(Card card, int position) {
-//                Log.d("LONG_CLICK", card.getTag().toString());
-//            }
-//        });
-//        removeDeleteCards(refreshedCardList);
     }
 
 
@@ -334,48 +237,35 @@ public class HomeActivity extends AppCompatActivity implements SwipeRefreshLayou
         }
     }
 
-    public List<Project> getProjectList() {
-        return projectList;
-    }
-
     @Override
     public void onRefresh() {
         getAllboards();
     }
 
-    public void updateCardList(List<Project> projectList)
-    {
+    public void updateCardList(List<Project> projectList) {
         //remove deleted projects
-        for(Project oldProject : projects)
-        {
+        for (Project oldProject : projects) {
             boolean stillExist = false;
-            for(Project currentProject : projectList)
-            {
+            for (Project currentProject : projectList) {
 
-                if(Objects.equals(currentProject.getName(), oldProject.getName()))
-                {
+                if (Objects.equals(currentProject.getName(), oldProject.getName())) {
                     stillExist = true;
                 }
             }
-            if(!stillExist)
-            {
+            if (!stillExist) {
                 projects.remove(oldProject);
             }
         }
 
 //        //add only new project
-        for(Project newProject : projectList)
-        {
+        for (Project newProject : projectList) {
             boolean duplicate = false;
-            for(Project currentProject: projects)
-            {
-                if(Objects.equals(currentProject.getName(), newProject.getName()))
-                {
+            for (Project currentProject : projects) {
+                if (Objects.equals(currentProject.getName(), newProject.getName())) {
                     duplicate = true;
                 }
             }
-            if(!duplicate)
-            {
+            if (!duplicate) {
                 projects.add(newProject);
             }
         }

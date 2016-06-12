@@ -10,9 +10,7 @@ import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import ca.michalwozniak.jiraflow.model.Feed.ActivityFeed;
 import ca.michalwozniak.jiraflow.model.User;
-import ca.michalwozniak.jiraflow.service.JiraSoftwareService;
 import ca.michalwozniak.jiraflow.service.LoginService;
 import ca.michalwozniak.jiraflow.service.ServiceGenerator;
 import rx.Subscriber;
@@ -47,30 +45,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void testFeed() {
-
-        JiraSoftwareService jiraSoftwareService = ServiceGenerator.createServiceXML(JiraSoftwareService.class, "mv740", "Wozm__06");
-        jiraSoftwareService.getActivityFeed()
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<ActivityFeed>() {
-                    @Override
-                    public void onCompleted() {
-                        //do nothing
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e("mainActivty", e.getMessage());
-                    }
-
-                    @Override
-                    public void onNext(ActivityFeed feed) {
-                        Log.d("hello", feed.getEntry().get(0).getAuthor().getName());
-
-                    }
-                });
-    }
 
     private void connectJira(String username, String password) {
 
@@ -93,7 +67,8 @@ public class MainActivity extends AppCompatActivity {
                     public void onNext(User user) {
                         if (user != null) {
 
-                            Intent startHome = new Intent(MainActivity.this, HomeActivity.class);
+                            //Intent startHome = new Intent(MainActivity.this, HomeActivity.class);
+                           Intent startHome = new Intent(MainActivity.this, DashboardActivity.class);
                             startHome.putExtra("name", user.getName());
                             startHome.putExtra("email", user.getEmailAddress());
                             startActivity(startHome);

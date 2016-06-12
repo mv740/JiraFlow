@@ -19,8 +19,10 @@ import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
 
-    @BindView(R.id.input_username) EditText _username;
-    @BindView(R.id.input_password) EditText _password;
+    @BindView(R.id.input_username)
+    EditText _username;
+    @BindView(R.id.input_password)
+    EditText _password;
 
     @OnClick(R.id.button)
     void logIn() {
@@ -68,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
                         if (user != null) {
 
                             //Intent startHome = new Intent(MainActivity.this, HomeActivity.class);
-                           Intent startHome = new Intent(MainActivity.this, DashboardActivity.class);
+                            Intent startHome = new Intent(MainActivity.this, DashboardActivity.class);
                             startHome.putExtra("name", user.getName());
                             startHome.putExtra("email", user.getEmailAddress());
                             startActivity(startHome);

@@ -1,5 +1,7 @@
 package ca.michalwozniak.jiraflow.model.Feed;
 
+import android.graphics.drawable.Drawable;
+
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
 
@@ -34,6 +36,8 @@ public class Entry {
     private ObjectXML object;
     @Element(name = "timezone-offset")
     private String timezone;
+
+    private Drawable avatar;
 
     public String getId() {
         return id;
@@ -81,5 +85,13 @@ public class Entry {
 
     public String getTimezone() {
         return timezone;
+    }
+
+    public void setAvatar(Drawable avatar) {
+        this.avatar = avatar;
+    }
+
+    public Drawable getAvatar() {
+        return avatar;
     }
 }

@@ -12,18 +12,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.dexafree.materialList.card.Card;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import ca.michalwozniak.jiraflow.R;
-import ca.michalwozniak.jiraflow.adapter.CardViewAdapter;
+import ca.michalwozniak.jiraflow.adapter.CardViewMessageAdapter;
 import ca.michalwozniak.jiraflow.helper.ImageIcon;
+import ca.michalwozniak.jiraflow.model.Feed.ActivityFeed;
+import ca.michalwozniak.jiraflow.model.Feed.Entry;
 import ca.michalwozniak.jiraflow.model.ImageType;
-import ca.michalwozniak.jiraflow.model.Project;
 import ca.michalwozniak.jiraflow.service.JiraSoftwareService;
 import ca.michalwozniak.jiraflow.service.ServiceGenerator;
 import ca.michalwozniak.jiraflow.utility.DownloadResourceManager;
@@ -39,8 +38,8 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private Activity myActivity;
-    private List<Project> projects;
-    private CardViewAdapter cardView;
+    private List<Entry> messages;
+    private CardViewMessageAdapter cardView;
 
     public StreamFragment() {
         // Required empty public constructor
@@ -63,8 +62,8 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
         rv.setLayoutManager(llm);
         rv.setHasFixedSize(true);
 
-        projects = new ArrayList<>();
-        cardView = new CardViewAdapter(projects);
+        messages = new ArrayList<>();
+        cardView = new CardViewMessageAdapter(messages);
         rv.setAdapter(cardView);
         swipeRefreshLayout.setOnRefreshListener(this);
         swipeRefreshLayout.post(new Runnable() {
@@ -72,7 +71,7 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
                                     public void run() {
                                         swipeRefreshLayout.setRefreshing(true);
 
-                                        getAllboards();
+                                        getActivityStream();
                                     }
                                 }
         );
@@ -83,18 +82,18 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     @Override
     public void onRefresh() {
-        getAllboards();
+        getActivityStream();
     }
 
-    private void getAllboards() {
+    private void getActivityStream() {
 
-        JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, "mv740", "Wozm__06");
+        JiraSoftwareService jiraService = ServiceGenerator.createServiceXML(JiraSoftwareService.class, "mv740", "Wozm__06");
 
         final DownloadResourceManager downloadResourceManager = new DownloadResourceManager(super.getActivity(), "mv740", "Wozn__06");
-        jiraService.getAllProjects()
+        jiraService.getActivityFeed()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<List<Project>>() {
+                .subscribe(new Subscriber<ActivityFeed>() {
                     @Override
                     public void onCompleted() {
                         //do nothing
@@ -106,19 +105,20 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
                     }
 
                     @Override
-                    public void onNext(List<Project> projects) {
+                    public void onNext(ActivityFeed feed) {
 
-                        generateProjectCards(projects, null, downloadResourceManager);
+                        generateMessageFeedCards(feed.getEntry(), downloadResourceManager);
                     }
                 });
 
     }
-    private void generateProjectCards(final List<Project> projects, List<Card> refreshedCardList, final DownloadResourceManager downloadResourceManager) {
-        for (final Project project : projects) {
+
+    private void generateMessageFeedCards(final List<Entry> activityFeed, final DownloadResourceManager downloadResourceManager) {
+        for (final Entry entry : activityFeed) {
 
 
             OkHttpClient httpClient = new OkHttpClient();
-            okhttp3.Request request = new okhttp3.Request.Builder().url(project.getAvatarUrls().getExtraSmall()).build();
+            okhttp3.Request request = new okhttp3.Request.Builder().url(entry.getAuthor().getLink().get(0).getHref()).build();
 
             okhttp3.Call call1 = httpClient.newCall(request);
             call1.enqueue(new okhttp3.Callback() {
@@ -132,9 +132,9 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
                     //// TODO: 4/22/2016 do each condition for each imageType
                     if (ResourceManager.getImageType(response.headers().get("Content-Type")) == ImageType.SVG) {
-                        String destinationName = project.getKey() + ".svg";
-                        String name = project.getAvatarUrls().getSmall();
-                        ImageIcon imageIcon = new ImageIcon(destinationName,myActivity , project, ImageType.SVG);
+                        String destinationName = entry.getAuthor().getName() + ".svg";
+                        String name = entry.getAuthor().getLink().get(0).getHref();
+                        ImageIcon imageIcon = new ImageIcon(destinationName, myActivity, entry, ImageType.SVG);
                         downloadResourceManager.add(name, destinationName, imageIcon);
 
 
@@ -146,7 +146,7 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
             });
         }
 
-        updateCardList(projects);
+        updateCardList(activityFeed);
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
@@ -159,32 +159,37 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
         }, 1000);
     }
 
-    public void updateCardList(List<Project> projectList) {
+    public void updateCardList(List<Entry> activityFeed) {
         //remove deleted projects
-        for (Project oldProject : projects) {
+        for (Entry entry : messages) {
             boolean stillExist = false;
-            for (Project currentProject : projectList) {
+            for (Entry entryFeed : activityFeed) {
 
-                if (Objects.equals(currentProject.getName(), oldProject.getName())) {
+                if (Objects.equals(entryFeed.getPublished(), entry.getPublished())) {
                     stillExist = true;
                 }
             }
             if (!stillExist) {
-                projects.remove(oldProject);
+                messages.remove(entry);
             }
         }
 
         //add only new project
-        for (Project newProject : projectList) {
+        for (Entry newProject : activityFeed) {
             boolean duplicate = false;
-            for (Project currentProject : projects) {
-                if (Objects.equals(currentProject.getName(), newProject.getName())) {
+            for (Entry currentProject : messages) {
+                if (Objects.equals(currentProject.getPublished(), newProject.getPublished())) {
                     duplicate = true;
                 }
             }
             if (!duplicate) {
-                projects.add(newProject);
+                messages.add(newProject);
             }
+        }
+
+        for(Entry test : messages)
+        {
+            Log.d("test",test.getAuthor().getName());
         }
     }
 }

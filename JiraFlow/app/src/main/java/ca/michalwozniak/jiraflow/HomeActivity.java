@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.dexafree.materialList.card.Card;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -164,13 +163,13 @@ public class HomeActivity extends AppCompatActivity implements SwipeRefreshLayou
                     @Override
                     public void onNext(List<Project> projects) {
 
-                        generateProjectCards(projects, null, downloadResourceManager);
+                        generateProjectCards(projects, downloadResourceManager);
                     }
                 });
 
     }
 
-    private void generateProjectCards(final List<Project> projects, List<Card> refreshedCardList, final DownloadResourceManager downloadResourceManager) {
+    private void generateProjectCards(final List<Project> projects, final DownloadResourceManager downloadResourceManager) {
         for (final Project project : projects) {
 
 

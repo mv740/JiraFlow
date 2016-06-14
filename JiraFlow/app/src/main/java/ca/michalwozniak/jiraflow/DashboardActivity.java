@@ -24,6 +24,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ca.michalwozniak.jiraflow.adapter.ViewPagerAdapter;
 import ca.michalwozniak.jiraflow.fragment.AssignedIssuesFragment;
+import ca.michalwozniak.jiraflow.fragment.ProjectFragment;
 import ca.michalwozniak.jiraflow.fragment.StreamFragment;
 
 public class DashboardActivity extends AppCompatActivity {
@@ -111,7 +112,8 @@ public class DashboardActivity extends AppCompatActivity {
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new StreamFragment(), "Stream");
-        adapter.addFragment(new AssignedIssuesFragment(), "Assigned Issues");
+        adapter.addFragment(new AssignedIssuesFragment(), "My Issues");
+        adapter.addFragment(new ProjectFragment(), "Projects");
         viewPager.setAdapter(adapter);
     }
 

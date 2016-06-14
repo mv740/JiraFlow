@@ -40,7 +40,14 @@ public class ImageIcon {
         Drawable drawable;
         if (imageType == ImageType.SVG) {
             drawable = ResourceManager.getDrawableFromSVG(destinationName, context);
-            entry.setAvatar(drawable);
+            if(entry != null)
+            {
+                entry.setAvatar(drawable);
+            }
+            if(project != null)
+            {
+                project.setAvatar(drawable);
+            }
         }else if(imageType == ImageType.PNG)
         {
             //// TODO: 4/24/2016

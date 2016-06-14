@@ -2,10 +2,12 @@ package ca.michalwozniak.jiraflow;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.widget.EditText;
 import android.widget.Toast;
+
+import com.maksim88.passwordedittext.PasswordEditText;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -20,12 +22,12 @@ import rx.schedulers.Schedulers;
 public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.input_username)
-    EditText _username;
+    TextInputEditText _username;
     @BindView(R.id.input_password)
-    EditText _password;
+    PasswordEditText _password;
 
     @OnClick(R.id.button)
-    void logIn() {
+    public void logIn() {
         String user = _username.getText().toString();
         String pass = _password.getText().toString();
 
@@ -69,7 +71,6 @@ public class MainActivity extends AppCompatActivity {
                     public void onNext(User user) {
                         if (user != null) {
 
-                            //Intent startHome = new Intent(MainActivity.this, HomeActivity.class);
                             Intent startHome = new Intent(MainActivity.this, DashboardActivity.class);
                             startHome.putExtra("name", user.getName());
                             startHome.putExtra("email", user.getEmailAddress());

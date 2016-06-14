@@ -17,6 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import ca.michalwozniak.jiraflow.R;
 import ca.michalwozniak.jiraflow.adapter.CardViewMessageAdapter;
 import ca.michalwozniak.jiraflow.helper.ImageIcon;
@@ -36,10 +39,12 @@ import rx.schedulers.Schedulers;
 public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
 
-    private SwipeRefreshLayout swipeRefreshLayout;
+    @BindView(R.id.swiperefresh)
+    SwipeRefreshLayout swipeRefreshLayout;
     private Activity myActivity;
     private List<Entry> messages;
     private CardViewMessageAdapter cardView;
+    private Unbinder unbinder;
 
     public StreamFragment() {
         // Required empty public constructor
@@ -55,7 +60,7 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_stream, container, false);
-        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swiperefresh);
+        unbinder = ButterKnife.bind(this,view);
 
         RecyclerView rv = (RecyclerView) view.findViewById(R.id.rv);
         LinearLayoutManager llm = new LinearLayoutManager(super.getActivity());
@@ -78,6 +83,10 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
         myActivity = super.getActivity();
         return view;
+    }
+    @Override public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
     @Override

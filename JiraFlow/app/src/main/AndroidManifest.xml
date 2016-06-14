@@ -20,10 +20,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".HomeActivity"
-            android:label="@string/title_activity_home"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
             android:name=".ProjectActivity"
             android:label="@string/title_activity_project"
             android:theme="@style/AppTheme.NoActionBar" />

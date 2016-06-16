@@ -36,11 +36,13 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 
-public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
 
 
     @BindView(R.id.swiperefresh)
     SwipeRefreshLayout swipeRefreshLayout;
+    @BindView(R.id.rv)
+    RecyclerView rv;
     private Activity myActivity;
     private List<Entry> messages;
     private CardViewMessageAdapter cardView;
@@ -59,10 +61,9 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view =  inflater.inflate(R.layout.fragment_stream, container, false);
-        unbinder = ButterKnife.bind(this,view);
+        View view = inflater.inflate(R.layout.fragment_stream, container, false);
+        unbinder = ButterKnife.bind(this, view);
 
-        RecyclerView rv = (RecyclerView) view.findViewById(R.id.rv);
         LinearLayoutManager llm = new LinearLayoutManager(super.getActivity());
         rv.setLayoutManager(llm);
         rv.setHasFixedSize(true);
@@ -75,7 +76,6 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
                                     @Override
                                     public void run() {
                                         swipeRefreshLayout.setRefreshing(true);
-
                                         getActivityStream();
                                     }
                                 }
@@ -84,7 +84,9 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
         myActivity = super.getActivity();
         return view;
     }
-    @Override public void onDestroyView() {
+
+    @Override
+    public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
     }
@@ -163,7 +165,10 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
                 cardView.notifyDataSetChanged();
                 // stopping swipe refresh
-                swipeRefreshLayout.setRefreshing(false);
+                if (swipeRefreshLayout != null) {
+                    if (swipeRefreshLayout.isRefreshing())
+                        swipeRefreshLayout.setRefreshing(false);
+                }
             }
         }, 1000);
     }
@@ -196,9 +201,8 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
             }
         }
 
-        for(Entry test : messages)
-        {
-            Log.d("test",test.getAuthor().getName());
+        for (Entry test : messages) {
+            Log.d("test", test.getAuthor().getName());
         }
     }
 }

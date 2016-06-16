@@ -40,7 +40,8 @@ public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     @BindView(R.id.swiperefresh)
     SwipeRefreshLayout swipeRefreshLayout;
-    @BindView(R.id.rv) RecyclerView rv;
+    @BindView(R.id.rv)
+    RecyclerView rv;
     private Activity myActivity;
     private List<Project> projects;
     private CardViewAdapter cardView;
@@ -59,8 +60,8 @@ public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRe
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view =  inflater.inflate(R.layout.fragment_stream, container, false);
-        unbinder = ButterKnife.bind(this,view);
+        View view = inflater.inflate(R.layout.fragment_stream, container, false);
+        unbinder = ButterKnife.bind(this, view);
 
         LinearLayoutManager llm = new LinearLayoutManager(super.getActivity());
         rv.setLayoutManager(llm);
@@ -83,7 +84,8 @@ public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRe
         return view;
     }
 
-    @Override public void onDestroyView() {
+    @Override
+    public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
     }
@@ -162,7 +164,10 @@ public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
                 cardView.notifyDataSetChanged();
                 // stopping swipe refresh
-                swipeRefreshLayout.setRefreshing(false);
+                if (swipeRefreshLayout != null) {
+                    if (swipeRefreshLayout.isRefreshing())
+                        swipeRefreshLayout.setRefreshing(false);
+                }
             }
         }, 1000);
     }

@@ -8,11 +8,11 @@ import android.content.SharedPreferences;
  */
 public class PreferenceManager {
 
-    public static final String USER_PREFERENCE = "userPreference";
-    public static final String NOT_FOUND = "notFound";
-    public static final String PASSWORD = "password";
-    public static final String USERNAME = "username";
-    private PreferenceManager instance = null;
+    private static final String USER_PREFERENCE = "userPreference";
+    private static final String NOT_FOUND = "notFound";
+    private static final String PASSWORD = "password";
+    private static final String USERNAME = "username";
+    private static PreferenceManager instance = null;
     private Context context;
 
     private PreferenceManager(Context context)
@@ -20,9 +20,9 @@ public class PreferenceManager {
         this.context = context;
     }
 
-    public PreferenceManager getInstance(Context context)
+    public static PreferenceManager getInstance(Context context)
     {
-        if(instance !=null)
+        if(instance ==null)
         {
             instance = new PreferenceManager(context);
         }

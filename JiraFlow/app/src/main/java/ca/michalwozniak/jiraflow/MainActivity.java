@@ -15,6 +15,7 @@ import butterknife.OnClick;
 import ca.michalwozniak.jiraflow.model.User;
 import ca.michalwozniak.jiraflow.service.LoginService;
 import ca.michalwozniak.jiraflow.service.ServiceGenerator;
+import ca.michalwozniak.jiraflow.utility.PreferenceManager;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -50,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void connectJira(String username, String password) {
+    private void connectJira(final String username, final String password) {
 
         LoginService loginService = ServiceGenerator.createService(LoginService.class, username, password);
         loginService.basicLogin()
@@ -64,22 +65,32 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(Throwable e) {
+
                         Log.e("mainActivty", e.getMessage());
+                        if (e.getMessage().contains("403")) {
+                            Log.e("mainActivty", "Authentication fail : wrong password");
+                            _password.setError("Wrong password");
+                            Toast.makeText(MainActivity.this, "Wrong password", Toast.LENGTH_LONG).show();
+                        }
+                        if(e.getMessage().contains("401"))
+                        {
+                            Log.e("mainActivty", "Authentication Failed");
+                            Toast.makeText(MainActivity.this, "Authentication Failed", Toast.LENGTH_LONG).show();
+                        }
+
                     }
 
                     @Override
                     public void onNext(User user) {
-                        if (user != null) {
 
-                            Intent startHome = new Intent(MainActivity.this, DashboardActivity.class);
-                            startHome.putExtra("name", user.getName());
-                            startHome.putExtra("email", user.getEmailAddress());
-                            startActivity(startHome);
+                        PreferenceManager pm = PreferenceManager.getInstance(MainActivity.this);
+                        pm.saveUsername(username);
+                        pm.savePassword(password);
 
-                        } else {
-                            _password.setError("Wrong password");
-                            Log.e("failure", "failedLog");
-                        }
+                        Intent startHome = new Intent(MainActivity.this, DashboardActivity.class);
+                        startHome.putExtra("name", user.getName());
+                        startHome.putExtra("email", user.getEmailAddress());
+                        startActivity(startHome);
                     }
                 });
 

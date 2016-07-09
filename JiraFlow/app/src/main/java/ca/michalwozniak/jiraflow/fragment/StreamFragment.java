@@ -29,6 +29,7 @@ import ca.michalwozniak.jiraflow.model.ImageType;
 import ca.michalwozniak.jiraflow.service.JiraSoftwareService;
 import ca.michalwozniak.jiraflow.service.ServiceGenerator;
 import ca.michalwozniak.jiraflow.utility.DownloadResourceManager;
+import ca.michalwozniak.jiraflow.utility.PreferenceManager;
 import ca.michalwozniak.jiraflow.utility.ResourceManager;
 import okhttp3.OkHttpClient;
 import rx.Subscriber;
@@ -47,6 +48,7 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
     private List<Entry> messages;
     private CardViewMessageAdapter cardView;
     private Unbinder unbinder;
+    private PreferenceManager preferenceManager;
 
     public StreamFragment() {
         // Required empty public constructor
@@ -63,6 +65,7 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_stream, container, false);
         unbinder = ButterKnife.bind(this, view);
+        preferenceManager = PreferenceManager.getInstance(myActivity);
 
         LinearLayoutManager llm = new LinearLayoutManager(super.getActivity());
         rv.setLayoutManager(llm);
@@ -98,9 +101,9 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     private void getActivityStream() {
 
-        JiraSoftwareService jiraService = ServiceGenerator.createServiceXML(JiraSoftwareService.class, "mv740", "Wozm__06");
+        JiraSoftwareService jiraService = ServiceGenerator.createServiceXML(JiraSoftwareService.class, preferenceManager.getUsername(), preferenceManager.getPassword());
 
-        final DownloadResourceManager downloadResourceManager = new DownloadResourceManager(super.getActivity(), "mv740", "Wozn__06");
+        final DownloadResourceManager downloadResourceManager = new DownloadResourceManager(super.getActivity());
         jiraService.getActivityFeed()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())

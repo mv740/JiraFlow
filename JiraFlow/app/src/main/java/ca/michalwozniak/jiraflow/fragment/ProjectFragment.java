@@ -28,6 +28,7 @@ import ca.michalwozniak.jiraflow.model.Project;
 import ca.michalwozniak.jiraflow.service.JiraSoftwareService;
 import ca.michalwozniak.jiraflow.service.ServiceGenerator;
 import ca.michalwozniak.jiraflow.utility.DownloadResourceManager;
+import ca.michalwozniak.jiraflow.utility.PreferenceManager;
 import ca.michalwozniak.jiraflow.utility.ResourceManager;
 import okhttp3.OkHttpClient;
 import rx.Subscriber;
@@ -46,6 +47,7 @@ public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRe
     private List<Project> projects;
     private CardViewAdapter cardView;
     private Unbinder unbinder;
+    private PreferenceManager preferenceManager;
 
     public ProjectFragment() {
         // Required empty public constructor
@@ -62,6 +64,8 @@ public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRe
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_stream, container, false);
         unbinder = ButterKnife.bind(this, view);
+        this.preferenceManager = PreferenceManager.getInstance(myActivity);
+
 
         LinearLayoutManager llm = new LinearLayoutManager(super.getActivity());
         rv.setLayoutManager(llm);
@@ -97,9 +101,9 @@ public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     private void getProjects() {
 
-        JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, "mv740", "Wozm__06");
+        JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, preferenceManager.getUsername(), preferenceManager.getPassword());
 
-        final DownloadResourceManager downloadResourceManager = new DownloadResourceManager(myActivity, "mv740", "Wozn__06");
+        final DownloadResourceManager downloadResourceManager = new DownloadResourceManager(myActivity);
         jiraService.getAllProjects()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())

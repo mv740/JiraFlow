@@ -23,8 +23,8 @@ public class DownloadResourceManager {
     private ThinDownloadManager thinDownloadManager;
     private Activity activity;
     private static final String TAG = "DOWNLOAD_MANAGER";
-    private String username;
-    private String password;
+    private String _username;
+    private String _password;
     private boolean basicAuthentication = false;
     Map<Integer,ImageIcon> downloadMap;
     private ImageIcon imageIcon;
@@ -32,14 +32,10 @@ public class DownloadResourceManager {
 
     public DownloadResourceManager(Activity activity) {
         this.thinDownloadManager = new ThinDownloadManager();
+        PreferenceManager preferenceManager = PreferenceManager.getInstance(activity);
+        this._username = preferenceManager.getUsername();
+        this._password = preferenceManager.getPassword();
         this.activity = activity;
-    }
-
-    public DownloadResourceManager(Activity activity, String username, String password) {
-        this.thinDownloadManager = new ThinDownloadManager();
-        this.activity = activity;
-        this.username = username;
-        this.password = password;
         this.basicAuthentication = true;
         this.downloadMap = new HashMap<>();
     }
@@ -53,7 +49,7 @@ public class DownloadResourceManager {
             DownloadRequest downloadRequest = new DownloadRequest(downloadUri);
 
             if (basicAuthentication) {
-                String credentials = "mv740" + ":" + "Wozm__06";
+                String credentials = _username + ":" + _password;
                 final String basic =
                         "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
                 downloadRequest.addCustomHeader("Authorization", basic);

@@ -1,5 +1,9 @@
 package ca.michalwozniak.jiraflow.adapter;
 
+/**
+ * Created by michal on 7/10/2016.
+ */
+
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -14,34 +18,28 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.GenericRequestBuilder;
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.model.GlideUrl;
-import com.bumptech.glide.load.model.LazyHeaders;
 import com.caverock.androidsvg.SVG;
 
 import java.io.InputStream;
 import java.util.List;
 
 import ca.michalwozniak.jiraflow.R;
-import ca.michalwozniak.jiraflow.model.Feed.Entry;
-import ca.michalwozniak.jiraflow.model.ImageType;
+import ca.michalwozniak.jiraflow.model.Issue.Issue;
 import ca.michalwozniak.jiraflow.utility.ResourceManager;
-import de.hdodenhof.circleimageview.CircleImageView;
 
-/**
- * Created by michal on 5/4/2016.
- */
-public class CardViewMessageAdapter extends RecyclerView.Adapter<CardViewMessageAdapter.ProjectViewHolder> {
+
+public class CardViewProjectIssueAdapter extends RecyclerView.Adapter<CardViewProjectIssueAdapter.ProjectViewHolder> {
 
 
     public static class ProjectViewHolder extends RecyclerView.ViewHolder{
 
         CardView cardView;
-        CircleImageView circleImageView;
+        ImageView circleImageView;
         TextView title;
         TextView subTitle;
         Context context;
@@ -49,8 +47,8 @@ public class CardViewMessageAdapter extends RecyclerView.Adapter<CardViewMessage
 
         public ProjectViewHolder(final View itemView) {
             super(itemView);
-            this.cardView = (CardView) itemView.findViewById(R.id.cardViewMessage);
-            this.circleImageView = (CircleImageView) itemView.findViewById(R.id.image);
+            this.cardView = (CardView) itemView.findViewById(R.id.cardViewIssue);
+            this.circleImageView = (ImageView) itemView.findViewById(R.id.image);
             this.title = (TextView) itemView.findViewById(R.id.title);
             this.subTitle = (TextView) itemView.findViewById(R.id.subtitle);
             this.context = itemView.getContext();
@@ -58,7 +56,7 @@ public class CardViewMessageAdapter extends RecyclerView.Adapter<CardViewMessage
             Drawable icon = ContextCompat.getDrawable(context, R.drawable.zzz_message);
             icon.setColorFilter(Color.GRAY, PorterDuff.Mode.SRC_ATOP);
 
-            //need to style using xml style 
+            //need to style using xml style
             title.setPadding(0,0,0,0);
             title.setTextSize(15);
             ImageButton button = (ImageButton) itemView.findViewById(R.id.buttonMessage);
@@ -75,18 +73,18 @@ public class CardViewMessageAdapter extends RecyclerView.Adapter<CardViewMessage
 
     }
 
-    List<Entry> messages;
+    List<Issue> issues;
 
-    public CardViewMessageAdapter(List<Entry> messages)
+    public CardViewProjectIssueAdapter(List<Issue> issues)
     {
-        this.messages = messages;
+        this.issues = issues;
     }
 
     @Override
     public ProjectViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         //create a new view
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_view_message,parent,false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_view_issue,parent,false);
 
         //set the view's size, margin , padding and layout parameters
         //...
@@ -96,40 +94,20 @@ public class CardViewMessageAdapter extends RecyclerView.Adapter<CardViewMessage
     @Override
     public void onBindViewHolder(ProjectViewHolder holder, int position) {
 
-        //Svg picture are not protected on jira : public
-        if (messages.get(position).getImageType() == ImageType.SVG) {
-            GenericRequestBuilder<Uri, InputStream, SVG, PictureDrawable> requestBuilder = ResourceManager.getGenericRequestBuilderForSVG(holder.context);
+        GenericRequestBuilder<Uri, InputStream, SVG, PictureDrawable> requestBuilder = ResourceManager.getGenericRequestBuilderForSVG(holder.context);
 
             requestBuilder
                     .diskCacheStrategy(DiskCacheStrategy.NONE)
-                    .load(Uri.parse(messages.get(position).getAuthor().getLink().get(0).getHref()))
+                    .load(Uri.parse(issues.get(position).getFields().getIssuetype().getIconUrl()))
                     .into(holder.circleImageView);
-        } else {
 
-
-            GlideUrl glideUrl = new GlideUrl(messages.get(position).getAuthor().getLink().get(0).getHref(), new LazyHeaders.Builder()
-                    .addHeader("Authorization", ResourceManager.getEncoredCredentialString(holder.context))
-                    .addHeader("Accept", "application/json")
-                    .build());
-
-            Glide
-                    .with(holder.context)
-                    .load(glideUrl)
-                    .placeholder(R.drawable.ic_check)
-                    .error(R.drawable.zzz_controller_xbox)
-                    .dontAnimate()
-                    .fitCenter()
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .into(holder.circleImageView);
-        }
-
-        holder.title.setText(messages.get(position).getAuthor().getName());
-        holder.subTitle.setText(messages.get(position).getObject().getTitle());
+        holder.title.setText(issues.get(position).getKey());
+        holder.subTitle.setText(issues.get(position).getFields().getSummary());
 
     }
 
     @Override
     public int getItemCount() {
-        return messages.size();
+        return issues.size();
     }
 }

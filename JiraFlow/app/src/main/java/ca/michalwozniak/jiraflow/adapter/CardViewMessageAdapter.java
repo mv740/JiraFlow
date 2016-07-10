@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.PictureDrawable;
+import android.net.Uri;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -14,10 +16,20 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.bumptech.glide.GenericRequestBuilder;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.model.GlideUrl;
+import com.bumptech.glide.load.model.LazyHeaders;
+import com.caverock.androidsvg.SVG;
+
+import java.io.InputStream;
 import java.util.List;
 
 import ca.michalwozniak.jiraflow.R;
 import ca.michalwozniak.jiraflow.model.Feed.Entry;
+import ca.michalwozniak.jiraflow.model.ImageType;
+import ca.michalwozniak.jiraflow.utility.ResourceManager;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
@@ -33,6 +45,7 @@ public class CardViewMessageAdapter extends RecyclerView.Adapter<CardViewMessage
         TextView title;
         TextView subTitle;
         Context context;
+
 
         public ProjectViewHolder(final View itemView) {
             super(itemView);
@@ -82,7 +95,34 @@ public class CardViewMessageAdapter extends RecyclerView.Adapter<CardViewMessage
 
     @Override
     public void onBindViewHolder(ProjectViewHolder holder, int position) {
-        holder.circleImageView.setImageDrawable(messages.get(position).getAvatar());
+
+        //Svg picture are not protected on jira : public
+        if (messages.get(position).getImageType() == ImageType.SVG) {
+            GenericRequestBuilder<Uri, InputStream, SVG, PictureDrawable> requestBuilder = ResourceManager.getGenericRequestBuilderForSVG(holder.context);
+
+            requestBuilder
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .load(Uri.parse(messages.get(position).getAuthor().getLink().get(0).getHref()))
+                    .into(holder.circleImageView);
+        } else {
+
+
+            GlideUrl glideUrl = new GlideUrl(messages.get(position).getAuthor().getLink().get(0).getHref(), new LazyHeaders.Builder()
+                    .addHeader("Authorization", ResourceManager.getEncoredCredentialString(holder.context))
+                    .addHeader("Accept", "application/json")
+                    .build());
+
+            Glide
+                    .with(holder.context)
+                    .load(glideUrl)
+                    .placeholder(R.drawable.ic_check)
+                    .error(R.drawable.zzz_controller_xbox)
+                    .dontAnimate()
+                    .fitCenter()
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(holder.circleImageView);
+        }
+
         holder.title.setText(messages.get(position).getAuthor().getName());
         holder.subTitle.setText(messages.get(position).getObject().getTitle());
 

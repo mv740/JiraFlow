@@ -22,12 +22,9 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import ca.michalwozniak.jiraflow.R;
 import ca.michalwozniak.jiraflow.adapter.CardViewAdapter;
-import ca.michalwozniak.jiraflow.helper.ImageIcon;
-import ca.michalwozniak.jiraflow.model.ImageType;
 import ca.michalwozniak.jiraflow.model.Project;
 import ca.michalwozniak.jiraflow.service.JiraSoftwareService;
 import ca.michalwozniak.jiraflow.service.ServiceGenerator;
-import ca.michalwozniak.jiraflow.utility.DownloadResourceManager;
 import ca.michalwozniak.jiraflow.utility.PreferenceManager;
 import ca.michalwozniak.jiraflow.utility.ResourceManager;
 import okhttp3.OkHttpClient;
@@ -103,7 +100,6 @@ public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
         JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, preferenceManager.getUsername(), preferenceManager.getPassword());
 
-        final DownloadResourceManager downloadResourceManager = new DownloadResourceManager(myActivity);
         jiraService.getAllProjects()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -121,13 +117,13 @@ public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRe
                     @Override
                     public void onNext(List<Project> projects) {
 
-                        generateProjectCards(projects, downloadResourceManager);
+                        generateProjectCards(projects);
                     }
                 });
 
     }
 
-    private void generateProjectCards(final List<Project> projects, final DownloadResourceManager downloadResourceManager) {
+    private void generateProjectCards(final List<Project> projects) {
         for (final Project project : projects) {
 
 
@@ -144,17 +140,7 @@ public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 @Override
                 public void onResponse(final okhttp3.Call call, okhttp3.Response response) throws IOException {
 
-                    //// TODO: 4/22/2016 do each condition for each imageType
-                    if (ResourceManager.getImageType(response.headers().get("Content-Type")) == ImageType.SVG) {
-                        String destinationName = project.getKey() + ".svg";
-                        String name = project.getAvatarUrls().getSmall();
-                        ImageIcon imageIcon = new ImageIcon(destinationName, myActivity, project, ImageType.SVG);
-                        downloadResourceManager.add(name, destinationName, imageIcon);
-
-
-                    } else {
-                        String url = myActivity.getFilesDir() + "/" + "museum_ex_1.png";
-                    }
+                    project.setImageType(ResourceManager.getImageType(response.headers().get("Content-type")));
                     response.body().close();
                 }
             });

@@ -22,13 +22,10 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import ca.michalwozniak.jiraflow.R;
 import ca.michalwozniak.jiraflow.adapter.CardViewMessageAdapter;
-import ca.michalwozniak.jiraflow.helper.ImageIcon;
 import ca.michalwozniak.jiraflow.model.Feed.ActivityFeed;
 import ca.michalwozniak.jiraflow.model.Feed.Entry;
-import ca.michalwozniak.jiraflow.model.ImageType;
 import ca.michalwozniak.jiraflow.service.JiraSoftwareService;
 import ca.michalwozniak.jiraflow.service.ServiceGenerator;
-import ca.michalwozniak.jiraflow.utility.DownloadResourceManager;
 import ca.michalwozniak.jiraflow.utility.PreferenceManager;
 import ca.michalwozniak.jiraflow.utility.ResourceManager;
 import okhttp3.OkHttpClient;
@@ -102,8 +99,7 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
     private void getActivityStream() {
 
         JiraSoftwareService jiraService = ServiceGenerator.createServiceXML(JiraSoftwareService.class, preferenceManager.getUsername(), preferenceManager.getPassword());
-
-        final DownloadResourceManager downloadResourceManager = new DownloadResourceManager(super.getActivity());
+        
         jiraService.getActivityFeed()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -121,13 +117,13 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
                     @Override
                     public void onNext(ActivityFeed feed) {
 
-                        generateMessageFeedCards(feed.getEntry(), downloadResourceManager);
+                        generateMessageFeedCards(feed.getEntry());
                     }
                 });
 
     }
 
-    private void generateMessageFeedCards(final List<Entry> activityFeed, final DownloadResourceManager downloadResourceManager) {
+    private void generateMessageFeedCards(final List<Entry> activityFeed) {
         for (final Entry entry : activityFeed) {
 
 
@@ -144,17 +140,7 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 @Override
                 public void onResponse(final okhttp3.Call call, okhttp3.Response response) throws IOException {
 
-                    //// TODO: 4/22/2016 do each condition for each imageType
-                    if (ResourceManager.getImageType(response.headers().get("Content-Type")) == ImageType.SVG) {
-                        String destinationName = entry.getAuthor().getName() + ".svg";
-                        String name = entry.getAuthor().getLink().get(0).getHref();
-                        ImageIcon imageIcon = new ImageIcon(destinationName, myActivity, entry, ImageType.SVG);
-                        downloadResourceManager.add(name, destinationName, imageIcon);
-
-
-                    } else {
-                        String url = myActivity.getFilesDir() + "/" + "museum_ex_1.png";
-                    }
+                    entry.setImageType(ResourceManager.getImageType(response.headers().get("Content-type")));
                     response.body().close();
                 }
             });

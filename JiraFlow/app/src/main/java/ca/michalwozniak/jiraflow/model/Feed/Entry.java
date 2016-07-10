@@ -7,6 +7,8 @@ import org.simpleframework.xml.ElementList;
 
 import java.util.List;
 
+import ca.michalwozniak.jiraflow.model.ImageType;
+
 /**
  * Created by micha on 6/11/2016.
  */
@@ -36,6 +38,7 @@ public class Entry {
     private ObjectXML object;
     @Element(name = "timezone-offset")
     private String timezone;
+    private ImageType imageType;
 
     private Drawable avatar;
 
@@ -93,5 +96,13 @@ public class Entry {
 
     public Drawable getAvatar() {
         return avatar;
+    }
+
+    public ImageType getImageType() {
+        return imageType;
+    }
+
+    public void setImageType(ImageType imageType) {
+        this.imageType = imageType;
     }
 }

@@ -22,6 +22,9 @@ public interface JiraSoftwareService {
     @GET("/rest/api/2/project/{projectIdOrKey}")
     Observable<Project> getProject();
 
+   // @GET("/rest/api/2/search?jql={project}")
+   // Observable<>
+
     @GET("/activity")
     Observable<ActivityFeed> getActivityFeed();
 

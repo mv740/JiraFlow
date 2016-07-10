@@ -5,5 +5,5 @@ package ca.michalwozniak.jiraflow.model;
  */
 public enum  ImageType {
 
-    SVG, PNG, JPEG;
+    SVG, PNG, JPEG, BIG, MEDIUM, SMALL, EXTRASMALL;
 }

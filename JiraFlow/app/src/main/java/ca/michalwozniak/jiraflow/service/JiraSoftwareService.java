@@ -3,8 +3,10 @@ package ca.michalwozniak.jiraflow.service;
 import java.util.List;
 
 import ca.michalwozniak.jiraflow.model.Feed.ActivityFeed;
+import ca.michalwozniak.jiraflow.model.Issue.ProjectIssues;
 import ca.michalwozniak.jiraflow.model.Project;
 import retrofit2.http.GET;
+import retrofit2.http.Query;
 import rx.Observable;
 
 /**
@@ -22,8 +24,9 @@ public interface JiraSoftwareService {
     @GET("/rest/api/2/project/{projectIdOrKey}")
     Observable<Project> getProject();
 
-   // @GET("/rest/api/2/search?jql={project}")
-   // Observable<>
+    //@GET("/rest/api/2/search?jql={project}")
+    @GET("/rest/api/2/search?jql")
+    Observable<ProjectIssues> getProjectIssues(@Query("project") String project);
 
     @GET("/activity")
     Observable<ActivityFeed> getActivityFeed();

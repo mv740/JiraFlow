@@ -12,7 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -21,13 +20,12 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import ca.michalwozniak.jiraflow.R;
-import ca.michalwozniak.jiraflow.adapter.CardViewAdapter;
-import ca.michalwozniak.jiraflow.model.Project;
+import ca.michalwozniak.jiraflow.adapter.CardViewProjectIssueAdapter;
+import ca.michalwozniak.jiraflow.model.Issue.Issue;
+import ca.michalwozniak.jiraflow.model.Issue.ProjectIssues;
 import ca.michalwozniak.jiraflow.service.JiraSoftwareService;
 import ca.michalwozniak.jiraflow.service.ServiceGenerator;
 import ca.michalwozniak.jiraflow.utility.PreferenceManager;
-import ca.michalwozniak.jiraflow.utility.ResourceManager;
-import okhttp3.OkHttpClient;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -40,8 +38,8 @@ public class One extends Fragment implements SwipeRefreshLayout.OnRefreshListene
     @BindView(R.id.rv)
     RecyclerView rv;
     private Activity myActivity;
-    private List<Project> projects;
-    private CardViewAdapter cardView;
+    private List<Issue> projectIssues;
+    private CardViewProjectIssueAdapter cardView;
     private Unbinder unbinder;
     private PreferenceManager preferenceManager;
 
@@ -67,15 +65,15 @@ public class One extends Fragment implements SwipeRefreshLayout.OnRefreshListene
         rv.setLayoutManager(llm);
         rv.setHasFixedSize(true);
 
-        projects = new ArrayList<>();
-        cardView = new CardViewAdapter(projects);
+        projectIssues = new ArrayList<>();
+        cardView = new CardViewProjectIssueAdapter(projectIssues);
         rv.setAdapter(cardView);
         swipeRefreshLayout.setOnRefreshListener(this);
         swipeRefreshLayout.post(new Runnable() {
                                     @Override
                                     public void run() {
                                         swipeRefreshLayout.setRefreshing(true);
-                                        getProjects();
+                                        getProjectsIssues();
                                     }
                                 }
         );
@@ -92,17 +90,17 @@ public class One extends Fragment implements SwipeRefreshLayout.OnRefreshListene
 
     @Override
     public void onRefresh() {
-        getProjects();
+        getProjectsIssues();
     }
 
-    private void getProjects() {
+    private void getProjectsIssues() {
 
         JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, preferenceManager.getUsername(), preferenceManager.getPassword());
 
-        jiraService.getAllProjects()
+        jiraService.getProjectIssues("test1")
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<List<Project>>() {
+                .subscribe(new Subscriber<ProjectIssues>() {
                     @Override
                     public void onCompleted() {
                         //do nothing
@@ -111,51 +109,52 @@ public class One extends Fragment implements SwipeRefreshLayout.OnRefreshListene
                     @Override
                     public void onError(Throwable e) {
                         Log.e("errorSubscriber", e.getMessage());
+
                     }
 
                     @Override
-                    public void onNext(List<Project> projects) {
+                    public void onNext(ProjectIssues projectIssues) {
 
-                        generateProjectCards(projects);
+                        generateIssueCards(projectIssues.getIssues());
                     }
                 });
 
     }
 
-    private void generateProjectCards(final List<Project> projects) {
-        for (final Project project : projects) {
+    private void generateIssueCards(final List<Issue> issues) {
+//        for (final Issue issue : issues) {
+//
+//
+//            Log.e("link",project.getAvatarUrls().getBig());
+//            //http://173.176.41.65:8000/secure/projectavatar?size=small&pid=10001
+//            OkHttpClient httpClient = new OkHttpClient();
+//
+//            String link = project.getAvatarUrls().getBig();
+//            if(ResourceManager.isSVG(link))
+//            {
+//                link = ResourceManager.fixImageUrl(project.getAvatarUrls().getBig());
+//
+//            }
+//
+//            okhttp3.Request request = new okhttp3.Request.Builder().url(link).build();
+//
+//            okhttp3.Call call1 = httpClient.newCall(request);
+//            call1.enqueue(new okhttp3.Callback() {
+//                @Override
+//                public void onFailure(okhttp3.Call call, IOException e) {
+//
+//                }
+//
+//                @Override
+//                public void onResponse(final okhttp3.Call call, okhttp3.Response response) throws IOException {
+//
+//                    issue.setImageType(ResourceManager.getImageType(response.headers().get("Content-type")));
+//                    response.body().close();
+//                }
+//            });
+//        }
 
-
-            Log.e("link",project.getAvatarUrls().getBig());
-            //http://173.176.41.65:8000/secure/projectavatar?size=small&pid=10001
-            OkHttpClient httpClient = new OkHttpClient();
-
-            String link = project.getAvatarUrls().getBig();
-            if(ResourceManager.isSVG(link))
-            {
-                link = ResourceManager.fixImageUrl(project.getAvatarUrls().getBig());
-
-            }
-
-            okhttp3.Request request = new okhttp3.Request.Builder().url(link).build();
-
-            okhttp3.Call call1 = httpClient.newCall(request);
-            call1.enqueue(new okhttp3.Callback() {
-                @Override
-                public void onFailure(okhttp3.Call call, IOException e) {
-
-                }
-
-                @Override
-                public void onResponse(final okhttp3.Call call, okhttp3.Response response) throws IOException {
-
-                    project.setImageType(ResourceManager.getImageType(response.headers().get("Content-type")));
-                    response.body().close();
-                }
-            });
-        }
-
-        updateCardList(projects);
+        updateCardList(issues);
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
@@ -171,30 +170,30 @@ public class One extends Fragment implements SwipeRefreshLayout.OnRefreshListene
         }, 1000);
     }
 
-    public void updateCardList(List<Project> projectList) {
+    public void updateCardList(List<Issue> issueList) {
         //remove deleted projects
-        for (Project oldProject : projects) {
+        for (Issue oldProject : projectIssues) {
             boolean stillExist = false;
-            for (Project currentProject : projectList) {
+            for (Issue currentProject : issueList) {
 
-                if (Objects.equals(currentProject.getName(), oldProject.getName())) {
+                if (Objects.equals(currentProject.getId(), oldProject.getId())) {
                     stillExist = true;
                 }
             }
             if (!stillExist) {
-                projects.remove(oldProject);
+                projectIssues.remove(oldProject);
             }
         }
         //add only new project
-        for (Project newProject : projectList) {
+        for (Issue newProject : issueList) {
             boolean duplicate = false;
-            for (Project currentProject : projects) {
-                if (Objects.equals(currentProject.getName(), newProject.getName())) {
+            for (Issue currentProject : projectIssues) {
+                if (Objects.equals(currentProject.getId(), newProject.getId())) {
                     duplicate = true;
                 }
             }
             if (!duplicate) {
-                projects.add(newProject);
+                projectIssues.add(newProject);
             }
         }
     }

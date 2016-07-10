@@ -99,7 +99,7 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
     private void getActivityStream() {
 
         JiraSoftwareService jiraService = ServiceGenerator.createServiceXML(JiraSoftwareService.class, preferenceManager.getUsername(), preferenceManager.getPassword());
-        
+
         jiraService.getActivityFeed()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -191,7 +191,7 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
         }
 
         for (Entry test : messages) {
-            Log.d("test", test.getAuthor().getName());
+            Log.d("test1", test.getAuthor().getName());
         }
     }
 }

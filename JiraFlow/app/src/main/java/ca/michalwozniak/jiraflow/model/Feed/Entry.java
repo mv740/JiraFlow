@@ -10,7 +10,7 @@ import java.util.List;
 import ca.michalwozniak.jiraflow.model.ImageType;
 
 /**
- * Created by micha on 6/11/2016.
+ * Created by Michal Wozniak on 6/11/2016.
  */
 @Element(name = "entry")
 public class Entry {
@@ -18,23 +18,29 @@ public class Entry {
     private String id;
     @Element
     private String title;
+    @Element(required = false)
+    private String content;
     @Element
     private Author author;
     @Element
     private String published;
     @Element
     private String updated;
-    @Element(required = false)
-    private String category;
-    @ElementList(inline = true, required = false)
+    @Element(required=false)
+    private CategoryXML category;
+    @ElementList(inline = true)
     private List<Link> link;
-    @Element(required = false)
-    private String generator;
-    @Element(required = false)
-    private String application;
-    @Element(required = false)
-    private String verb;
+    @Element(name = "in-reply-to", required = false)
+    private String inReplyTo;
     @Element
+    private Generator generator;
+    @Element
+    private String application;
+    @ElementList(inline = true, entry = "verb")
+    private List<String> verb;
+    @Element(required = false)
+    private Target target;
+    @Element(name = "object")
     private ObjectXML object;
     @Element(name = "timezone-offset")
     private String timezone;
@@ -62,7 +68,7 @@ public class Entry {
         return updated;
     }
 
-    public String getCategory() {
+    public CategoryXML getCategory() {
         return category;
     }
 
@@ -70,7 +76,7 @@ public class Entry {
         return link;
     }
 
-    public String getGenerator() {
+    public Generator getGenerator() {
         return generator;
     }
 
@@ -78,7 +84,7 @@ public class Entry {
         return application;
     }
 
-    public String getVerb() {
+    public List<String> getVerb() {
         return verb;
     }
 
@@ -92,6 +98,10 @@ public class Entry {
 
     public void setAvatar(Drawable avatar) {
         this.avatar = avatar;
+    }
+
+    public String getContent() {
+        return content;
     }
 
     public Drawable getAvatar() {

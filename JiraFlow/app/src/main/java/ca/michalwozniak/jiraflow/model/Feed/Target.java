@@ -3,14 +3,14 @@ package ca.michalwozniak.jiraflow.model.Feed;
 import org.simpleframework.xml.Element;
 
 /**
- * Created by Michal Wozniak on 6/11/2016.
+ * Created by Michal Wozniak on 7/11/2016.
  */
-public class ObjectXML {
+public class Target {
     @Element
     private String id;
-    @Element(required = false)
+    @Element
     private String title;
-    @Element(required = false)
+    @Element
     private String summary;
     @Element
     private Link link;

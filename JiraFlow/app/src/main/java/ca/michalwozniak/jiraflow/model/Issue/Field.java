@@ -21,7 +21,7 @@ public class Field {
     private Project project;
     private List<FixVersion> fixVersions;
     private int aggregatetimespent;
-    private String resolution;
+    private Resolution resolution;
     private String customfield_10006;
     private int aggregatetimeestimate;
     private String resolutiondate;
@@ -47,7 +47,7 @@ public class Field {
     private Progress progress;
     private List<IssueLink> issuelinks;
     private Votes votes;
-    private String assignee;
+    private Assignee assignee;
     private String updated;
     private Status status;
 
@@ -83,7 +83,7 @@ public class Field {
         return aggregatetimespent;
     }
 
-    public String getResolution() {
+    public Resolution getResolution() {
         return resolution;
     }
 
@@ -168,7 +168,7 @@ public class Field {
         return votes;
     }
 
-    public String getAssignee() {
+    public Assignee getAssignee() {
         return assignee;
     }
 

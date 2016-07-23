@@ -1,5 +1,9 @@
 package ca.michalwozniak.jiraflow;
 
+import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.PictureDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -8,9 +12,19 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.GenericRequestBuilder;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.model.GlideUrl;
+import com.bumptech.glide.load.model.LazyHeaders;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
+import com.caverock.androidsvg.SVG;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -22,7 +36,10 @@ import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.mikepenz.materialdrawer.model.interfaces.Nameable;
+import com.mikepenz.materialdrawer.util.AbstractDrawerImageLoader;
+import com.mikepenz.materialdrawer.util.DrawerImageLoader;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +48,8 @@ import butterknife.ButterKnife;
 import ca.michalwozniak.jiraflow.fragment.AssignedIssuesFragment;
 import ca.michalwozniak.jiraflow.fragment.ProjectFragment;
 import ca.michalwozniak.jiraflow.fragment.StreamFragment;
+import ca.michalwozniak.jiraflow.utility.PreferenceManager;
+import ca.michalwozniak.jiraflow.utility.ResourceManager;
 
 public class DashboardActivity extends AppCompatActivity {
     @BindView(R.id.toolbar)
@@ -59,15 +78,69 @@ public class DashboardActivity extends AppCompatActivity {
             });
         }
 
-        String name = getIntent().getStringExtra("name");
-        String email = getIntent().getStringExtra("email");
+        final PreferenceManager pm = PreferenceManager.getInstance(this);
 
+
+        DrawerImageLoader.init(new AbstractDrawerImageLoader() {
+            @Override
+            public void set(final ImageView imageView, final Uri uri, final Drawable placeholder) {
+                //super.set(imageView, uri, placeholder);
+
+                GenericRequestBuilder<Uri, InputStream, SVG, PictureDrawable> requestBuilder = ResourceManager.getGenericRequestBuilderForSVG(imageView.getContext());
+
+                requestBuilder
+                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+                        .load(uri)
+                        .listener(new RequestListener<Uri, PictureDrawable>() {
+                            @Override
+                            public boolean onException(Exception e, Uri model, Target<PictureDrawable> target, boolean isFirstResource) {
+                                Log.v("Profile Icon","png");
+
+                                GlideUrl glideUrl = new GlideUrl(pm.getProfileIconUrl(), new LazyHeaders.Builder()
+                                        .addHeader("Authorization", ResourceManager.getEncoredCredentialString(DashboardActivity.this))
+                                        .addHeader("Accept", "application/json")
+                                        .build());
+
+                                Glide.with(imageView.getContext())
+                                        .load(glideUrl)
+                                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+                                        .dontAnimate()
+                                        .into(imageView);
+
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onResourceReady(PictureDrawable resource, Uri model, Target<PictureDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                                Log.v("Profile Icon ","svg");
+                                return false;
+                            }
+                        })
+                        .into(imageView);
+
+            }
+
+            @Override
+            public void cancel(ImageView imageView) {
+                Glide.clear(imageView);
+                //super.cancel(imageView);
+            }
+
+            @Override
+            public Drawable placeholder(Context ctx) {
+                return super.placeholder(ctx);
+            }
+
+        });
+
+
+        Log.v("adding","header");
         // Create the AccountHeader
         AccountHeader headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
                 .withHeaderBackground(R.drawable.background_account_header)
                 .addProfiles(
-                        new ProfileDrawerItem().withName(name).withEmail(email)
+                        new ProfileDrawerItem().withName(pm.getUsername()).withEmail(pm.getEmail()).withIcon(Uri.parse(pm.getProfileIconUrl()))
                 )
                 .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
                     @Override

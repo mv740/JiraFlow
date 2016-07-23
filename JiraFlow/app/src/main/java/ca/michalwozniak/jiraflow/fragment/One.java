@@ -97,7 +97,7 @@ public class One extends Fragment implements SwipeRefreshLayout.OnRefreshListene
 
         JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, preferenceManager.getUsername(), preferenceManager.getPassword());
 
-        jiraService.getProjectIssues("test1")
+        jiraService.getProjectIssues("hello")
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<ProjectIssues>() {

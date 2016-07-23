@@ -11,7 +11,9 @@ public class PreferenceManager {
     private static final String USER_PREFERENCE = "userPreference";
     private static final String NOT_FOUND = "notFound";
     private static final String PASSWORD = "password";
+    private static final String EMAIL = "email";
     private static final String USERNAME = "username";
+    private static final String PROFILE_ICON_URL = "profileIconUrl";
     private static PreferenceManager instance = null;
     private Context context;
 
@@ -70,6 +72,51 @@ public class PreferenceManager {
         if(sharedPref!=null)
         {
             return sharedPref.getString(PASSWORD, NOT_FOUND);
+        }
+        return NOT_FOUND;
+    }
+
+    public void saveEmail(String email)
+    {
+        SharedPreferences sharedPref = context.getSharedPreferences(USER_PREFERENCE, Context.MODE_PRIVATE);
+        if(sharedPref!=null)
+        {
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString(EMAIL, email);
+            editor.commit();
+        }
+    }
+
+    public String getEmail()
+    {
+        SharedPreferences sharedPref = context.getSharedPreferences(USER_PREFERENCE,Context.MODE_PRIVATE);
+        if(sharedPref!=null)
+        {
+            return sharedPref.getString(EMAIL, NOT_FOUND);
+
+        }
+        return NOT_FOUND;
+    }
+
+
+    public void saveProfileIconUrl(String url)
+    {
+        SharedPreferences sharedPref = context.getSharedPreferences(USER_PREFERENCE, Context.MODE_PRIVATE);
+        if(sharedPref!=null)
+        {
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString(PROFILE_ICON_URL, url);
+            editor.commit();
+        }
+    }
+
+    public String getProfileIconUrl()
+    {
+        SharedPreferences sharedPref = context.getSharedPreferences(USER_PREFERENCE,Context.MODE_PRIVATE);
+        if(sharedPref!=null)
+        {
+            return sharedPref.getString(PROFILE_ICON_URL, NOT_FOUND);
+
         }
         return NOT_FOUND;
     }

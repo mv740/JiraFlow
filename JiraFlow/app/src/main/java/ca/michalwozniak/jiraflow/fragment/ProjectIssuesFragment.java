@@ -21,6 +21,7 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import ca.michalwozniak.jiraflow.R;
 import ca.michalwozniak.jiraflow.adapter.CardViewProjectIssueAdapter;
+import ca.michalwozniak.jiraflow.helper.JQLHelper;
 import ca.michalwozniak.jiraflow.model.Issue.Issue;
 import ca.michalwozniak.jiraflow.model.Issue.ProjectIssues;
 import ca.michalwozniak.jiraflow.service.JiraSoftwareService;
@@ -31,7 +32,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 
-public class One extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
+public class ProjectIssuesFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
 
     @BindView(R.id.swiperefresh)
     SwipeRefreshLayout swipeRefreshLayout;
@@ -42,8 +43,9 @@ public class One extends Fragment implements SwipeRefreshLayout.OnRefreshListene
     private CardViewProjectIssueAdapter cardView;
     private Unbinder unbinder;
     private PreferenceManager preferenceManager;
+    private String projectID;
 
-    public One() {
+    public ProjectIssuesFragment() {
         // Required empty public constructor
     }
 
@@ -56,10 +58,11 @@ public class One extends Fragment implements SwipeRefreshLayout.OnRefreshListene
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_stream, container, false);
+        View view = inflater.inflate(R.layout.fragment_projects_issues, container, false);
         unbinder = ButterKnife.bind(this, view);
         this.preferenceManager = PreferenceManager.getInstance(myActivity);
 
+        projectID = getArguments().getString("project");
 
         LinearLayoutManager llm = new LinearLayoutManager(super.getActivity());
         rv.setLayoutManager(llm);
@@ -97,7 +100,8 @@ public class One extends Fragment implements SwipeRefreshLayout.OnRefreshListene
 
         JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, preferenceManager.getUsername(), preferenceManager.getPassword());
 
-        jiraService.getProjectIssues("hello")
+        JQLHelper jqlHelper = new JQLHelper(JQLHelper.Query.PROJECT.toString(), projectID);
+        jiraService.getProjectIssues(jqlHelper.toString())
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<ProjectIssues>() {
@@ -172,28 +176,28 @@ public class One extends Fragment implements SwipeRefreshLayout.OnRefreshListene
 
     public void updateCardList(List<Issue> issueList) {
         //remove deleted projects
-        for (Issue oldProject : projectIssues) {
+        for (Issue old : projectIssues) {
             boolean stillExist = false;
-            for (Issue currentProject : issueList) {
+            for (Issue current : issueList) {
 
-                if (Objects.equals(currentProject.getId(), oldProject.getId())) {
+                if (Objects.equals(current.getId(), old.getId())) {
                     stillExist = true;
                 }
             }
             if (!stillExist) {
-                projectIssues.remove(oldProject);
+                projectIssues.remove(old);
             }
         }
         //add only new project
-        for (Issue newProject : issueList) {
+        for (Issue newIssue : issueList) {
             boolean duplicate = false;
             for (Issue currentProject : projectIssues) {
-                if (Objects.equals(currentProject.getId(), newProject.getId())) {
+                if (Objects.equals(currentProject.getId(), newIssue.getId())) {
                     duplicate = true;
                 }
             }
             if (!duplicate) {
-                projectIssues.add(newProject);
+                projectIssues.add(newIssue);
             }
         }
     }

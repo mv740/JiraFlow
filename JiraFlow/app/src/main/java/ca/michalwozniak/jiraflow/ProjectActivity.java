@@ -10,13 +10,15 @@ import android.view.View;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ca.michalwozniak.jiraflow.adapter.ViewPagerAdapter;
-import ca.michalwozniak.jiraflow.fragment.One;
+import ca.michalwozniak.jiraflow.fragment.ProjectIssuesFragment;
 import ca.michalwozniak.jiraflow.fragment.Two;
 
 public class ProjectActivity extends AppCompatActivity {
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.tabs) TabLayout tabLayout;
     @BindView(R.id.viewpager) ViewPager viewPager;
+
+    private String projectTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,8 +28,8 @@ public class ProjectActivity extends AppCompatActivity {
         if(toolbar!=null)
         {
             setSupportActionBar(toolbar);
-            String title = getIntent().getStringExtra("title");
-            getSupportActionBar().setTitle(title);
+            projectTitle = getIntent().getStringExtra("title");
+            getSupportActionBar().setTitle(projectTitle);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeButtonEnabled(true);
 
@@ -45,7 +47,11 @@ public class ProjectActivity extends AppCompatActivity {
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new One(), "ONE");
+        ProjectIssuesFragment projectIssuesFragment = new ProjectIssuesFragment();
+        Bundle bundle=new Bundle();
+        bundle.putString("project", projectTitle);
+        projectIssuesFragment.setArguments(bundle);
+        adapter.addFragment(projectIssuesFragment, "ONE");
         adapter.addFragment(new Two(), "TWO");
         viewPager.setAdapter(adapter);
     }

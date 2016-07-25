@@ -3,6 +3,7 @@ package ca.michalwozniak.jiraflow;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -36,12 +37,11 @@ public class LoginActivity extends AppCompatActivity implements ILoginView {
         String user = _username.getText().toString();
         String pass = _password.getText().toString();
 
-        if (isValid())
+        if(presenter.validateInput(user,pass))
         {
             presenter.authenticateProcess(user,pass);
         }
 
-        Toast.makeText(this, "logIn", Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -49,6 +49,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginView {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
+
         progressBar.setVisibility(View.GONE);
         button.setVisibility(View.VISIBLE
         );
@@ -61,32 +62,19 @@ public class LoginActivity extends AppCompatActivity implements ILoginView {
 
         //for testing
         presenter.authenticateProcess("mv740", "Q1w2e3r4");
-        //testFeed();
 
-    }
-
-
-
-    private boolean isValid() {
-        boolean valid = true;
-
-        if (_password.getText().toString().isEmpty()) {
-            _password.setError("password is required!");
-            valid = false;
-        }
-        if (_username.getText().toString().isEmpty()) {
-            _username.setError("username is required!");
-            valid = false;
-        }
-
-        return valid;
     }
 
     @Override
-    public void loginFailed(String errorMessage) {
-        Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
-        progressBar.setVisibility(View.GONE);
-        button.setVisibility(View.VISIBLE);
+    public void loginFailed(final String errorMessage) {
+       new Handler().postDelayed(new Runnable() {
+           @Override
+           public void run() {
+               Toast.makeText(LoginActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+               progressBar.setVisibility(View.GONE);
+               button.setVisibility(View.VISIBLE);
+           }
+       },2000);
 
     }
 

@@ -56,6 +56,7 @@ public class CardViewAdapter extends RecyclerView.Adapter<CardViewAdapter.Projec
                 @Override
                 public void onClick(View v) {
                     Log.d("Ripple", "click");
+                    Log.d("Ripple", title.getText().toString());
 
                     Intent project = new Intent(context, ProjectActivity.class);
                     project.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);

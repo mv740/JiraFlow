@@ -1,6 +1,7 @@
 package ca.michalwozniak.jiraflow.service;
 
 import android.util.Base64;
+import android.util.Log;
 
 import java.io.IOException;
 
@@ -18,7 +19,7 @@ import retrofit2.converter.simplexml.SimpleXmlConverterFactory;
  */
 public class ServiceGenerator {
 
-    public static final String API_BASE_URL = "http://173.176.41.65:8000/rest/api/2/";
+    public static final String API_BASE_URL = "http://173.176.41.65:8000";
 
     private static OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 
@@ -50,11 +51,15 @@ public class ServiceGenerator {
                 public Response intercept(Interceptor.Chain chain) throws IOException {
                     Request original = chain.request();
 
+                    Log.e("url", String.valueOf(original.url()));
                     Request.Builder requestBuilder = original.newBuilder()
                             .header("Authorization", basic)
                             .header("Accept", "application/json")
                             .method(original.method(), original.body());
                     Request request = requestBuilder.build();
+
+                    Log.e("url",request.headers().toString());
+
                     return chain.proceed(request);
                 }
             });

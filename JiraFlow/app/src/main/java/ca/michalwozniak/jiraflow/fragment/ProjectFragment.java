@@ -59,7 +59,7 @@ public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRe
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_stream, container, false);
+        View view = inflater.inflate(R.layout.fragment_project, container, false);
         unbinder = ButterKnife.bind(this, view);
         this.preferenceManager = PreferenceManager.getInstance(myActivity);
 

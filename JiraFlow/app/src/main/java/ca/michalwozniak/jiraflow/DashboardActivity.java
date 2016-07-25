@@ -86,6 +86,11 @@ public class DashboardActivity extends AppCompatActivity {
             public void set(final ImageView imageView, final Uri uri, final Drawable placeholder) {
                 //super.set(imageView, uri, placeholder);
 
+                final GlideUrl glideUrl = new GlideUrl(pm.getProfileIconUrl(), new LazyHeaders.Builder()
+                        .addHeader("Authorization", ResourceManager.getEncoredCredentialString(DashboardActivity.this))
+                        .addHeader("Accept", "application/json")
+                        .build());
+
                 GenericRequestBuilder<Uri, InputStream, SVG, PictureDrawable> requestBuilder = ResourceManager.getGenericRequestBuilderForSVG(imageView.getContext());
 
                 requestBuilder
@@ -95,11 +100,6 @@ public class DashboardActivity extends AppCompatActivity {
                             @Override
                             public boolean onException(Exception e, Uri model, Target<PictureDrawable> target, boolean isFirstResource) {
                                 Log.v("Profile Icon","png");
-
-                                GlideUrl glideUrl = new GlideUrl(pm.getProfileIconUrl(), new LazyHeaders.Builder()
-                                        .addHeader("Authorization", ResourceManager.getEncoredCredentialString(DashboardActivity.this))
-                                        .addHeader("Accept", "application/json")
-                                        .build());
 
                                 Glide.with(imageView.getContext())
                                         .load(glideUrl)
@@ -117,7 +117,6 @@ public class DashboardActivity extends AppCompatActivity {
                             }
                         })
                         .into(imageView);
-
             }
 
             @Override

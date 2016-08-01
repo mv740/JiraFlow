@@ -1,6 +1,5 @@
 <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/tools"
     android:id="@+id/cardView"
     style="@style/Material_Card_View"
     card_view:cardCornerRadius="@dimen/card_corner_radius"
@@ -9,6 +8,7 @@
     android:clickable="true">
 
         <com.balysv.materialripple.MaterialRippleLayout
+            xmlns:app="http://schemas.android.com/tools"
             android:id="@+id/ripple"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

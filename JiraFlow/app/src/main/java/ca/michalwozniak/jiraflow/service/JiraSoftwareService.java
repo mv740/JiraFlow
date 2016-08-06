@@ -2,12 +2,15 @@ package ca.michalwozniak.jiraflow.service;
 
 import java.util.List;
 
+import ca.michalwozniak.jiraflow.model.BoardConfiguration;
+import ca.michalwozniak.jiraflow.model.BoardList;
 import ca.michalwozniak.jiraflow.model.Feed.ActivityFeed;
 import ca.michalwozniak.jiraflow.model.Issue.ProjectIssues;
 import ca.michalwozniak.jiraflow.model.Issue.userIssues;
 import ca.michalwozniak.jiraflow.model.Project;
 import ca.michalwozniak.jiraflow.model.User;
 import retrofit2.http.GET;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 import rx.Observable;
 
@@ -48,10 +51,11 @@ public interface JiraSoftwareService {
     @GET("/activity")
     Observable<ActivityFeed> getActivityFeed();
 
-    @GET("/agile/1.0/board")
-    Observable<>
+    @GET("rest/agile/1.0/board")
+    Observable<BoardList> getAllBoards(@Query("maxResults") int i, @Query("startAt") int i2, @Query("projectKeyOrId") String str, @Query("type") String str2);
 
-
+    @GET("rest/agile/1.0/board/{boardId}/configuration")
+    Observable<BoardConfiguration> getBoardConfiguration(@Path("boardId") int i);
 
 //
 //        @POST("/api/2/issue/{issueIdOrKey}/comment")

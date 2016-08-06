@@ -10,30 +10,13 @@
     tools:context=".LoginActivity">
 
 
-    <Button
-        android:id="@+id/button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:text="LOGIN" />
-
-    <ProgressBar
-        android:id="@+id/loginProgressBar"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        />
-
-
     <android.support.design.widget.TextInputLayout
         android:id="@+id/input_layout_username"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
+        android:layout_margin="16dp"
         android:layout_marginBottom="8dp"
         android:layout_marginTop="67dp">
 
@@ -53,6 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/input_layout_username"
+        android:layout_margin="16dp"
         android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp">
 
@@ -64,5 +48,33 @@
             android:inputType="textPassword" />
 
     </android.support.design.widget.TextInputLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_margin="16dp">
+
+
+        <ProgressBar
+            android:id="@+id/loginProgressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:indeterminateDuration="1000"
+            android:indeterminateDrawable="@drawable/circular_progressbar"
+            />
+
+        <Button
+            android:id="@+id/loginButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/md_white_1000"
+            android:text="LOGIN" />
+
+        <!--style="?android:attr/progressBarStyleLarge"-->
+    </FrameLayout>
 
 </RelativeLayout>

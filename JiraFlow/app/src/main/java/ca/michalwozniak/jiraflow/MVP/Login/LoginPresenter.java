@@ -1,8 +1,6 @@
 package ca.michalwozniak.jiraflow.MVP.Login;
 
-import android.util.Log;
-
-import ca.michalwozniak.jiraflow.MVP.IPresenter;
+import ca.michalwozniak.jiraflow.MVP.Presenter;
 import ca.michalwozniak.jiraflow.model.User;
 import ca.michalwozniak.jiraflow.service.JiraSoftwareService;
 import ca.michalwozniak.jiraflow.service.ServiceGenerator;
@@ -15,9 +13,9 @@ import rx.schedulers.Schedulers;
 /**
  * Created by Michal Wozniak on 7/23/2016.
  */
-public class LoginPresenter implements IPresenter<ILoginView> {
+public class LoginPresenter implements Presenter<LoginView> {
 
-    private ILoginView loginView;
+    private LoginView loginView;
     private Subscription subscription;
 
     public LoginPresenter() {
@@ -25,7 +23,7 @@ public class LoginPresenter implements IPresenter<ILoginView> {
 
 
     @Override
-    public void attachView(ILoginView view) {
+    public void attachView(LoginView view) {
         this.loginView = view;
     }
 
@@ -35,7 +33,7 @@ public class LoginPresenter implements IPresenter<ILoginView> {
         if (subscription != null) subscription.unsubscribe();
     }
 
-    public void authenticateProcess(final String usernameEntered, final String passwordEntered)
+    public void login(final String usernameEntered, final String passwordEntered)
     {
         loginView.showProgressIndicator();
 
@@ -53,7 +51,7 @@ public class LoginPresenter implements IPresenter<ILoginView> {
                 .subscribe(new Subscriber<User>() {
                     @Override
                     public void onCompleted() {
-                        loginView.navigateToDasboard();
+                        loginView.navigateToDashboard();
                     }
 
                     @Override

@@ -1,12 +1,12 @@
 package ca.michalwozniak.jiraflow;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -16,10 +16,12 @@ import com.maksim88.passwordedittext.PasswordEditText;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import ca.michalwozniak.jiraflow.MVP.Login.ILoginView;
 import ca.michalwozniak.jiraflow.MVP.Login.LoginPresenter;
+import ca.michalwozniak.jiraflow.MVP.Login.LoginView;
+import ca.michalwozniak.jiraflow.dragAndDrop.MainActivity;
+import top.wefor.circularanim.CircularAnimUtil;
 
-public class LoginActivity extends AppCompatActivity implements ILoginView {
+public class LoginActivity extends AppCompatActivity implements LoginView {
 
     @BindView(R.id.input_username)
     TextInputEditText _username;
@@ -27,22 +29,36 @@ public class LoginActivity extends AppCompatActivity implements ILoginView {
     PasswordEditText _password;
     @BindView(R.id.loginProgressBar)
     ProgressBar progressBar;
-    @BindView(R.id.button)
-    Button button;
+    @BindView(R.id.loginButton)
+    Button loginButton;
+
+    private View loginView;
 
     LoginPresenter presenter;
 
-    @OnClick(R.id.button)
-    public void logIn() {
+    @OnClick(R.id.loginButton)
+    public void logIn(View view) {
         String user = _username.getText().toString();
         String pass = _password.getText().toString();
 
+       hideKeyboard(view);
+
+        loginView = view;
         if(presenter.validateInput(user,pass))
         {
-            presenter.authenticateProcess(user,pass);
+            loginButton.setEnabled(false);
+            progressBar.setVisibility(View.VISIBLE);
+            CircularAnimUtil.hide(loginButton);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    presenter.login("mv740", "Q1w2e3r4");
+                }
+            },1000);
         }
 
     }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,8 +67,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginView {
         ButterKnife.bind(this);
 
         progressBar.setVisibility(View.GONE);
-        button.setVisibility(View.VISIBLE
-        );
+        loginButton.setVisibility(View.VISIBLE);
         //pass your presenter a reference to your view
         if(presenter == null)
         {
@@ -61,7 +76,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginView {
         presenter.attachView(this);
 
         //for testing
-        presenter.authenticateProcess("mv740", "Q1w2e3r4");
+        //presenter.login("mv740", "Q1w2e3r4");
 
     }
 
@@ -71,8 +86,9 @@ public class LoginActivity extends AppCompatActivity implements ILoginView {
            @Override
            public void run() {
                Toast.makeText(LoginActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+               loginButton.setEnabled(true);
                progressBar.setVisibility(View.GONE);
-               button.setVisibility(View.VISIBLE);
+               CircularAnimUtil.show(loginButton);
            }
        },2000);
 
@@ -81,15 +97,24 @@ public class LoginActivity extends AppCompatActivity implements ILoginView {
     @Override
     public void showProgressIndicator() {
         this.progressBar.setVisibility(View.VISIBLE);
-        this.button.setVisibility(View.GONE);
+        this.loginButton.setVisibility(View.GONE);
     }
 
     @Override
-    public void navigateToDasboard() {
+    public void navigateToDashboard() {
 
-        progressBar.setVisibility(View.GONE);
-        Intent startHome = new Intent(this, DashboardActivity.class);
-        startActivity(startHome);
+        //Intent startHome = new Intent(this, DashboardActivity.class);
+        //CircularAnimUtil.startActivity(LoginActivity.this, DashboardActivity.class, this.loginView, R.color.colorPrimary);
+        CircularAnimUtil.startActivity(LoginActivity.this, MainActivity.class, this.loginView, R.color.colorPrimary);
+       new Handler().postDelayed(new Runnable() {
+           @Override
+           public void run() {
+               loginButton.setEnabled(true);
+               progressBar.setVisibility(View.GONE);
+               loginButton.setVisibility(View.VISIBLE);
+           }
+       },1000);
+        //startActivity(startHome);
 
     }
 
@@ -103,4 +128,12 @@ public class LoginActivity extends AppCompatActivity implements ILoginView {
     public Context getContext() {
         return this;
     }
+
+    public void hideKeyboard(View view)
+    {
+        InputMethodManager imm = (InputMethodManager)
+                getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
 }

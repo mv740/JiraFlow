@@ -30,7 +30,7 @@ import ca.michalwozniak.jiraflow.utility.ResourceManager;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
- * Created by michal on 5/4/2016.
+ * Created by Michal Wozniak on 5/4/2016.
  */
 public class CardViewAdapter extends RecyclerView.Adapter<CardViewAdapter.ProjectViewHolder> {
 

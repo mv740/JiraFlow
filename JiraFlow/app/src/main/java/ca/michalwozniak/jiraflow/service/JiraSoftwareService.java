@@ -48,6 +48,9 @@ public interface JiraSoftwareService {
     @GET("/activity")
     Observable<ActivityFeed> getActivityFeed();
 
+    @GET("/agile/1.0/board")
+    Observable<>
+
 
 
 //

@@ -8,9 +8,9 @@ import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.util.Pair;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -37,6 +37,7 @@ public class BoardFragment extends Fragment {
     private int mColumns;
 
     public static BoardFragment newInstance() {
+
         return new BoardFragment();
     }
 
@@ -47,7 +48,7 @@ public class BoardFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.test_board_layout, container, false);
 
         mBoardView = (BoardView) view.findViewById(R.id.board_view);
@@ -80,13 +81,13 @@ public class BoardFragment extends Fragment {
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+    public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-//        if(getActivity() != null)
-//        {
-//            getActivity().getActionBar().setTitle("Board");
-//        }
+        if(getActivity() != null)
+        {
+            ((AppCompatActivity)getActivity()).getSupportActionBar().setSubtitle("test-board");
+        }
 
 
         View view1 = addColumnList();

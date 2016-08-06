@@ -18,7 +18,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import ca.michalwozniak.jiraflow.MVP.Login.LoginPresenter;
 import ca.michalwozniak.jiraflow.MVP.Login.LoginView;
-import ca.michalwozniak.jiraflow.dragAndDrop.MainActivity;
 import top.wefor.circularanim.CircularAnimUtil;
 
 public class LoginActivity extends AppCompatActivity implements LoginView {
@@ -105,7 +104,7 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
 
         //Intent startHome = new Intent(this, DashboardActivity.class);
         //CircularAnimUtil.startActivity(LoginActivity.this, DashboardActivity.class, this.loginView, R.color.colorPrimary);
-        CircularAnimUtil.startActivity(LoginActivity.this, MainActivity.class, this.loginView, R.color.colorPrimary);
+        CircularAnimUtil.startActivity(LoginActivity.this, DashboardActivity.class, this.loginView, R.color.colorPrimary);
        new Handler().postDelayed(new Runnable() {
            @Override
            public void run() {

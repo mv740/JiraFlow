@@ -9,6 +9,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -16,6 +17,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
+import android.widget.ViewFlipper;
 
 import com.bumptech.glide.GenericRequestBuilder;
 import com.bumptech.glide.Glide;
@@ -45,6 +47,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import ca.michalwozniak.jiraflow.dragAndDrop.BoardFragment;
 import ca.michalwozniak.jiraflow.fragment.AssignedIssuesFragment;
 import ca.michalwozniak.jiraflow.fragment.ProjectFragment;
 import ca.michalwozniak.jiraflow.fragment.StreamFragment;
@@ -58,6 +61,9 @@ public class DashboardActivity extends AppCompatActivity {
     TabLayout tabLayout;
     @BindView(R.id.viewpager)
     ViewPager viewPager;
+    @BindView(R.id.viewFlipper)
+    ViewFlipper viewFlipper;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +105,7 @@ public class DashboardActivity extends AppCompatActivity {
                         .listener(new RequestListener<Uri, PictureDrawable>() {
                             @Override
                             public boolean onException(Exception e, Uri model, Target<PictureDrawable> target, boolean isFirstResource) {
-                                Log.v("Profile Icon","png");
+                                Log.v("Profile Icon", "png");
 
                                 Glide.with(imageView.getContext())
                                         .load(glideUrl)
@@ -112,7 +118,7 @@ public class DashboardActivity extends AppCompatActivity {
 
                             @Override
                             public boolean onResourceReady(PictureDrawable resource, Uri model, Target<PictureDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                                Log.v("Profile Icon ","svg");
+                                Log.v("Profile Icon ", "svg");
                                 return false;
                             }
                         })
@@ -133,7 +139,7 @@ public class DashboardActivity extends AppCompatActivity {
         });
 
 
-        Log.v("adding","header");
+        Log.v("adding", "header");
         // Create the AccountHeader
         AccountHeader headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
@@ -161,8 +167,35 @@ public class DashboardActivity extends AppCompatActivity {
                 .withAccountHeader(headerResult)
                 .withDrawerLayout(R.layout.material_drawer_fits_not)
                 .addDrawerItems(
-                        new SecondaryDrawerItem().withName("test1"),
-                        new SecondaryDrawerItem().withName("test2"),
+                        new SecondaryDrawerItem().withName("Home").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                            @Override
+                            public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                                if (viewFlipper.getDisplayedChild() != 0) {
+                                    if (tabLayout.getVisibility() == View.GONE) {
+                                        tabLayout.setVisibility(View.VISIBLE);
+
+                                    }
+                                    // toolbar.getMenu().setGroupEnabled(0,false);
+                                    toolbar.getMenu().setGroupVisible(0, false);
+                                    viewFlipper.setDisplayedChild(0);
+                                }
+                                return false;
+                            }
+                        }),
+                        new SecondaryDrawerItem().withName("Board").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                            @Override
+                            public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                                if (viewFlipper.getDisplayedChild() != 1) {
+                                    if (tabLayout.getVisibility() == View.VISIBLE) {
+
+                                        tabLayout.setVisibility(View.GONE);
+                                    }
+                                    viewFlipper.setDisplayedChild(1);
+                                    showFragment(BoardFragment.newInstance());
+                                }
+                                return false;
+                            }
+                        }),
                         new DividerDrawerItem(),
                         new ProfileSettingDrawerItem().withName("Manage Account").withIcon(R.drawable.ic_settings_grey600_48dp)
                 )
@@ -182,9 +215,16 @@ public class DashboardActivity extends AppCompatActivity {
 
         drawerResult.getActionBarDrawerToggle().setDrawerIndicatorEnabled(true);
 
+        //viewPager.setVisibility(View.VISIBLE);
         setupViewPager(viewPager);
         tabLayout.setupWithViewPager(viewPager);
     }
+
+    private void showFragment(Fragment fragment) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.container, fragment, "fragment").commit();
+    }
+
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
@@ -193,8 +233,9 @@ public class DashboardActivity extends AppCompatActivity {
         adapter.addFragment(new ProjectFragment(), "Projects");
         viewPager.setAdapter(adapter);
     }
+
     //used to add icon to title  http://www.androidhive.info/2015/09/android-material-design-working-with-tabs/
-    class ViewPagerAdapter extends FragmentPagerAdapter{
+    class ViewPagerAdapter extends FragmentPagerAdapter {
         private final List<Fragment> mFragmentList = new ArrayList<>();
         private final List<String> mFragmentTitleList = new ArrayList<>();
 

@@ -28,13 +28,17 @@ import com.woxthebox.draglistview.BoardView;
 import com.woxthebox.draglistview.DragItem;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import ca.michalwozniak.jiraflow.R;
+import ca.michalwozniak.jiraflow.helper.JQLHelper;
 import ca.michalwozniak.jiraflow.model.BoardConfiguration;
+import ca.michalwozniak.jiraflow.model.Issue.Issue;
+import ca.michalwozniak.jiraflow.model.Sprint;
 import ca.michalwozniak.jiraflow.model.other.Column;
-import ca.michalwozniak.jiraflow.model.other.Status;
 import ca.michalwozniak.jiraflow.service.JiraSoftwareService;
 import ca.michalwozniak.jiraflow.service.ServiceGenerator;
 import ca.michalwozniak.jiraflow.utility.PreferenceManager;
@@ -50,6 +54,7 @@ public class BoardFragment extends Fragment {
     private Unbinder unbinder;
     private PreferenceManager preferenceManager;
     private Activity myActivity;
+
 
 
     public static BoardFragment newInstance() {
@@ -106,15 +111,17 @@ public class BoardFragment extends Fragment {
     private void getBoardConfiguration() {
 
 
-        JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, preferenceManager.getUsername(), preferenceManager.getPassword());
+        final JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, preferenceManager.getUsername(), preferenceManager.getPassword());
 
-        jiraService.getBoardConfiguration(1)
+        final int boardID = 1;
+        jiraService.getBoardConfiguration(boardID)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<BoardConfiguration>() {
                     @Override
                     public void onCompleted() {
                         //do nothing
+
                     }
 
                     @Override
@@ -123,15 +130,40 @@ public class BoardFragment extends Fragment {
                     }
 
                     @Override
-                    public void onNext(BoardConfiguration boardConfig) {
+                    public void onNext(final BoardConfiguration boardConfig) {
 
-                        generateBoard(boardConfig);
-                        //generateMessageFeedCards(feed.getEntry());
+
+
+                        //Log.v("list size - " , String.valueOf(type.size()));
+                        //generateBoard(boardConfig,null);
+
+
+                        JQLHelper jqlHelper = new JQLHelper(JQLHelper.Query.PROJECT.toString(),"HEL AND sprint in openSprints()");
+
+                        jiraService.getIssuesForActiveSprint(jqlHelper.toString())
+                                .subscribeOn(Schedulers.newThread())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(new Subscriber<Sprint>() {
+                                    @Override
+                                    public void onCompleted() {
+
+                                    }
+
+                                    @Override
+                                    public void onError(Throwable e) {
+
+                                    }
+
+                                    @Override
+                                    public void onNext(Sprint sprint) {
+                                        generateBoard(boardConfig,sprint);
+                                    }
+                                });
                     }
                 });
     }
 
-    private void generateBoard(BoardConfiguration boardConfig) {
+    private void generateBoard(BoardConfiguration boardConfig, Sprint sprint) {
 
 
         if(getActivity() != null)
@@ -141,7 +173,7 @@ public class BoardFragment extends Fragment {
 
         for(Column current : boardConfig.getColumnConfig().getColumns())
         {
-            addCustomColumnList(current);
+            addCustomColumnList(current,sprint);
         }
     }
 
@@ -206,7 +238,7 @@ public class BoardFragment extends Fragment {
         }
 
         final int column = mColumns;
-        final ItemAdapter listAdapter = new ItemAdapter(mItemArray, R.layout.test_column_item, R.id.item_layout, true);
+        final ItemAdapter listAdapter = new ItemAdapter(mItemArray, null, R.layout.test_column_item, R.id.item_layout, true);
         final View header = View.inflate(getActivity(), R.layout.test_column_header, null);
         ((TextView) header.findViewById(R.id.text)).setText("Column " + (mColumns + 1));
         ((TextView) header.findViewById(R.id.item_count)).setText("" + addItems);
@@ -229,22 +261,24 @@ public class BoardFragment extends Fragment {
         return header;
     }
 
-    private View addCustomColumnList(Column current) {
+    private View addCustomColumnList(Column current, Sprint sprint) {
         final ArrayList<Pair<Long, String>> mItemArray = new ArrayList<>();
-//        int addItems = 15;
-//        for (int i = 0; i < addItems; i++) {
-//            long id = sCreatedItems++;
-//            mItemArray.add(new Pair<>(id, "Item " + id));
-//        }
+        final Map<Long,String> mItemArrayIcon = new HashMap<>();
+
         int addItems = 0;
-        for(Status currentStatus : current.getStatuses())
+        for(Issue issue : sprint.getIssues())
         {
-            mItemArray.add(new Pair<>(Long.parseLong(currentStatus.getId()), "status " + currentStatus.getId()));
-            addItems++;
+
+            if(issue.getFields().getStatus().getName().equals(current.getName()))
+            {
+                mItemArray.add(new Pair<>(Long.parseLong(issue.getId()), "Key : "+ issue.getKey() +" Summary " + issue.getFields().getSummary()));
+                mItemArrayIcon.put(Long.parseLong(issue.getId()), issue.getFields().getIssuetype().getIconUrl());
+                addItems++;
+            }
         }
 
         final int column = mColumns;
-        final ItemAdapter listAdapter = new ItemAdapter(mItemArray, R.layout.test_column_item, R.id.item_layout, true);
+        final ItemAdapter listAdapter = new ItemAdapter(mItemArray,mItemArrayIcon, R.layout.test_column_item, R.id.item_layout, true);
         final View header = View.inflate(getActivity(), R.layout.test_column_header, null);
         ((TextView) header.findViewById(R.id.text)).setText(current.getName());
         ((TextView) header.findViewById(R.id.item_count)).setText("" + addItems);

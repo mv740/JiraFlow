@@ -138,8 +138,6 @@ public class DashboardActivity extends AppCompatActivity {
 
         });
 
-
-        Log.v("adding", "header");
         // Create the AccountHeader
         AccountHeader headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
@@ -173,7 +171,7 @@ public class DashboardActivity extends AppCompatActivity {
                                 if (viewFlipper.getDisplayedChild() != 0) {
                                     if (tabLayout.getVisibility() == View.GONE) {
                                         tabLayout.setVisibility(View.VISIBLE);
-
+                                        toolbar.setSubtitle(null);
                                     }
                                     // toolbar.getMenu().setGroupEnabled(0,false);
                                     toolbar.getMenu().setGroupVisible(0, false);

@@ -44,10 +44,10 @@
             android:padding="12dp">
 
             <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:layout_marginRight="12dp"
-                android:src="@drawable/zzz_account_circle"/>
+                android:id="@+id/head_image" />
 
             <TextView
                 android:id="@+id/text"

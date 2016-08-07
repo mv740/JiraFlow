@@ -6,8 +6,10 @@ import ca.michalwozniak.jiraflow.model.BoardConfiguration;
 import ca.michalwozniak.jiraflow.model.BoardList;
 import ca.michalwozniak.jiraflow.model.Feed.ActivityFeed;
 import ca.michalwozniak.jiraflow.model.Issue.ProjectIssues;
+import ca.michalwozniak.jiraflow.model.Issue.issueType;
 import ca.michalwozniak.jiraflow.model.Issue.userIssues;
 import ca.michalwozniak.jiraflow.model.Project;
+import ca.michalwozniak.jiraflow.model.Sprint;
 import ca.michalwozniak.jiraflow.model.User;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
@@ -44,7 +46,6 @@ public interface JiraSoftwareService {
     //Observable<userIssues> getUserIssues(@Query("assignee") String username);
 
     @GET("/rest/api/2/search")
-
     Observable<userIssues> getUserIssues(@Query("jql") String username);
 
     //xml response
@@ -52,10 +53,25 @@ public interface JiraSoftwareService {
     Observable<ActivityFeed> getActivityFeed();
 
     @GET("rest/agile/1.0/board")
-    Observable<BoardList> getAllBoards(@Query("maxResults") int i, @Query("startAt") int i2, @Query("projectKeyOrId") String str, @Query("type") String str2);
+    Observable<BoardList> getAllBoards(@Query("maxResults") int max, @Query("startAt") int start, @Query("projectKeyOrId") String keyId, @Query("type") String type);
 
     @GET("rest/agile/1.0/board/{boardId}/configuration")
     Observable<BoardConfiguration> getBoardConfiguration(@Path("boardId") int i);
+
+    //// TODO: 8/6/2016 remove or keep ?
+    @GET("/rest/api/2/issuetype/{issueKeyOrId}")
+    Observable<issueType> getIssueType(@Path("issueKeyOrId") String id);
+    //http://173.176.41.65:8000/rest/api/2/issuetype/10004
+
+    @GET("rest/agile/1.0/board/{boardId}/sprint")
+    Observable<Sprint> getSprintsForBoard(@Path("boardId") int id, @Query("state") String state, @Query("maxResults") Integer max);
+
+    @GET("rest/agile/1.0/sprint/{sprintId}/issue")
+    Observable<Sprint> getIssuesForSprint(@Path("sprintId") int id, @Query("state") String state, @Query("maxResults") Integer max);
+
+    @GET("/rest/api/2/search")
+    Observable<Sprint> getIssuesForActiveSprint(@Query("jql") String project);
+
 
 //
 //        @POST("/api/2/issue/{issueIdOrKey}/comment")

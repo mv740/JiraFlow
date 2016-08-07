@@ -7,6 +7,7 @@ package ca.michalwozniak.jiraflow.dragAndDrop;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.util.Pair;
@@ -21,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,8 +30,6 @@ import com.woxthebox.draglistview.BoardView;
 import com.woxthebox.draglistview.DragItem;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -216,69 +216,27 @@ public class BoardFragment extends Fragment {
                 mBoardView.setDragEnabled(true);
                 getActivity().invalidateOptionsMenu();
                 return true;
-            case R.id.action_add_column:
-                addColumnList();
-                return true;
-            case R.id.action_remove_column:
-                mBoardView.removeColumn(0);
-                return true;
-            case R.id.action_clear_board:
-                mBoardView.clearBoard();
-                return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private View addColumnList() {
-        final ArrayList<Pair<Long, String>> mItemArray = new ArrayList<>();
-        int addItems = 15;
-        for (int i = 0; i < addItems; i++) {
-            long id = sCreatedItems++;
-            mItemArray.add(new Pair<>(id, "Item " + id));
-        }
-
-        final int column = mColumns;
-        final ItemAdapter listAdapter = new ItemAdapter(mItemArray, null, R.layout.test_column_item, R.id.item_layout, true);
-        final View header = View.inflate(getActivity(), R.layout.test_column_header, null);
-        ((TextView) header.findViewById(R.id.text)).setText("Column " + (mColumns + 1));
-        ((TextView) header.findViewById(R.id.item_count)).setText("" + addItems);
-        header.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                long id = sCreatedItems++;
-                Pair item = new Pair<>(id, "Test " + id);
-                mBoardView.addItem(column, 0, item, true);
-                //mBoardView.moveItem(4, 0, 0, true);
-                //mBoardView.removeItem(column, 0);
-                //mBoardView.moveItem(0, 0, 1, 3, false);
-                //mBoardView.replaceItem(0, 0, item1, true);
-                ((TextView) header.findViewById(R.id.item_count)).setText("" + mItemArray.size());
-            }
-        });
-
-        mBoardView.addColumnList(listAdapter, header, false);
-        mColumns++;
-        return header;
-    }
-
     private View addCustomColumnList(Column current, Sprint sprint) {
-        final ArrayList<Pair<Long, String>> mItemArray = new ArrayList<>();
-        final Map<Long,String> mItemArrayIcon = new HashMap<>();
+        final ArrayList<Pair<Long, DragCardData>> mItemArray = new ArrayList<>();
+
 
         int addItems = 0;
         for(Issue issue : sprint.getIssues())
         {
-
             if(issue.getFields().getStatus().getName().equals(current.getName()))
             {
-                mItemArray.add(new Pair<>(Long.parseLong(issue.getId()), "Key : "+ issue.getKey() +" Summary " + issue.getFields().getSummary()));
-                mItemArrayIcon.put(Long.parseLong(issue.getId()), issue.getFields().getIssuetype().getIconUrl());
+                DragCardData information = new DragCardData(issue.getKey(),issue.getFields().getSummary(),issue.getFields().getIssuetype().getName());
+                mItemArray.add(new Pair<>(Long.parseLong(issue.getId()), information));
                 addItems++;
             }
         }
 
         final int column = mColumns;
-        final ItemAdapter listAdapter = new ItemAdapter(mItemArray,mItemArrayIcon, R.layout.test_column_item, R.id.item_layout, true);
+        final ItemAdapter listAdapter = new ItemAdapter(mItemArray, R.layout.test_column_item, R.id.item_layout, true);
         final View header = View.inflate(getActivity(), R.layout.test_column_header, null);
         ((TextView) header.findViewById(R.id.text)).setText(current.getName());
         ((TextView) header.findViewById(R.id.item_count)).setText("" + addItems);
@@ -311,6 +269,13 @@ public class BoardFragment extends Fragment {
         public void onBindDragView(View clickedView, View dragView) {
             CharSequence text = ((TextView) clickedView.findViewById(R.id.text)).getText();
             ((TextView) dragView.findViewById(R.id.text)).setText(text);
+
+            ImageView clickedViewImage = (ImageView) clickedView.findViewById(R.id.head_image);
+            ImageView dragImage = (ImageView) dragView.findViewById(R.id.head_image);
+
+            Drawable image = clickedViewImage.getDrawable();
+            dragImage.setImageDrawable(image);
+
             CardView dragCard = ((CardView) dragView.findViewById(R.id.card));
             CardView clickedCard = ((CardView) clickedView.findViewById(R.id.card));
 
@@ -324,6 +289,7 @@ public class BoardFragment extends Fragment {
         public void onMeasureDragView(View clickedView, View dragView) {
             CardView dragCard = ((CardView) dragView.findViewById(R.id.card));
             CardView clickedCard = ((CardView) clickedView.findViewById(R.id.card));
+
             int widthDiff = dragCard.getPaddingLeft() - clickedCard.getPaddingLeft() + dragCard.getPaddingRight() -
                     clickedCard.getPaddingRight();
             int heightDiff = dragCard.getPaddingTop() - clickedCard.getPaddingTop() + dragCard.getPaddingBottom() -
@@ -340,6 +306,7 @@ public class BoardFragment extends Fragment {
         @Override
         public void onStartDragAnimation(View dragView) {
             CardView dragCard = ((CardView) dragView.findViewById(R.id.card));
+
             ObjectAnimator anim = ObjectAnimator.ofFloat(dragCard, "CardElevation", dragCard.getCardElevation(), 40);
             anim.setInterpolator(new DecelerateInterpolator());
             anim.setDuration(ANIMATION_DURATION);

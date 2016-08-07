@@ -85,11 +85,9 @@ public class ResourceManager {
     }
 
     public static boolean isSVG(String url) {
-        if(url.contains("pid") && url.contains("avatarId"))
-        {
+        if (url.contains("pid") && url.contains("avatarId")) {
             return true;
-        }
-        else
+        } else
             return false;
     }
 
@@ -116,12 +114,11 @@ public class ResourceManager {
     //---------------------------------------------------------------------------------------------
     //Reused static Method
 
-    public static GenericRequestBuilder<Uri, InputStream, SVG, PictureDrawable> getGenericRequestBuilderForSVG(Context context)
-    {
+    public static GenericRequestBuilder<Uri, InputStream, SVG, PictureDrawable> getGenericRequestBuilderForSVG(Context context) {
         GenericRequestBuilder<Uri, InputStream, SVG, PictureDrawable> requestBuilder;
 
         requestBuilder = Glide.with(context)
-                .using(Glide.buildStreamModelLoader(Uri.class,context), InputStream.class)
+                .using(Glide.buildStreamModelLoader(Uri.class, context), InputStream.class)
                 .from(Uri.class)
                 .as(SVG.class)
                 .transcode(new SvgDrawableTranscoder(), PictureDrawable.class)
@@ -136,12 +133,29 @@ public class ResourceManager {
         return requestBuilder;
     }
 
-    public static String getEncoredCredentialString(Context context)
-    {
+    public static String getEncoredCredentialString(Context context) {
         PreferenceManager preferenceManager = PreferenceManager.getInstance(context);
         String credentials = preferenceManager.getUsername() + ":" + preferenceManager.getPassword();
         return "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
     }
 
+    // Image Type Icon ID
+    public static int getIssueTypeIconId(String name) {
+        switch (name) {
+            case "Bug":
+                return R.drawable.bug;
+
+            case "Story":
+                return R.drawable.story;
+
+            case "Task":
+                return R.drawable.task;
+
+            case "Epic":
+                return R.drawable.epic;
+
+        }
+        return 0;
+    }
 
 }

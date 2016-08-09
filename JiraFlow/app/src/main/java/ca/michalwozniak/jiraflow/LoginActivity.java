@@ -16,7 +16,7 @@ import com.maksim88.passwordedittext.PasswordEditText;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import ca.michalwozniak.jiraflow.MVP.Login.LoginPresenter;
+import ca.michalwozniak.jiraflow.MVP.Login.LoginPresenterImpl;
 import ca.michalwozniak.jiraflow.MVP.Login.LoginView;
 import top.wefor.circularanim.CircularAnimUtil;
 
@@ -33,7 +33,7 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
 
     private View loginView;
 
-    LoginPresenter presenter;
+    LoginPresenterImpl presenter;
 
     @OnClick(R.id.loginButton)
     public void logIn(View view) {
@@ -45,19 +45,21 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
         loginView = view;
         if(presenter.validateInput(user,pass))
         {
+            _username.setError(null);
+            _password.setError(null);
+
             loginButton.setEnabled(false);
             progressBar.setVisibility(View.VISIBLE);
             CircularAnimUtil.hide(loginButton);
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    presenter.login("mv740", "Q1w2e3r4");
+                    presenter.validateCredentials("mv740", "Q1w2e3r4");
                 }
             },1000);
         }
 
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,9 +72,8 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
         //pass your presenter a reference to your view
         if(presenter == null)
         {
-            presenter = new LoginPresenter();
+            presenter = new LoginPresenterImpl(this);
         }
-        presenter.attachView(this);
 
         //for testing
         //presenter.login("mv740", "Q1w2e3r4");
@@ -102,8 +103,6 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
     @Override
     public void navigateToDashboard() {
 
-        //Intent startHome = new Intent(this, DashboardActivity.class);
-        //CircularAnimUtil.startActivity(LoginActivity.this, DashboardActivity.class, this.loginView, R.color.colorPrimary);
         CircularAnimUtil.startActivity(LoginActivity.this, DashboardActivity.class, this.loginView, R.color.colorPrimary);
        new Handler().postDelayed(new Runnable() {
            @Override
@@ -113,19 +112,31 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
                loginButton.setVisibility(View.VISIBLE);
            }
        },1000);
-        //startActivity(startHome);
 
+    }
+
+    @Override
+    public void inputEmpty() {
+        _username.setError("username required");
+        _password.setError("password required");
+    }
+
+    @Override
+    public void usernameEmpty() {
+        _username.requestFocus();
+        _username.setError("username required");
+    }
+
+    @Override
+    public void passwordEmpty() {
+        _password.requestFocus();
+        _password.setError("username required");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         presenter.detachView();
-    }
-
-    @Override
-    public Context getContext() {
-        return this;
     }
 
     public void hideKeyboard(View view)

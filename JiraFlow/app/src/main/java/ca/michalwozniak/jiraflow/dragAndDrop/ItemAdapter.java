@@ -15,8 +15,9 @@ import android.widget.Toast;
 import com.woxthebox.draglistview.DragItemAdapter;
 
 import java.util.ArrayList;
-import java.util.Map;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import ca.michalwozniak.jiraflow.R;
 import ca.michalwozniak.jiraflow.utility.ResourceManager;
 
@@ -24,7 +25,6 @@ public class ItemAdapter extends DragItemAdapter<Pair<Long, DragCardData>, ItemA
 
     private int mLayoutId;
     private int mGrabHandleId;
-    private Map<Long, String> mItemMapIconType;
 
     public ItemAdapter(ArrayList<Pair<Long, DragCardData>> list, int layoutId, int grabHandleId, boolean dragOnLongPress) {
         super(dragOnLongPress);
@@ -38,7 +38,6 @@ public class ItemAdapter extends DragItemAdapter<Pair<Long, DragCardData>, ItemA
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(mLayoutId, parent, false);
 
-
     return new ViewHolder(view);
 }
 
@@ -51,7 +50,7 @@ public class ItemAdapter extends DragItemAdapter<Pair<Long, DragCardData>, ItemA
         String text =data.getSummary();
         holder.mText.setText(text);
         holder.itemView.setTag(text);
-        
+
         holder.mImage.setImageResource(ResourceManager.getIssueTypeIconId(data.getIconType()));
     }
 
@@ -61,13 +60,14 @@ public class ItemAdapter extends DragItemAdapter<Pair<Long, DragCardData>, ItemA
     }
 
 public class ViewHolder extends DragItemAdapter<Pair<Long, DragCardData>, ItemAdapter.ViewHolder>.ViewHolder {
-    private TextView mText;
-    private ImageView mImage;
+    @BindView(R.id.text)
+    TextView mText;
+    @BindView(R.id.head_image)
+    ImageView mImage;
 
     public ViewHolder(final View itemView) {
         super(itemView, mGrabHandleId);
-        mText = (TextView) itemView.findViewById(R.id.text);
-        mImage = (ImageView) itemView.findViewById(R.id.head_image);
+        ButterKnife.bind(this, itemView);
     }
 
     @Override

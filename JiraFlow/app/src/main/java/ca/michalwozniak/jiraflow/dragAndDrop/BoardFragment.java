@@ -181,15 +181,6 @@ public class BoardFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-
-
-//        View view1 = addColumnList();
-//        View view2 = addColumnList();
-//        View view3 = addColumnList();
-//
-//        view1.setBackgroundColor(Color.BLUE);
-//        view2.setBackgroundColor(Color.YELLOW);
-//        view3.setBackgroundColor(Color.GREEN);
     }
 
     @Override

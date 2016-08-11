@@ -134,8 +134,8 @@ public class ResourceManager {
     }
 
     public static String getEncoredCredentialString(Context context) {
-        PreferenceManager preferenceManager = PreferenceManager.getInstance(context);
-        String credentials = preferenceManager.getUsername() + ":" + preferenceManager.getPassword();
+        SessionManager sessionManager = SessionManager.getInstance(context);
+        String credentials = sessionManager.getUsername() + ":" + sessionManager.getPassword();
         return "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
     }
 

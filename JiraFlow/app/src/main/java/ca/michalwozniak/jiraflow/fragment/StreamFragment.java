@@ -26,7 +26,7 @@ import ca.michalwozniak.jiraflow.model.Feed.ActivityFeed;
 import ca.michalwozniak.jiraflow.model.Feed.Entry;
 import ca.michalwozniak.jiraflow.service.JiraSoftwareService;
 import ca.michalwozniak.jiraflow.service.ServiceGenerator;
-import ca.michalwozniak.jiraflow.utility.PreferenceManager;
+import ca.michalwozniak.jiraflow.utility.SessionManager;
 import ca.michalwozniak.jiraflow.utility.ResourceManager;
 import okhttp3.OkHttpClient;
 import rx.Subscriber;
@@ -45,7 +45,7 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
     private List<Entry> messages;
     private CardViewMessageAdapter cardView;
     private Unbinder unbinder;
-    private PreferenceManager preferenceManager;
+    private SessionManager sessionManager;
 
     public StreamFragment() {
         // Required empty public constructor
@@ -62,7 +62,7 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_stream, container, false);
         unbinder = ButterKnife.bind(this, view);
-        preferenceManager = PreferenceManager.getInstance(myActivity);
+        sessionManager = SessionManager.getInstance(myActivity);
 
         LinearLayoutManager llm = new LinearLayoutManager(super.getActivity());
         rv.setLayoutManager(llm);
@@ -98,7 +98,7 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     private void getActivityStream() {
 
-        JiraSoftwareService jiraService = ServiceGenerator.createServiceXML(JiraSoftwareService.class, preferenceManager.getUsername(), preferenceManager.getPassword());
+        JiraSoftwareService jiraService = ServiceGenerator.createServiceXML(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword());
 
         jiraService.getActivityFeed()
                 .subscribeOn(Schedulers.newThread())

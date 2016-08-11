@@ -8,10 +8,4 @@ public interface LoginView  {
     void loginFailed(String errorMessage);
     void showProgressIndicator();
     void navigateToDashboard();
-
-    void inputEmpty();
-
-    void usernameEmpty();
-
-    void passwordEmpty();
 }

@@ -81,8 +81,8 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
         if (presenter == null) {
             presenter = new LoginPresenterImpl(this);
         }
-
         setupInputObserver();
+
     }
 
     private void setupInputObserver() {
@@ -165,24 +165,6 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
             }
         }, 1000);
 
-    }
-
-    @Override
-    public void inputEmpty() {
-        mUsername.setError("username required");
-        mPassword.setError("password required");
-    }
-
-    @Override
-    public void usernameEmpty() {
-        mUsername.requestFocus();
-        mUsername.setError("username required");
-    }
-
-    @Override
-    public void passwordEmpty() {
-        mPassword.requestFocus();
-        mPassword.setError("username required");
     }
 
     @Override

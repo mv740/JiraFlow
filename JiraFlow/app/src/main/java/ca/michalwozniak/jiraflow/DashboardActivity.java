@@ -1,6 +1,7 @@
 package ca.michalwozniak.jiraflow;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.PictureDrawable;
 import android.net.Uri;
@@ -51,8 +52,8 @@ import ca.michalwozniak.jiraflow.dragAndDrop.BoardFragment;
 import ca.michalwozniak.jiraflow.fragment.AssignedIssuesFragment;
 import ca.michalwozniak.jiraflow.fragment.ProjectFragment;
 import ca.michalwozniak.jiraflow.fragment.StreamFragment;
-import ca.michalwozniak.jiraflow.utility.PreferenceManager;
 import ca.michalwozniak.jiraflow.utility.ResourceManager;
+import ca.michalwozniak.jiraflow.utility.SessionManager;
 
 public class DashboardActivity extends AppCompatActivity {
     @BindView(R.id.toolbar)
@@ -84,7 +85,7 @@ public class DashboardActivity extends AppCompatActivity {
             });
         }
 
-        final PreferenceManager pm = PreferenceManager.getInstance(this);
+        final SessionManager pm = SessionManager.getInstance(this);
 
 
         DrawerImageLoader.init(new AbstractDrawerImageLoader() {
@@ -195,7 +196,17 @@ public class DashboardActivity extends AppCompatActivity {
                             }
                         }),
                         new DividerDrawerItem(),
-                        new ProfileSettingDrawerItem().withName("Manage Account").withIcon(R.drawable.ic_settings_grey600_48dp)
+                        new ProfileSettingDrawerItem().withName("Logout").withIcon(R.drawable.ic_settings_grey600_48dp).withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                            @Override
+                            public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                                //// TODO: 8/10/2016 for now testing logout will
+                                pm.deleteUser();
+                                Intent intent = new Intent(DashboardActivity.this,LoginActivity.class);
+                                startActivity(intent);
+                                finish();
+                                return false;
+                            }
+                        })
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override

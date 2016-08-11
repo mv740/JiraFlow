@@ -41,7 +41,7 @@ import ca.michalwozniak.jiraflow.model.Sprint;
 import ca.michalwozniak.jiraflow.model.other.Column;
 import ca.michalwozniak.jiraflow.service.JiraSoftwareService;
 import ca.michalwozniak.jiraflow.service.ServiceGenerator;
-import ca.michalwozniak.jiraflow.utility.PreferenceManager;
+import ca.michalwozniak.jiraflow.utility.SessionManager;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -52,7 +52,7 @@ public class BoardFragment extends Fragment {
     private BoardView mBoardView;
     private int mColumns;
     private Unbinder unbinder;
-    private PreferenceManager preferenceManager;
+    private SessionManager sessionManager;
     private Activity myActivity;
 
 
@@ -72,7 +72,7 @@ public class BoardFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.test_board_layout, container, false);
         unbinder = ButterKnife.bind(this, view);
-        preferenceManager = PreferenceManager.getInstance(myActivity);
+        sessionManager = SessionManager.getInstance(myActivity);
 
 
         mBoardView = (BoardView) view.findViewById(R.id.board_view);
@@ -111,7 +111,7 @@ public class BoardFragment extends Fragment {
     private void getBoardConfiguration() {
 
 
-        final JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, preferenceManager.getUsername(), preferenceManager.getPassword());
+        final JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword());
 
         final int boardID = 1;
         jiraService.getBoardConfiguration(boardID)

@@ -26,7 +26,7 @@ import ca.michalwozniak.jiraflow.model.Issue.Issue;
 import ca.michalwozniak.jiraflow.model.Issue.userIssues;
 import ca.michalwozniak.jiraflow.service.JiraSoftwareService;
 import ca.michalwozniak.jiraflow.service.ServiceGenerator;
-import ca.michalwozniak.jiraflow.utility.PreferenceManager;
+import ca.michalwozniak.jiraflow.utility.SessionManager;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -43,7 +43,7 @@ public class AssignedIssuesFragment extends Fragment implements SwipeRefreshLayo
     private List<Issue> issues;
     private CardViewIssueAdapter cardView;
     private Unbinder unbinder;
-    private PreferenceManager preferenceManager;
+    private SessionManager sessionManager;
 
     public AssignedIssuesFragment() {
         // Required empty public constructor
@@ -60,7 +60,7 @@ public class AssignedIssuesFragment extends Fragment implements SwipeRefreshLayo
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_assigned_issues, container, false);
         unbinder = ButterKnife.bind(this, view);
-        this.preferenceManager = PreferenceManager.getInstance(myActivity);
+        this.sessionManager = SessionManager.getInstance(myActivity);
 
 
         LinearLayoutManager llm = new LinearLayoutManager(super.getActivity());
@@ -97,7 +97,7 @@ public class AssignedIssuesFragment extends Fragment implements SwipeRefreshLayo
 
     private void getProjects() {
 
-        JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, preferenceManager.getUsername(), preferenceManager.getPassword());
+        JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword());
 
         JQLHelper jqlHelper = new JQLHelper(JQLHelper.Query.ASSIGNEE.toString(),"mv740");
         jiraService.getUserIssues(jqlHelper.toString())

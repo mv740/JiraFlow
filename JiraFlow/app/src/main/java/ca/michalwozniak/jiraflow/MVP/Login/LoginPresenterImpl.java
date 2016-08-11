@@ -3,7 +3,7 @@ package ca.michalwozniak.jiraflow.MVP.Login;
 import android.content.Context;
 
 import ca.michalwozniak.jiraflow.model.User;
-import ca.michalwozniak.jiraflow.utility.PreferenceManager;
+import ca.michalwozniak.jiraflow.utility.SessionManager;
 
 /**
  * Created by Michal Wozniak on 7/23/2016.
@@ -18,20 +18,6 @@ public class LoginPresenterImpl implements LoginPresenter, LoginInteractor.OnLog
     public LoginPresenterImpl(LoginView loginView) {
         this.loginView = loginView;
         this.loginInteractor = new LoginInteractorImpl();
-    }
-
-    public boolean validateInput(String username, String password) {
-
-        if ((username.isEmpty() || password.isEmpty())) {
-            loginView.inputEmpty();
-            return false;
-        } else if (username.isEmpty()) {
-            loginView.usernameEmpty();
-            return false;
-        } else if (password.isEmpty()) {
-            loginView.passwordEmpty();
-            return false;
-        } else return true;
     }
 
     @Override
@@ -72,7 +58,7 @@ public class LoginPresenterImpl implements LoginPresenter, LoginInteractor.OnLog
     @Override
     public void saveUser(String username, String password, User user) {
 
-        PreferenceManager pm = PreferenceManager.getInstance((Context) this.loginView);
+        SessionManager pm = SessionManager.getInstance((Context) this.loginView);
         pm.saveUsername(username);
         pm.savePassword(password);
         pm.saveEmail(user.getEmailAddress());

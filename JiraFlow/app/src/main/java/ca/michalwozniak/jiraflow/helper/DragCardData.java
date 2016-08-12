@@ -1,4 +1,4 @@
-package ca.michalwozniak.jiraflow.dragAndDrop;
+package ca.michalwozniak.jiraflow.helper;
 
 /**
  * Created by Michal Wozniak on 8/7/2016.

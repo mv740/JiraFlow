@@ -1,4 +1,4 @@
-package ca.michalwozniak.jiraflow.dragAndDrop;
+package ca.michalwozniak.jiraflow.fragment;
 
 /**
  * Created by Michal Wozniak on 8/4/2016.
@@ -34,6 +34,8 @@ import java.util.ArrayList;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import ca.michalwozniak.jiraflow.R;
+import ca.michalwozniak.jiraflow.helper.DragCardData;
+import ca.michalwozniak.jiraflow.adapter.dragItemAdapter;
 import ca.michalwozniak.jiraflow.helper.JQLHelper;
 import ca.michalwozniak.jiraflow.model.BoardConfiguration;
 import ca.michalwozniak.jiraflow.model.Issue.Issue;
@@ -132,12 +134,6 @@ public class BoardFragment extends Fragment {
                     @Override
                     public void onNext(final BoardConfiguration boardConfig) {
 
-
-
-                        //Log.v("list size - " , String.valueOf(type.size()));
-                        //generateBoard(boardConfig,null);
-
-
                         JQLHelper jqlHelper = new JQLHelper(JQLHelper.Query.PROJECT.toString(),"HEL AND sprint in openSprints()");
 
                         jiraService.getIssuesForActiveSprint(jqlHelper.toString())
@@ -227,7 +223,7 @@ public class BoardFragment extends Fragment {
         }
 
         final int column = mColumns;
-        final ItemAdapter listAdapter = new ItemAdapter(mItemArray, R.layout.test_column_item, R.id.item_layout, true);
+        final dragItemAdapter listAdapter = new dragItemAdapter(mItemArray, R.layout.test_column_item, R.id.item_layout, true);
         final View header = View.inflate(getActivity(), R.layout.test_column_header, null);
         ((TextView) header.findViewById(R.id.text)).setText(current.getName());
         ((TextView) header.findViewById(R.id.item_count)).setText("" + addItems);

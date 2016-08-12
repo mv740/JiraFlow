@@ -48,7 +48,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import ca.michalwozniak.jiraflow.dragAndDrop.BoardFragment;
+import ca.michalwozniak.jiraflow.fragment.BoardFragment;
 import ca.michalwozniak.jiraflow.fragment.AssignedIssuesFragment;
 import ca.michalwozniak.jiraflow.fragment.ProjectFragment;
 import ca.michalwozniak.jiraflow.fragment.StreamFragment;

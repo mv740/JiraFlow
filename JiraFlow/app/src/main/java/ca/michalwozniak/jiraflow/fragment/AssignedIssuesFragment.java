@@ -99,7 +99,7 @@ public class AssignedIssuesFragment extends Fragment implements SwipeRefreshLayo
 
         JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword());
 
-        JQLHelper jqlHelper = new JQLHelper(JQLHelper.Query.ASSIGNEE.toString(),"mv740");
+        JQLHelper jqlHelper = new JQLHelper(JQLHelper.Query.ASSIGNEE,"mv740");
         jiraService.getUserIssues(jqlHelper.toString())
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -125,27 +125,6 @@ public class AssignedIssuesFragment extends Fragment implements SwipeRefreshLayo
     }
 
     private void generateIssueCards(final List<Issue> issueList) {
-//        for (final Issue project : projects) {
-//
-//
-//            OkHttpClient httpClient = new OkHttpClient();
-//            okhttp3.Request request = new okhttp3.Request.Builder().url(project.getAvatarUrls().getExtraSmall()).build();
-//
-//            okhttp3.Call call1 = httpClient.newCall(request);
-//            call1.enqueue(new okhttp3.Callback() {
-//                @Override
-//                public void onFailure(okhttp3.Call call, IOException e) {
-//
-//                }
-//
-//                @Override
-//                public void onResponse(final okhttp3.Call call, okhttp3.Response response) throws IOException {
-//
-//                    project.setImageType(ResourceManager.getImageType(response.headers().get("Content-type")));
-//                    response.body().close();
-//                }
-//            });
-//        }
 
         updateCardList(issueList);
         final Handler handler = new Handler();

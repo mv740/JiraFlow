@@ -21,17 +21,13 @@ public class JQLHelper {
             parameter = p;
         }
 
-        @Override
-        public String toString() {
-            return parameter;
-        }
     }
 
     private String query;
     private String parameter;
 
-    public JQLHelper(String query, String parameter) {
-        this.query = query;
+    public JQLHelper(Query query, String parameter) {
+        this.query = query.toString();
         this.parameter = parameter;
     }
 

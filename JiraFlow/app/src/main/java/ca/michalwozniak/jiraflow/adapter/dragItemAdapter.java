@@ -1,4 +1,4 @@
-package ca.michalwozniak.jiraflow.dragAndDrop;
+package ca.michalwozniak.jiraflow.adapter;
 
 /**
  * Created by Michal Wozniak on 8/4/2016.
@@ -19,14 +19,15 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ca.michalwozniak.jiraflow.R;
+import ca.michalwozniak.jiraflow.helper.DragCardData;
 import ca.michalwozniak.jiraflow.utility.ResourceManager;
 
-public class ItemAdapter extends DragItemAdapter<Pair<Long, DragCardData>, ItemAdapter.ViewHolder> {
+public class dragItemAdapter extends DragItemAdapter<Pair<Long, DragCardData>, dragItemAdapter.ViewHolder> {
 
     private int mLayoutId;
     private int mGrabHandleId;
 
-    public ItemAdapter(ArrayList<Pair<Long, DragCardData>> list, int layoutId, int grabHandleId, boolean dragOnLongPress) {
+    public dragItemAdapter(ArrayList<Pair<Long, DragCardData>> list, int layoutId, int grabHandleId, boolean dragOnLongPress) {
         super(dragOnLongPress);
         mLayoutId = layoutId;
         mGrabHandleId = grabHandleId;
@@ -59,7 +60,7 @@ public class ItemAdapter extends DragItemAdapter<Pair<Long, DragCardData>, ItemA
         return mItemList.get(position).first;
     }
 
-public class ViewHolder extends DragItemAdapter<Pair<Long, DragCardData>, ItemAdapter.ViewHolder>.ViewHolder {
+public class ViewHolder extends DragItemAdapter<Pair<Long, DragCardData>, dragItemAdapter.ViewHolder>.ViewHolder {
     @BindView(R.id.text)
     TextView mText;
     @BindView(R.id.head_image)

@@ -100,7 +100,7 @@ public class ProjectIssuesFragment extends Fragment implements SwipeRefreshLayou
 
         JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword());
 
-        JQLHelper jqlHelper = new JQLHelper(JQLHelper.Query.PROJECT.toString(), projectID);
+        JQLHelper jqlHelper = new JQLHelper(JQLHelper.Query.PROJECT, projectID);
         jiraService.getProjectIssues(jqlHelper.toString())
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -126,37 +126,6 @@ public class ProjectIssuesFragment extends Fragment implements SwipeRefreshLayou
     }
 
     private void generateIssueCards(final List<Issue> issues) {
-//        for (final Issue issue : issues) {
-//
-//
-//            Log.e("link",project.getAvatarUrls().getBig());
-//            //http://173.176.41.65:8000/secure/projectavatar?size=small&pid=10001
-//            OkHttpClient httpClient = new OkHttpClient();
-//
-//            String link = project.getAvatarUrls().getBig();
-//            if(ResourceManager.isSVG(link))
-//            {
-//                link = ResourceManager.fixImageUrl(project.getAvatarUrls().getBig());
-//
-//            }
-//
-//            okhttp3.Request request = new okhttp3.Request.Builder().url(link).build();
-//
-//            okhttp3.Call call1 = httpClient.newCall(request);
-//            call1.enqueue(new okhttp3.Callback() {
-//                @Override
-//                public void onFailure(okhttp3.Call call, IOException e) {
-//
-//                }
-//
-//                @Override
-//                public void onResponse(final okhttp3.Call call, okhttp3.Response response) throws IOException {
-//
-//                    issue.setImageType(ResourceManager.getImageType(response.headers().get("Content-type")));
-//                    response.body().close();
-//                }
-//            });
-//        }
 
         updateCardList(issues);
         final Handler handler = new Handler();

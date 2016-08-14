@@ -16,7 +16,9 @@ public interface LoginInteractor {
         void onSuccess();
 
         void saveUser(String username, String password, User user);
+
+        void rememberProfile();
     }
 
-    void login(String username,String password, OnLoginFinishedListener listener);
+    void login(String username, String password, boolean isChecked, OnLoginFinishedListener listener);
 }

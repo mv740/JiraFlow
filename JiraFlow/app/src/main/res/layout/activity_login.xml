@@ -77,4 +77,14 @@
         <!--style="?android:attr/progressBarStyleLarge"-->
     </FrameLayout>
 
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Remember me"
+        android:id="@+id/checkBoxRememberMe"
+        android:layout_below="@+id/input_layout_password"
+        android:layout_alignStart="@+id/input_layout_password"
+        android:checked="false"
+        />
+
 </RelativeLayout>

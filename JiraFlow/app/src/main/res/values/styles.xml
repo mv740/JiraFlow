@@ -11,6 +11,7 @@
     <style name="AppTheme.Main" parent="Theme.AppCompat.Light.NoActionBar">
 
         <item name="android:colorBackground">@color/atlassianNavy</item>
+
     </style>
 
     <style name="AppTheme.NoActionBar">

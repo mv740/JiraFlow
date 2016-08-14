@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -40,6 +41,8 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
     ProgressBar progressBar;
     @BindView(R.id.loginButton)
     Button loginButton;
+    @BindView(R.id.checkBoxRememberMe)
+    CheckBox rememberMe;
 
 
     private View loginView;
@@ -50,6 +53,7 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
     public void logIn(View view) {
         final String user = mUsername.getText().toString();
         final String pass = mPassword.getText().toString();
+        final boolean isChecked = rememberMe.isChecked();
 
         hideKeyboard(view);
 
@@ -61,7 +65,7 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                presenter.validateCredentials("mv740", "Q1w2e3r4");
+                presenter.validateCredentials("mv740", "Q1w2e3r4", isChecked);
                 //presenter.validateCredentials(user, pass);
             }
         }, 1000);

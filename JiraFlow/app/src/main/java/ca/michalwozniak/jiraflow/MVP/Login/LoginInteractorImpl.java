@@ -12,7 +12,7 @@ import rx.schedulers.Schedulers;
  */
 public class LoginInteractorImpl implements LoginInteractor {
     @Override
-    public void login(final String username, final String password, final OnLoginFinishedListener listener) {
+    public void login(final String username, final String password, final boolean rememberMe, final OnLoginFinishedListener listener) {
 
         final JiraSoftwareService jiraSoftwareService = ServiceGenerator.createService(JiraSoftwareService.class, username, password);
         jiraSoftwareService.getUser()
@@ -41,7 +41,10 @@ public class LoginInteractorImpl implements LoginInteractor {
                     public void onNext(User user) {
 
                         listener.saveUser(username,password,user);
-
+                        if(rememberMe)
+                        {
+                            listener.rememberProfile();
+                        }
                     }
                 });
 

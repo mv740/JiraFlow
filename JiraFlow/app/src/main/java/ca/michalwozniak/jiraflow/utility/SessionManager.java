@@ -14,6 +14,7 @@ public class SessionManager {
     private static final String EMAIL = "email";
     private static final String USERNAME = "username";
     private static final String PROFILE_ICON_URL = "profileIconUrl";
+    private static final String REMEMBER_ME ="rememberMe";
     private static SessionManager instance = null;
     private Context context;
 
@@ -28,13 +29,6 @@ public class SessionManager {
         }
         return instance;
     }
-
-    public boolean doesProfileExist() {
-        SharedPreferences sharedPref = context.getSharedPreferences(USER_PREFERENCE, Context.MODE_PRIVATE);
-        String profile = sharedPref.getString(USERNAME, "empty");
-        return !profile.contains("empty");
-    }
-
 
     public void saveUsername(String username) {
         SharedPreferences sharedPref = context.getSharedPreferences(USER_PREFERENCE, Context.MODE_PRIVATE);
@@ -113,7 +107,20 @@ public class SessionManager {
         SharedPreferences preferences = context.getSharedPreferences(USER_PREFERENCE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.clear();
+        editor.commit();
     }
 
+    public boolean doesProfileExist() {
+        SharedPreferences sharedPref = context.getSharedPreferences(USER_PREFERENCE, Context.MODE_PRIVATE);
+        return sharedPref.getBoolean(REMEMBER_ME, false);
+    }
 
+    public void rememberProfile() {
+        SharedPreferences sharedPref = context.getSharedPreferences(USER_PREFERENCE, Context.MODE_PRIVATE);
+        if (sharedPref != null) {
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putBoolean(REMEMBER_ME, true);
+            editor.commit();
+        }
+    }
 }

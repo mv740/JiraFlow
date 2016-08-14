@@ -134,7 +134,7 @@ public class BoardFragment extends Fragment {
                     @Override
                     public void onNext(final BoardConfiguration boardConfig) {
 
-                        JQLHelper jqlHelper = new JQLHelper(JQLHelper.Query.PROJECT.toString(),"HEL AND sprint in openSprints()");
+                        JQLHelper jqlHelper = new JQLHelper(JQLHelper.Query.PROJECT,"HEL AND sprint in openSprints()");
 
                         jiraService.getIssuesForActiveSprint(jqlHelper.toString())
                                 .subscribeOn(Schedulers.newThread())

@@ -31,4 +31,20 @@ public class Avatar {
     public String getBig() {
         return big;
     }
+
+    public void setExtraSmall(String extraSmall) {
+        this.extraSmall = extraSmall;
+    }
+
+    public void setSmall(String small) {
+        this.small = small;
+    }
+
+    public void setMedium(String medium) {
+        this.medium = medium;
+    }
+
+    public void setBig(String big) {
+        this.big = big;
+    }
 }

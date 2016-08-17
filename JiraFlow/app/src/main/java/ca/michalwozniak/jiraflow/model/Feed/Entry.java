@@ -115,4 +115,12 @@ public class Entry {
     public void setImageType(ImageType imageType) {
         this.imageType = imageType;
     }
+
+    public String getInReplyTo() {
+        return inReplyTo;
+    }
+
+    public Target getTarget() {
+        return target;
+    }
 }

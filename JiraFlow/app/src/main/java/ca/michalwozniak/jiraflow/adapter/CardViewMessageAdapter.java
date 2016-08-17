@@ -9,11 +9,13 @@ import android.net.Uri;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.GenericRequestBuilder;
@@ -43,8 +45,11 @@ public class CardViewMessageAdapter extends RecyclerView.Adapter<CardViewMessage
         CardView cardView;
         CircleImageView circleImageView;
         TextView title;
-        TextView subTitle;
+        TextView message_content;
+        ImageView messageTypeIcon;
+        TextView dateUpdated;
         Context context;
+
 
 
         public ProjectViewHolder(final View itemView) {
@@ -52,7 +57,10 @@ public class CardViewMessageAdapter extends RecyclerView.Adapter<CardViewMessage
             this.cardView = (CardView) itemView.findViewById(R.id.cardViewMessage);
             this.circleImageView = (CircleImageView) itemView.findViewById(R.id.image);
             this.title = (TextView) itemView.findViewById(R.id.title);
-            this.subTitle = (TextView) itemView.findViewById(R.id.subtitle);
+            this.message_content = (TextView) itemView.findViewById(R.id.message_content);
+            this.messageTypeIcon = (ImageView) itemView.findViewById(R.id.messageTypeIcon);
+            this.dateUpdated = (TextView) itemView.findViewById(R.id.dateUpdated) ;
+
             this.context = itemView.getContext();
 
             Drawable icon = ContextCompat.getDrawable(context, R.drawable.zzz_message);
@@ -123,8 +131,24 @@ public class CardViewMessageAdapter extends RecyclerView.Adapter<CardViewMessage
                     .into(holder.circleImageView);
         }
 
-        holder.title.setText(messages.get(position).getAuthor().getName());
-        holder.subTitle.setText(messages.get(position).getObject().getTitle());
+        holder.title.setText(Html.fromHtml(messages.get(position).getTitle()));
+
+        if(messages.get(position).getContent() != null)
+        {
+            holder.message_content.setText(Html.fromHtml(messages.get(position).getContent()));
+        }
+
+
+        String newFormat = ResourceManager.getDate(messages.get(position).getUpdated());
+        holder.dateUpdated.setText(newFormat);
+
+        GenericRequestBuilder<Uri, InputStream, SVG, PictureDrawable> requestBuilder = ResourceManager.getGenericRequestBuilderForSVG(holder.context);
+
+        requestBuilder
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .load(Uri.parse(messages.get(position).getLink().get(1).getHref()))
+                .into(holder.messageTypeIcon);
+
 
     }
 

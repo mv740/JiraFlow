@@ -22,6 +22,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 
 import ca.michalwozniak.jiraflow.R;
 import ca.michalwozniak.jiraflow.model.ImageType;
@@ -156,6 +159,29 @@ public class ResourceManager {
 
         }
         return 0;
+    }
+    //http://stackoverflow.com/questions/14853389/how-to-convert-utc-timestamp-to-device-local-time-in-android
+    //http://stackoverflow.com/questions/18483314/unparseable-date-2013-07-11t134122-000z-at-offset-23
+    public static String getDate(String OurDate)
+    {
+        try
+        {
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+            Date value = formatter.parse(OurDate);
+
+            SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm"); //this format changeable
+            dateFormatter.setTimeZone(TimeZone.getDefault());
+            OurDate = dateFormatter.format(value);
+
+            Log.d("OurDate", OurDate);
+        }
+        catch (Exception e)
+        {
+            Log.e("error",e.getMessage());
+            OurDate = "00-00-0000 00:00";
+        }
+        return OurDate;
     }
 
 }

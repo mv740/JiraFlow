@@ -4,10 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.PictureDrawable;
-import android.net.Uri;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.util.Log;
@@ -18,16 +15,10 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.GenericRequestBuilder;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.model.GlideUrl;
-import com.bumptech.glide.load.model.LazyHeaders;
-import com.caverock.androidsvg.SVG;
-
-import java.io.InputStream;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import ca.michalwozniak.jiraflow.R;
 import ca.michalwozniak.jiraflow.model.Feed.Entry;
 import ca.michalwozniak.jiraflow.model.ImageType;
@@ -40,42 +31,44 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class CardViewMessageAdapter extends RecyclerView.Adapter<CardViewMessageAdapter.ProjectViewHolder> {
 
 
-    public static class ProjectViewHolder extends RecyclerView.ViewHolder{
+    private Context context;
 
-        CardView cardView;
+    public static class ProjectViewHolder extends RecyclerView.ViewHolder {
+
+        @BindView(R.id.image)
         CircleImageView circleImageView;
+        @BindView(R.id.message_contentImage)
+        ImageView messageContentImage;
+        @BindView(R.id.title)
         TextView title;
+        @BindView(R.id.message_content)
         TextView message_content;
+        @BindView(R.id.messageTypeIcon)
         ImageView messageTypeIcon;
+        @BindView(R.id.dateUpdated)
         TextView dateUpdated;
-        Context context;
-
+        @BindView(R.id.buttonMessage)
+        ImageButton button;
+        Context holderContext;
 
 
         public ProjectViewHolder(final View itemView) {
             super(itemView);
-            this.cardView = (CardView) itemView.findViewById(R.id.cardViewMessage);
-            this.circleImageView = (CircleImageView) itemView.findViewById(R.id.image);
-            this.title = (TextView) itemView.findViewById(R.id.title);
-            this.message_content = (TextView) itemView.findViewById(R.id.message_content);
-            this.messageTypeIcon = (ImageView) itemView.findViewById(R.id.messageTypeIcon);
-            this.dateUpdated = (TextView) itemView.findViewById(R.id.dateUpdated) ;
+            ButterKnife.bind(this, itemView);
+            this.holderContext = itemView.getContext();
 
-            this.context = itemView.getContext();
-
-            Drawable icon = ContextCompat.getDrawable(context, R.drawable.zzz_message);
+            Drawable icon = ContextCompat.getDrawable(holderContext, R.drawable.zzz_message);
             icon.setColorFilter(Color.GRAY, PorterDuff.Mode.SRC_ATOP);
 
             //need to style using xml style 
-            title.setPadding(0,0,0,0);
+            title.setPadding(0, 0, 0, 0);
             title.setTextSize(15);
-            ImageButton button = (ImageButton) itemView.findViewById(R.id.buttonMessage);
-            //button.setCompoundDrawables(null,icon,null,null);
+
             button.setImageDrawable(icon);
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.d("buttonMesg","click");
+                    Log.d("buttonMesg", "click");
                 }
             });
 
@@ -85,19 +78,15 @@ public class CardViewMessageAdapter extends RecyclerView.Adapter<CardViewMessage
 
     List<Entry> messages;
 
-    public CardViewMessageAdapter(List<Entry> messages)
-    {
+    public CardViewMessageAdapter(List<Entry> messages, Context context) {
         this.messages = messages;
+        this.context = context;
     }
 
     @Override
     public ProjectViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
         //create a new view
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_view_message,parent,false);
-
-        //set the view's size, margin , padding and layout parameters
-        //...
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_view_message, parent, false);
         return new ProjectViewHolder(v);
     }
 
@@ -106,51 +95,65 @@ public class CardViewMessageAdapter extends RecyclerView.Adapter<CardViewMessage
 
         //Svg picture are not protected on jira : public
         if (messages.get(position).getImageType() == ImageType.SVG) {
-            GenericRequestBuilder<Uri, InputStream, SVG, PictureDrawable> requestBuilder = ResourceManager.getGenericRequestBuilderForSVG(holder.context);
 
-            requestBuilder
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)
-                    .load(Uri.parse(messages.get(position).getAuthor().getLink().get(0).getHref()))
-                    .into(holder.circleImageView);
+            ResourceManager.loadImageSVG(context, messages.get(position).getAuthor().getLink().get(0).getHref(), holder.circleImageView);
+
         } else {
 
+            ResourceManager.loadImage(context, messages.get(position).getAuthor().getLink().get(0).getHref(), holder.circleImageView);
 
-            GlideUrl glideUrl = new GlideUrl(messages.get(position).getAuthor().getLink().get(0).getHref(), new LazyHeaders.Builder()
-                    .addHeader("Authorization", ResourceManager.getEncoredCredentialString(holder.context))
-                    .addHeader("Accept", "application/json")
-                    .build());
-
-            Glide
-                    .with(holder.context)
-                    .load(glideUrl)
-                    .placeholder(R.drawable.ic_check)
-                    .error(R.drawable.zzz_controller_xbox)
-                    .dontAnimate()
-                    .fitCenter()
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .into(holder.circleImageView);
         }
 
         holder.title.setText(Html.fromHtml(messages.get(position).getTitle()));
 
-        if(messages.get(position).getContent() != null)
-        {
-            holder.message_content.setText(Html.fromHtml(messages.get(position).getContent()));
+        if (messages.get(position).getContent() != null) {
+
+            if (messages.get(position).getTitle().contains("attached")) {
+
+                String[] links = ResourceManager.extractLinks(messages.get(position).getContent());
+
+                //images
+                if (links.length != 0) {
+                    String url = links[0];
+                    String extension = url.substring(url.length() - 3);
+                    if (extension.contains("png")) {
+
+                        ResourceManager.loadImage(context, url, holder.messageContentImage);
+                    }
+                }
+
+            }else {
+
+                String result;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                    result = String.valueOf(Html.fromHtml(messages.get(position).getContent(), Html.FROM_HTML_MODE_LEGACY));
+                } else {
+                    result = String.valueOf(Html.fromHtml(messages.get(position).getContent()));
+
+                }
+                holder.message_content.setText(result);
+            }
+            String newFormat = ResourceManager.getDate(messages.get(position).getUpdated());
+            holder.dateUpdated.setText(newFormat);
+            ResourceManager.loadImageSVG(context, messages.get(position).getLink().get(1).getHref(), holder.messageTypeIcon);
         }
+    }
 
 
-        String newFormat = ResourceManager.getDate(messages.get(position).getUpdated());
-        holder.dateUpdated.setText(newFormat);
-
-        GenericRequestBuilder<Uri, InputStream, SVG, PictureDrawable> requestBuilder = ResourceManager.getGenericRequestBuilderForSVG(holder.context);
-
-        requestBuilder
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .load(Uri.parse(messages.get(position).getLink().get(1).getHref()))
-                .into(holder.messageTypeIcon);
-
+    public void add(int position, Entry newItem) {
+        messages.add(position, newItem);
+        notifyItemInserted(position);
 
     }
+
+    // This removes the data from our Dataset and Updates the Recycler View.
+    public void remove(Entry entryToRemove) {
+
+        int currPosition = messages.indexOf(entryToRemove);
+        messages.remove(currPosition);
+        notifyItemRemoved(currPosition);
+    }
+
 
     @Override
     public int getItemCount() {

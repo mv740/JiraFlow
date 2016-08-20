@@ -14,7 +14,8 @@
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:paddingBottom="5dp">
 
             <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/image"
@@ -35,6 +36,15 @@
                     tools:text="Title"
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent" />
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:maxHeight="50dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitStart"
+                    android:id="@+id/message_contentImage" />
 
                 <TextView
                     android:id="@+id/message_content"

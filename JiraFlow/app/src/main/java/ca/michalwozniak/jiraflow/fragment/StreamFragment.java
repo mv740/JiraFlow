@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -26,15 +27,15 @@ import ca.michalwozniak.jiraflow.model.Feed.ActivityFeed;
 import ca.michalwozniak.jiraflow.model.Feed.Entry;
 import ca.michalwozniak.jiraflow.service.JiraSoftwareService;
 import ca.michalwozniak.jiraflow.service.ServiceGenerator;
-import ca.michalwozniak.jiraflow.utility.SessionManager;
 import ca.michalwozniak.jiraflow.utility.ResourceManager;
+import ca.michalwozniak.jiraflow.utility.SessionManager;
 import okhttp3.OkHttpClient;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 
-public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
+public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
 
     @BindView(R.id.swiperefresh)
@@ -42,6 +43,8 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
     @BindView(R.id.rv)
     RecyclerView rv;
     private Activity myActivity;
+
+    private List<Entry> messagesHistory;
     private List<Entry> messages;
     private CardViewMessageAdapter cardView;
     private Unbinder unbinder;
@@ -69,7 +72,7 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
         rv.setHasFixedSize(true);
 
         messages = new ArrayList<>();
-        cardView = new CardViewMessageAdapter(messages);
+        cardView = new CardViewMessageAdapter(messages, getContext());
         rv.setAdapter(cardView);
         swipeRefreshLayout.setOnRefreshListener(this);
         swipeRefreshLayout.post(new Runnable() {
@@ -116,7 +119,6 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
                     @Override
                     public void onNext(ActivityFeed feed) {
-
                         generateMessageFeedCards(feed.getEntry());
                     }
                 });
@@ -152,7 +154,6 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
             @Override
             public void run() {
 
-                cardView.notifyDataSetChanged();
                 // stopping swipe refresh
                 if (swipeRefreshLayout != null) {
                     if (swipeRefreshLayout.isRefreshing())
@@ -162,36 +163,75 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
         }, 1000);
     }
 
+    /**
+     * Update card view list, add unique entry on refresh and delete removed entries
+     *
+     * @param activityFeed Jira activity feed
+     */
     public void updateCardList(List<Entry> activityFeed) {
-        //remove deleted projects
-        for (Entry entry : messages) {
-            boolean stillExist = false;
-            for (Entry entryFeed : activityFeed) {
 
-                if (Objects.equals(entryFeed.getPublished(), entry.getPublished())) {
-                    stillExist = true;
+        List<Entry> newEntrytoAddList = new ArrayList<>();
+        List<Entry> entriesToRemove = new ArrayList<>();
+
+        //check if it is first run or refreshing list
+
+
+
+        if (messagesHistory != null) {
+            //remove deleted projects
+            for (Entry entry : messagesHistory) {
+                boolean stillExist = false;
+                for (Entry entryFeed : activityFeed) {
+
+                    if (Objects.equals(entryFeed.getPublished(), entry.getPublished())) {
+                        stillExist = true;
+                    }
+                }
+                if (!stillExist) {
+                    entriesToRemove.add(entry);
                 }
             }
-            if (!stillExist) {
-                messages.remove(entry);
-            }
-        }
 
-        //add only new project
-        for (Entry newProject : activityFeed) {
-            boolean duplicate = false;
-            for (Entry currentProject : messages) {
-                if (Objects.equals(currentProject.getPublished(), newProject.getPublished())) {
-                    duplicate = true;
+            //add only new project
+            for (Entry newEntry : activityFeed) {
+                boolean duplicate = false;
+                for (Entry currentProject : messagesHistory) {
+                    if (Objects.equals(currentProject.getPublished(), newEntry.getPublished())) {
+                        duplicate = true;
+                    }
+                }
+                if (!duplicate) {
+                    newEntrytoAddList.add(newEntry);
                 }
             }
-            if (!duplicate) {
-                messages.add(newProject);
+
+
+            //delete entries
+            for (Entry toDelete : entriesToRemove)
+            {
+                cardView.remove(toDelete);
+            }
+            //add new entries
+            for (Entry item : newEntrytoAddList) {
+                cardView.add(0, item);
+                rv.scrollToPosition(0);
+            }
+
+
+        }
+        if (cardView.getItemCount() == 0)
+        {
+            //reverse order, top card is most recent date
+            Collections.reverse(activityFeed);
+
+            for (Entry item : activityFeed) {
+                cardView.add(0, item);
+                rv.scrollToPosition(0);
             }
         }
 
-        for (Entry test : messages) {
-            Log.d("test1", test.getAuthor().getName());
-        }
+        //save cards history for later comparing if old entry were deleted or new were added
+        messagesHistory = new ArrayList<>(messages);
+
     }
 }

@@ -14,7 +14,6 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.jakewharton.rxbinding.widget.RxTextView;
-import com.maksim88.passwordedittext.PasswordEditText;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -34,7 +33,7 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
     @BindView(R.id.input_layout_username)
     TextInputLayout mUsernameLayout;
     @BindView(R.id.input_password)
-    PasswordEditText mPassword;
+    TextInputEditText mPassword;
     @BindView(R.id.input_layout_password)
     TextInputLayout mPasswordLayout;
     @BindView(R.id.loginProgressBar)
@@ -58,7 +57,6 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
         hideKeyboard(view);
 
         loginView = view;
-
         loginButton.setEnabled(false);
         progressBar.setVisibility(View.VISIBLE);
         CircularAnimUtil.hide(loginButton);

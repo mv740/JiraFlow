@@ -7,9 +7,14 @@ import android.graphics.drawable.PictureDrawable;
 import android.net.Uri;
 import android.util.Base64;
 import android.util.Log;
+import android.util.Patterns;
+import android.widget.ImageView;
 
 import com.bumptech.glide.GenericRequestBuilder;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.model.GlideUrl;
+import com.bumptech.glide.load.model.LazyHeaders;
 import com.bumptech.glide.load.model.StreamEncoder;
 import com.bumptech.glide.load.resource.file.FileToStreamDecoder;
 import com.caverock.androidsvg.SVG;
@@ -23,8 +28,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
+import java.util.regex.Matcher;
 
 import ca.michalwozniak.jiraflow.R;
 import ca.michalwozniak.jiraflow.model.ImageType;
@@ -182,6 +190,46 @@ public class ResourceManager {
             OurDate = "00-00-0000 00:00";
         }
         return OurDate;
+    }
+
+    //http://stackoverflow.com/questions/6384240/how-to-parse-a-url-from-a-string-in-android
+    public static String[] extractLinks(String text) {
+        List<String> links = new ArrayList<>();
+        Matcher m = Patterns.WEB_URL.matcher(text);
+        while (m.find()) {
+            String url = m.group();
+            Log.d("extractLinks", "URL extracted: " + url);
+            links.add(url);
+        }
+
+        return links.toArray(new String[links.size()]);
+    }
+
+    public static void loadImage(Context context, String url, ImageView imageView)
+    {
+        GlideUrl glideUrl = new GlideUrl(url, new LazyHeaders.Builder()
+                .addHeader("Authorization", ResourceManager.getEncoredCredentialString(context))
+                .addHeader("Accept", "application/json")
+                .build());
+
+        Glide
+                .with(context)
+                .load(glideUrl)
+                .error(R.drawable.zzz_controller_xbox)
+                .dontAnimate()
+                .fitCenter()
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .into(imageView);
+    }
+
+    public static void loadImageSVG(Context context,String Href, ImageView imageView)
+    {
+        GenericRequestBuilder<Uri, InputStream, SVG, PictureDrawable> requestBuilder = ResourceManager.getGenericRequestBuilderForSVG(context);
+
+        requestBuilder
+                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                .load(Uri.parse(Href))
+                .into(imageView);
     }
 
 }

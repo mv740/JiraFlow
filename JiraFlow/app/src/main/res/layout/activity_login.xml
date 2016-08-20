@@ -18,7 +18,8 @@
         android:layout_alignParentTop="true"
         android:layout_margin="16dp"
         android:layout_marginBottom="8dp"
-        android:layout_marginTop="67dp">
+        android:layout_marginTop="67dp"
+        >
 
         <android.support.design.widget.TextInputEditText
             android:id="@+id/input_username"
@@ -40,12 +41,13 @@
         android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp">
 
-        <com.maksim88.passwordedittext.PasswordEditText
+        <android.support.design.widget.TextInputEditText
             android:id="@+id/input_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Password"
-            android:inputType="textPassword" />
+            android:inputType="textPassword"
+           />
 
     </android.support.design.widget.TextInputLayout>
 

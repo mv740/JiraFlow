@@ -12,8 +12,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".LoginActivity"
-            android:theme="@style/AppTheme.Main">
-        </activity>
+            android:theme="@style/AppTheme.Main"></activity>
         <activity
             android:name=".ProjectActivity"
             android:label="@string/title_activity_project"
@@ -31,6 +30,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".CreateIssueActivity"></activity>
     </application>
 
 </manifest>

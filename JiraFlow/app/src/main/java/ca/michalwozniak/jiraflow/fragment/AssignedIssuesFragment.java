@@ -1,6 +1,7 @@
 package ca.michalwozniak.jiraflow.fragment;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -18,7 +19,9 @@ import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
+import ca.michalwozniak.jiraflow.CreateIssueActivity;
 import ca.michalwozniak.jiraflow.R;
 import ca.michalwozniak.jiraflow.adapter.CardViewIssueAdapter;
 import ca.michalwozniak.jiraflow.helper.JQLHelper;
@@ -30,6 +33,7 @@ import ca.michalwozniak.jiraflow.utility.SessionManager;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
+import top.wefor.circularanim.CircularAnim;
 
 
 public class AssignedIssuesFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
@@ -48,6 +52,24 @@ public class AssignedIssuesFragment extends Fragment implements SwipeRefreshLayo
     public AssignedIssuesFragment() {
         // Required empty public constructor
     }
+
+
+    @OnClick(R.id.fabNewIssue)
+    public void newIssueClick(View view)
+    {
+
+        final Activity activity = this.getActivity();
+
+        CircularAnim.fullActivity(activity, view)
+                .colorOrImageRes(R.color.atlassianNavy)
+                .go(new CircularAnim.OnAnimationEndListener() {
+                    @Override
+                    public void onAnimationEnd() {
+                        startActivity(new Intent(activity, CreateIssueActivity.class));
+                    }
+                });
+    }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -99,7 +121,9 @@ public class AssignedIssuesFragment extends Fragment implements SwipeRefreshLayo
 
         JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword());
 
-        JQLHelper jqlHelper = new JQLHelper(JQLHelper.Query.ASSIGNEE,"mv740");
+
+
+        JQLHelper jqlHelper = new JQLHelper(JQLHelper.Query.ASSIGNEE,sessionManager.getUsername());
         jiraService.getUserIssues(jqlHelper.toString())
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())

@@ -1,6 +1,7 @@
 package ca.michalwozniak.jiraflow;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.TextInputEditText;
@@ -24,7 +25,7 @@ import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Func1;
 import rx.functions.Func2;
-import top.wefor.circularanim.CircularAnimUtil;
+import top.wefor.circularanim.CircularAnim;
 
 public class LoginActivity extends AppCompatActivity implements LoginView {
 
@@ -59,7 +60,7 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
         loginView = view;
         loginButton.setEnabled(false);
         progressBar.setVisibility(View.VISIBLE);
-        CircularAnimUtil.hide(loginButton);
+        CircularAnim.hide(loginButton).go();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -142,7 +143,7 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
                 Toast.makeText(LoginActivity.this, errorMessage, Toast.LENGTH_LONG).show();
                 loginButton.setEnabled(true);
                 progressBar.setVisibility(View.GONE);
-                CircularAnimUtil.show(loginButton);
+                CircularAnim.show(loginButton).go();
             }
         }, 2000);
 
@@ -157,16 +158,19 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
     @Override
     public void navigateToDashboard() {
 
-        CircularAnimUtil.startActivity(LoginActivity.this, DashboardActivity.class, this.loginView, R.color.colorPrimary);
-        new Handler().postDelayed(new Runnable() {
+        CircularAnim.fullActivity(LoginActivity.this, this.loginView)
+                .colorOrImageRes(R.color.cardview_light_background)
+                .duration(500)
+                .go(new CircularAnim.OnAnimationEndListener() {
             @Override
-            public void run() {
+            public void onAnimationEnd() {
                 loginButton.setEnabled(true);
                 progressBar.setVisibility(View.GONE);
                 loginButton.setVisibility(View.VISIBLE);
+                startActivity(new Intent(LoginActivity.this,DashboardActivity.class));
+                finish();
             }
-        }, 1000);
-
+        });
     }
 
     @Override

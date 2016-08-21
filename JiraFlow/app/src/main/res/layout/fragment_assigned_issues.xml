@@ -1,22 +1,45 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:tools="http://schemas.android.com/tools"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-tools:context="ca.michalwozniak.jiraflow.fragment.AssignedIssuesFragment">
-
-<android.support.v4.widget.SwipeRefreshLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/swiperefresh"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="ca.michalwozniak.jiraflow.fragment.AssignedIssuesFragment">
 
-    <android.support.v7.widget.RecyclerView
-        android:layout_height="match_parent"
+
+    <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:id="@+id/rv"
-        >
+        android:layout_height="match_parent">
 
-    </android.support.v7.widget.RecyclerView>
-</android.support.v4.widget.SwipeRefreshLayout>
+        <android.support.v4.widget.SwipeRefreshLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/swiperefresh"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <android.support.v7.widget.RecyclerView
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:id="@+id/rv"
+                >
+
+            </android.support.v7.widget.RecyclerView>
+
+        </android.support.v4.widget.SwipeRefreshLayout>
+
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fabNewIssue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:layout_margin="16dp"
+            app:fabSize="normal"
+            android:clickable="true"
+            android:src="@drawable/zzz_plus"
+            app:layout_anchor="@id/swiperefresh"
+            app:layout_anchorGravity="bottom|right|end"
+            app:elevation="6dp"
+            app:rippleColor="@color/black_button"/>
+    </android.support.design.widget.CoordinatorLayout>
 
 </FrameLayout>

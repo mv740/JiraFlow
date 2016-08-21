@@ -11,7 +11,6 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.PictureDrawable;
 import android.net.Uri;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,6 +27,8 @@ import com.caverock.androidsvg.SVG;
 import java.io.InputStream;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import ca.michalwozniak.jiraflow.R;
 import ca.michalwozniak.jiraflow.model.Issue.Issue;
 import ca.michalwozniak.jiraflow.utility.ResourceManager;
@@ -38,28 +39,30 @@ public class CardViewIssueAdapter extends RecyclerView.Adapter<CardViewIssueAdap
 
     public static class IssueViewHolder extends RecyclerView.ViewHolder{
 
-        CardView cardView;
+
+        @BindView(R.id.image)
         ImageView circleImageView;
+        @BindView(R.id.title)
         TextView title;
+        @BindView(R.id.subtitle)
         TextView subTitle;
+        @BindView(R.id.statusText)
+        TextView statusText;
+        @BindView(R.id.buttonMessage)
+        ImageButton button;
+
         Context context;
+
 
 
         public IssueViewHolder(final View itemView) {
             super(itemView);
-            this.cardView = (CardView) itemView.findViewById(R.id.cardViewIssue);
-            this.circleImageView = (ImageView) itemView.findViewById(R.id.image);
-            this.title = (TextView) itemView.findViewById(R.id.title);
-            this.subTitle = (TextView) itemView.findViewById(R.id.subtitle);
+            ButterKnife.bind(this, itemView);
             this.context = itemView.getContext();
 
             Drawable icon = ContextCompat.getDrawable(context, R.drawable.zzz_message);
             icon.setColorFilter(Color.GRAY, PorterDuff.Mode.SRC_ATOP);
 
-            //need to style using xml style
-            title.setPadding(0,0,0,0);
-            title.setTextSize(15);
-            ImageButton button = (ImageButton) itemView.findViewById(R.id.buttonMessage);
             //button.setCompoundDrawables(null,icon,null,null);
             button.setImageDrawable(icon);
             button.setOnClickListener(new View.OnClickListener() {
@@ -103,6 +106,13 @@ public class CardViewIssueAdapter extends RecyclerView.Adapter<CardViewIssueAdap
 
         holder.title.setText(issues.get(position).getKey());
         holder.subTitle.setText(issues.get(position).getFields().getSummary());
+
+        String status = issues.get(position).getFields().getStatus().getName();
+
+
+        Log.e("statusText",status);
+        holder.statusText.setTextColor(ResourceManager.getStatusTextColor(issues.get(position).getFields().getStatus().getStatusCategory().getColorName()));
+        holder.statusText.setText(status);
 
     }
 

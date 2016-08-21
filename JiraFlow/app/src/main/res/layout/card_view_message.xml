@@ -72,9 +72,8 @@
                 android:padding="4dp" />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="25dp"
-                android:text="Small Text"
                 android:id="@+id/dateUpdated"
                 android:layout_gravity="left|bottom|center_horizontal"
                 android:padding="5dp"

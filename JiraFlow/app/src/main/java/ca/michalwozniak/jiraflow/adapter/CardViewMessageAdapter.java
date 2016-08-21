@@ -60,7 +60,6 @@ public class CardViewMessageAdapter extends RecyclerView.Adapter<CardViewMessage
             Drawable icon = ContextCompat.getDrawable(holderContext, R.drawable.zzz_message);
             icon.setColorFilter(Color.GRAY, PorterDuff.Mode.SRC_ATOP);
 
-            //need to style using xml style 
             title.setPadding(0, 0, 0, 0);
             title.setTextSize(15);
 
@@ -104,11 +103,13 @@ public class CardViewMessageAdapter extends RecyclerView.Adapter<CardViewMessage
 
         }
 
-        holder.title.setText(Html.fromHtml(messages.get(position).getTitle()));
+        String titleHTML = messages.get(position).getTitle();
+        String title = String.valueOf(Html.fromHtml(titleHTML));
 
+        holder.title.setText(Html.fromHtml(titleHTML));
         if (messages.get(position).getContent() != null) {
 
-            if (messages.get(position).getTitle().contains("attached")) {
+            if (title.contains("attached")) {
 
                 String[] links = ResourceManager.extractLinks(messages.get(position).getContent());
 
@@ -123,6 +124,7 @@ public class CardViewMessageAdapter extends RecyclerView.Adapter<CardViewMessage
                 }
 
             }else {
+                holder.messageContentImage.setImageDrawable(null); //don't show the content
 
                 String result;
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
@@ -133,10 +135,19 @@ public class CardViewMessageAdapter extends RecyclerView.Adapter<CardViewMessage
                 }
                 holder.message_content.setText(result);
             }
-            String newFormat = ResourceManager.getDate(messages.get(position).getUpdated());
-            holder.dateUpdated.setText(newFormat);
-            ResourceManager.loadImageSVG(context, messages.get(position).getLink().get(1).getHref(), holder.messageTypeIcon);
+
+            if(!title.contains("commented"))
+            {
+                holder.message_content.setText(null);
+            }
+
+        }else{
+            holder.message_content.setText(null);
         }
+
+        ResourceManager.loadImageSVG(context, messages.get(position).getLink().get(1).getHref(), holder.messageTypeIcon);
+        String newFormat = ResourceManager.getDate(messages.get(position).getUpdated());
+        holder.dateUpdated.setText(newFormat);
     }
 
 

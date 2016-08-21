@@ -183,7 +183,7 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 boolean stillExist = false;
                 for (Entry entryFeed : activityFeed) {
 
-                    if (Objects.equals(entryFeed.getPublished(), entry.getPublished())) {
+                    if (Objects.equals(entryFeed.getUpdated(), entry.getUpdated())) {
                         stillExist = true;
                     }
                 }
@@ -195,8 +195,8 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
             //add only new project
             for (Entry newEntry : activityFeed) {
                 boolean duplicate = false;
-                for (Entry currentProject : messagesHistory) {
-                    if (Objects.equals(currentProject.getPublished(), newEntry.getPublished())) {
+                for (Entry currentEntry : messagesHistory) {
+                    if (Objects.equals(currentEntry.getUpdated(), newEntry.getUpdated())) {
                         duplicate = true;
                     }
                 }

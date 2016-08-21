@@ -1,6 +1,7 @@
 package ca.michalwozniak.jiraflow.utility;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Picture;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.PictureDrawable;
@@ -182,7 +183,7 @@ public class ResourceManager {
             dateFormatter.setTimeZone(TimeZone.getDefault());
             OurDate = dateFormatter.format(value);
 
-            Log.d("OurDate", OurDate);
+            //Log.d("OurDate", OurDate);
         }
         catch (Exception e)
         {
@@ -198,7 +199,7 @@ public class ResourceManager {
         Matcher m = Patterns.WEB_URL.matcher(text);
         while (m.find()) {
             String url = m.group();
-            Log.d("extractLinks", "URL extracted: " + url);
+           // Log.d("extractLinks", "URL extracted: " + url);
             links.add(url);
         }
 
@@ -230,6 +231,36 @@ public class ResourceManager {
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .load(Uri.parse(Href))
                 .into(imageView);
+    }
+
+    public static int getStatusTextColor(String colorDescriptor)
+    {
+        if(colorDescriptor.contains("yellow"))
+        {
+            return Color.parseColor("#FFC107");
+        }else if(colorDescriptor.contains("blue"))
+        {
+            return Color.parseColor("#3F51B5");
+        }else if (colorDescriptor.contains("green"))
+        {
+            return Color.parseColor("#4CAF50");
+        }
+        return Color.GRAY;
+    }
+
+    public static int getStatusBackgroundColor(String colorDescriptor)
+    {
+        if(colorDescriptor.contains("yellow"))
+        {
+            return Color.parseColor("#FFF8E1");
+        }else if(colorDescriptor.contains("blue"))
+        {
+            return Color.parseColor("#E8EAF6");
+        }else if (colorDescriptor.contains("green"))
+        {
+            return Color.parseColor("#E8F5E9");
+        }
+        return Color.GRAY;
     }
 
 }

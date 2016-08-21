@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -32,27 +33,31 @@ public class CardViewProjectIssueAdapter extends RecyclerView.Adapter<CardViewPr
 
     public static class ProjectViewHolder extends RecyclerView.ViewHolder{
 
+        @BindView(R.id.cardViewIssue)
+        CardView cardView;
         @BindView(R.id.image)
         ImageView circleImageView;
         @BindView(R.id.title)
         TextView title;
         @BindView(R.id.subtitle)
         TextView subTitle;
-
+        @BindView(R.id.statusText)
+        TextView statusText;
         Context context;
 
 
         public ProjectViewHolder(final View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            this.context = itemView.getContext();
 
             Drawable icon = ContextCompat.getDrawable(context, R.drawable.zzz_message);
             icon.setColorFilter(Color.GRAY, PorterDuff.Mode.SRC_ATOP);
 
             //need to style using xml style
-            title.setPadding(0,0,0,0);
-            title.setTextSize(15);
             ImageButton button = (ImageButton) itemView.findViewById(R.id.buttonMessage);
+
+
             //button.setCompoundDrawables(null,icon,null,null);
             button.setImageDrawable(icon);
             button.setOnClickListener(new View.OnClickListener() {
@@ -85,6 +90,14 @@ public class CardViewProjectIssueAdapter extends RecyclerView.Adapter<CardViewPr
         ResourceManager.loadImageSVG(holder.context,issues.get(position).getFields().getIssuetype().getIconUrl(),holder.circleImageView);
         holder.title.setText(issues.get(position).getKey());
         holder.subTitle.setText(issues.get(position).getFields().getSummary());
+
+        String status = issues.get(position).getFields().getStatus().getName();
+
+        Log.e("statusText",status);
+        Log.e("statusTextColor",issues.get(position).getFields().getStatus().getStatusCategory().getColorName());
+        holder.statusText.setTextColor(ResourceManager.getStatusTextColor(issues.get(position).getFields().getStatus().getStatusCategory().getColorName()));
+        holder.cardView.setBackgroundColor(ResourceManager.getStatusBackgroundColor(issues.get(position).getFields().getStatus().getStatusCategory().getColorName()));
+        holder.statusText.setText(status);
 
     }
 

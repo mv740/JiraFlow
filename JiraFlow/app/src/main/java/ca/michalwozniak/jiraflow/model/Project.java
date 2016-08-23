@@ -2,6 +2,10 @@ package ca.michalwozniak.jiraflow.model;
 
 import android.graphics.drawable.Drawable;
 
+import java.util.List;
+
+import ca.michalwozniak.jiraflow.model.Issue.issueType;
+
 /**
  * Created by michal on 4/17/2016.
  */
@@ -14,7 +18,10 @@ public class Project {
     private String name;
     private Avatar avatarUrls;
     private String projectTypeKey;
+   // @JsonProperty(required = false)
     private Category projectCategory;
+   // @JsonProperty(required = false)
+    private List<issueType> issuetypes;
     private Drawable avatar;
     private ImageType imageType;
 
@@ -68,5 +75,9 @@ public class Project {
 
     public void setAvatarBigUrls(String avatarUrls) {
         this.avatarUrls.setBig(avatarUrls);
+    }
+
+    public List<issueType> getIssuetypes() {
+        return issuetypes;
     }
 }

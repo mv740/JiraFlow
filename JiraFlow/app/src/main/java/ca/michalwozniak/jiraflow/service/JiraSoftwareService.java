@@ -4,6 +4,7 @@ import java.util.List;
 
 import ca.michalwozniak.jiraflow.model.BoardConfiguration;
 import ca.michalwozniak.jiraflow.model.BoardList;
+import ca.michalwozniak.jiraflow.model.CreateIssueMetaField;
 import ca.michalwozniak.jiraflow.model.Feed.ActivityFeed;
 import ca.michalwozniak.jiraflow.model.Issue.ProjectIssues;
 import ca.michalwozniak.jiraflow.model.Issue.issueType;
@@ -71,6 +72,9 @@ public interface JiraSoftwareService {
 
     @GET("/rest/api/2/search")
     Observable<Sprint> getIssuesForActiveSprint(@Query("jql") String project);
+
+    @GET("/rest/api/2/issue/createmeta")
+    Observable<CreateIssueMetaField> getCreateIssueMeta(@Query("projectIds") String projectIds, @Query("projectKeys") String projectKeys, @Query("issuetypeIds") String issuetypeIds, @Query("issuetypeNames") String issuetypeNames);
 
 
 //

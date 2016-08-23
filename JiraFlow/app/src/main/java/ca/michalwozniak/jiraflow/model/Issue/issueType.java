@@ -11,6 +11,7 @@ public class issueType {
     private String iconUrl;
     private String name;
     private boolean subtask;
+    //@JsonProperty(required = false)
     private int avatarId;
 
     public String getSelf() {

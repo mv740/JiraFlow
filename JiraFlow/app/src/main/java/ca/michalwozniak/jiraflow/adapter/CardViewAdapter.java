@@ -2,8 +2,6 @@ package ca.michalwozniak.jiraflow.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.PictureDrawable;
-import android.net.Uri;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -12,14 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.bumptech.glide.GenericRequestBuilder;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.model.GlideUrl;
-import com.bumptech.glide.load.model.LazyHeaders;
-import com.caverock.androidsvg.SVG;
-
-import java.io.InputStream;
 import java.util.List;
 
 import ca.michalwozniak.jiraflow.ProjectActivity;
@@ -90,41 +80,12 @@ public class CardViewAdapter extends RecyclerView.Adapter<CardViewAdapter.Projec
 
 
         if (projects.get(position).getImageType() == ImageType.SVG) {
-            GenericRequestBuilder<Uri, InputStream, SVG, PictureDrawable> requestBuilder = ResourceManager.getGenericRequestBuilderForSVG(holder.context);
 
-            requestBuilder
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)
-                    .load(Uri.parse(projects.get(position).getAvatarUrls().getSmall()))
-                    .into(holder.circleImageView);
+            ResourceManager.loadImageSVG(holder.context,projects.get(position).getAvatarUrls().getSmall(),holder.circleImageView);
+
         } else {
 
-            GlideUrl glideUrl = new GlideUrl(projects.get(position).getAvatarUrls().getBig(), new LazyHeaders.Builder()
-                    .addHeader("Authorization", ResourceManager.getEncoredCredentialString(holder.context))
-                    .addHeader("Accept", "application/json")
-                    .build());
-
-            Glide
-                    .with(holder.context)
-                    .load(glideUrl)
-                    //.load(Uri.parse(ResourceManager.fixImageUrl(projects.get(position).getAvatarUrls().getSmall())))
-                    .placeholder(R.drawable.ic_check)
-                    .error(R.drawable.zzz_controller_xbox)
-                    .dontAnimate()
-                    .fitCenter()
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-//                    .listener(new RequestListener<Uri, GlideDrawable>() {
-//                        @Override
-//                        public boolean onException(Exception e, Uri model, Target<GlideDrawable> target, boolean isFirstResource) {
-//                            Log.e("glideError",e.getMessage());
-//                            return false;
-//                        }
-//
-//                        @Override
-//                        public boolean onResourceReady(GlideDrawable resource, Uri model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-//                            return false;
-//                        }
-//                    })
-                    .into(holder.circleImageView);
+            ResourceManager.loadImage(holder.context,projects.get(position).getAvatarUrls().getBig(),holder.circleImageView);
         }
 
         holder.title.setText(projects.get(position).getName());

@@ -113,7 +113,7 @@ public class BoardFragment extends Fragment {
     private void getBoardConfiguration() {
 
 
-        final JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword());
+        final JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword(), sessionManager.getServerUrl());
 
         final int boardID = 1;
         jiraService.getBoardConfiguration(boardID)

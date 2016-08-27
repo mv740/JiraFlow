@@ -15,10 +15,12 @@ public interface LoginInteractor {
 
         void onSuccess();
 
-        void saveUser(String username, String password, User user);
+        void saveUser(String username, String password, User user, String url);
 
         void rememberProfile();
+
+        void onTimeout();
     }
 
-    void login(String username, String password, boolean isChecked, OnLoginFinishedListener listener);
+    void login(String username, String password, String url, boolean isChecked, OnLoginFinishedListener listener);
 }

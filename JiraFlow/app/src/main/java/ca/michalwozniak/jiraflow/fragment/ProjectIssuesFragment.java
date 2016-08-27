@@ -98,7 +98,7 @@ public class ProjectIssuesFragment extends Fragment implements SwipeRefreshLayou
 
     private void getProjectsIssues() {
 
-        JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword());
+        JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword(),sessionManager.getServerUrl());
 
         JQLHelper jqlHelper = new JQLHelper(JQLHelper.Query.PROJECT, projectID);
         jiraService.getProjectIssues(jqlHelper.toString())

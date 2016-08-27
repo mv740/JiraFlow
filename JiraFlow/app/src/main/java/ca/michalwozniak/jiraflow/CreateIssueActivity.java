@@ -1,5 +1,6 @@
 package ca.michalwozniak.jiraflow;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
@@ -14,8 +15,10 @@ import java.io.IOException;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnFocusChange;
-import ca.michalwozniak.jiraflow.adapter.MaterialSimpleListAdapter;
+import ca.michalwozniak.jiraflow.adapter.NewIssueProjectSimpleListAdapter;
+import ca.michalwozniak.jiraflow.adapter.NewIssueTypeSimpleListAdapter;
 import ca.michalwozniak.jiraflow.model.CreateIssueMetaField;
+import ca.michalwozniak.jiraflow.model.Issue.issueType;
 import ca.michalwozniak.jiraflow.model.Project;
 import ca.michalwozniak.jiraflow.service.JiraSoftwareService;
 import ca.michalwozniak.jiraflow.service.ServiceGenerator;
@@ -46,28 +49,53 @@ public class CreateIssueActivity extends AppCompatActivity {
     {
         if(hasFocus)
         {
-
-            final MaterialSimpleListAdapter simpleListAdapter = new MaterialSimpleListAdapter(new MaterialSimpleListAdapter.Callback() {
+            final NewIssueProjectSimpleListAdapter simpleListAdapter = new NewIssueProjectSimpleListAdapter(new NewIssueProjectSimpleListAdapter.Callback() {
                 @Override
                 public void onMaterialListItemSelected(int index, Project item) {
                     project.setText(item.getName());
                     projectIndexSelected = index;
+                    project.clearFocus();
                     issueType.setEnabled(true);
 
                 }
             },this.issueMetaFieldData.getProjects());
 
             new MaterialDialog.Builder(this)
-                    .title("title")
+                    .title("Select Project")
                     .adapter(simpleListAdapter,null)
+                    .cancelListener(new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialogInterface) {
+                            project.clearFocus();
+                        }
+                    })
                     .show();
         }
     }
     @OnFocusChange(R.id.input_issueType)
     public void actionOneditText1(View v,boolean hasFocus)
     {
-        if(hasFocus) {
-            Log.d("hey","issueType");
+        if(hasFocus)
+        {
+            Log.e("wtf","wtf------------------------");
+            final NewIssueTypeSimpleListAdapter simpleListAdapter = new NewIssueTypeSimpleListAdapter(new NewIssueTypeSimpleListAdapter.Callback() {
+                @Override
+                public void onIssueTypeItemSelected(int index, issueType item) {
+                    issueType.setText(item.getName());
+                    issueType.clearFocus();
+                }
+            },this.issueMetaFieldData.getProjects().get(projectIndexSelected).getIssuetypes());
+
+            new MaterialDialog.Builder(this)
+                    .title("Select issue type")
+                    .adapter(simpleListAdapter,null)
+                    .cancelListener(new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialogInterface) {
+                            issueType.clearFocus();
+                        }
+                    })
+                    .show();
         }
 
 
@@ -99,7 +127,7 @@ public class CreateIssueActivity extends AppCompatActivity {
 
     private void getIssueMetaFieldData() {
 
-        JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword());
+        JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword(),sessionManager.getServerUrl());
 
         jiraService.getCreateIssueMeta(null,null,null,null)
                 .subscribeOn(Schedulers.newThread())

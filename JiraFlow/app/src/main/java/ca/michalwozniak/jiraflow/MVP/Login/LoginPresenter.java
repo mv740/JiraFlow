@@ -5,7 +5,7 @@ package ca.michalwozniak.jiraflow.MVP.Login;
  */
 public interface LoginPresenter {
 
-    void validateCredentials(String username, String password, boolean isChecked);
+    void validateCredentials(String username, String password, String url, boolean rememberMe);
 
     void detachView();
 }

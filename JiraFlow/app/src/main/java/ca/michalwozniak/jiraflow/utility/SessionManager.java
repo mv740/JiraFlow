@@ -14,7 +14,8 @@ public class SessionManager {
     private static final String EMAIL = "email";
     private static final String USERNAME = "username";
     private static final String PROFILE_ICON_URL = "profileIconUrl";
-    private static final String REMEMBER_ME ="rememberMe";
+    private static final String REMEMBER_ME = "rememberMe";
+    private static final String SERVER_URL = "JiraServerURL";
     private static SessionManager instance = null;
     private Context context;
 
@@ -122,5 +123,23 @@ public class SessionManager {
             editor.putBoolean(REMEMBER_ME, true);
             editor.commit();
         }
+    }
+
+    public void saveServerUrl(String url) {
+        SharedPreferences sharedPref = context.getSharedPreferences(USER_PREFERENCE, Context.MODE_PRIVATE);
+        if (sharedPref != null) {
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString(SERVER_URL, url);
+            editor.commit();
+        }
+    }
+
+    public String getServerUrl() {
+        SharedPreferences sharedPref = context.getSharedPreferences(USER_PREFERENCE, Context.MODE_PRIVATE);
+        if (sharedPref != null) {
+            return sharedPref.getString(SERVER_URL, NOT_FOUND);
+
+        }
+        return NOT_FOUND;
     }
 }

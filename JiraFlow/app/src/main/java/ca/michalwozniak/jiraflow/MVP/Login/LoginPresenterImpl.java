@@ -21,12 +21,12 @@ public class LoginPresenterImpl implements LoginPresenter, LoginInteractor.OnLog
     }
 
     @Override
-    public void validateCredentials(String username, String password, boolean rememberMe) {
+    public void validateCredentials(String username, String password, String url, boolean rememberMe) {
         if (loginView != null) {
             loginView.showProgressIndicator();
         }
 
-        loginInteractor.login(username, password,rememberMe, this);
+        loginInteractor.login(username, password,url ,rememberMe, this);
     }
 
     @Override
@@ -52,22 +52,30 @@ public class LoginPresenterImpl implements LoginPresenter, LoginInteractor.OnLog
     public void onSuccess() {
         if (loginView != null) {
             loginView.navigateToDashboard();
+
         }
     }
 
     @Override
-    public void saveUser(String username, String password, User user) {
+    public void saveUser(String username, String password, User user, String url) {
 
         SessionManager pm = SessionManager.getInstance((Context) this.loginView);
         pm.saveUsername(username);
         pm.savePassword(password);
         pm.saveEmail(user.getEmailAddress());
         pm.saveProfileIconUrl(user.getAvatarUrls().getBig());
+        pm.saveServerUrl(url);
     }
 
     @Override
     public void rememberProfile() {
         SessionManager pm = SessionManager.getInstance((Context) this.loginView);
         pm.rememberProfile();
+    }
+
+    @Override
+    public void onTimeout() {
+        if(loginView !=null)
+            loginView.timeout();
     }
 }

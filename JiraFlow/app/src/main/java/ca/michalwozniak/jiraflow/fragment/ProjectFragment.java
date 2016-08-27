@@ -98,7 +98,7 @@ public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     private void getProjects() {
 
-        JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword());
+        JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword(),sessionManager.getServerUrl());
 
         jiraService.getAllProjects()
                 .subscribeOn(Schedulers.newThread())

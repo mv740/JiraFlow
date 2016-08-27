@@ -15,32 +15,33 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 import retrofit2.converter.simplexml.SimpleXmlConverterFactory;
 
 /**
- * Created by michal on 4/10/2016.
+ * Created by Michal Wozniak on 4/10/2016.
  */
 public class ServiceGenerator {
 
-    public static final String API_BASE_URL = "http://173.176.41.65:8000";
-
     private static OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 
-    private static Retrofit.Builder builder =
-            new Retrofit.Builder()
-                    .baseUrl(API_BASE_URL)
-                    .addConverterFactory(JacksonConverterFactory.create())
-                    .addCallAdapterFactory(RxJavaCallAdapterFactory.create());
-
-    private static Retrofit.Builder builderXML =
-            new Retrofit.Builder()
-                    .baseUrl(API_BASE_URL)
-                    .addConverterFactory(SimpleXmlConverterFactory.create())
-                    .addCallAdapterFactory(RxJavaCallAdapterFactory.create());
-
-
-    public static <S> S createService(Class<S> serviceClass) {
-        return createService(serviceClass, null, null);
+    private static  Retrofit.Builder getBuilder(String jiraBaseUrl)
+    {
+        return new Retrofit.Builder()
+                .baseUrl(jiraBaseUrl)
+                .addConverterFactory(JacksonConverterFactory.create())
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create());
     }
 
-    public static <S> S createService(Class<S> serviceClass, String username, String password) {
+    private static  Retrofit.Builder getBuilderXML(String jiraBaseUrl)
+    {
+       return new Retrofit.Builder()
+                .baseUrl(jiraBaseUrl)
+                .addConverterFactory(SimpleXmlConverterFactory.create())
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create());
+    }
+
+    public static <S> S createService(Class<S> serviceClass) {
+        return createService(serviceClass, null, null,null);
+    }
+
+    public static <S> S createService(final Class<S> serviceClass, String username, String password, String url) {
         if (username != null && password != null) {
             String credentials = username + ":" + password;
             final String basic =
@@ -66,11 +67,12 @@ public class ServiceGenerator {
         }
 
         OkHttpClient client = httpClient.build();
-        Retrofit retrofit = builder.client(client).build();
+        Retrofit retrofit = getBuilder(url).client(client).build();
+
         return retrofit.create(serviceClass);
     }
 
-    public static <S> S createServiceXML(Class<S> serviceClass, String username, String password) {
+    public static <S> S createServiceXML(Class<S> serviceClass, String username, String password, String url) {
         if (username != null && password != null) {
             String credentials = username + ":" + password;
             final String basic =
@@ -92,7 +94,7 @@ public class ServiceGenerator {
         }
 
         OkHttpClient client = httpClient.build();
-        Retrofit retrofit = builderXML.client(client).build();
+        Retrofit retrofit = getBuilderXML(url).client(client).build();
         return retrofit.create(serviceClass);
     }
 

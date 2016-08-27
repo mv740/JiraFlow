@@ -14,33 +14,32 @@ import com.afollestad.materialdialogs.internal.MDAdapter;
 import java.util.List;
 
 import ca.michalwozniak.jiraflow.R;
-import ca.michalwozniak.jiraflow.model.ImageType;
-import ca.michalwozniak.jiraflow.model.Project;
+import ca.michalwozniak.jiraflow.model.Issue.issueType;
 import ca.michalwozniak.jiraflow.utility.ResourceManager;
 
 /**
- * See the sample project to understand how this is used. Mimics the Simple List dialog style
- * displayed on Google's guidelines site: https://www.google.com/design/spec/components/dialogs.html#dialogs-simple-dialogs
+ * Created by Michal Wozniak on 8/25/2016.
  *
- * @author Aidan Follestad (afollestad)
+ * based on aidan Follestad version
  */
-public class MaterialSimpleListAdapter extends RecyclerView.Adapter<MaterialSimpleListAdapter.SimpleListVH> implements MDAdapter {
+
+public class NewIssueTypeSimpleListAdapter extends RecyclerView.Adapter<NewIssueTypeSimpleListAdapter.SimpleListVH> implements MDAdapter {
 
     public interface Callback {
-        void onMaterialListItemSelected(int index, Project item);
+        void onIssueTypeItemSelected(int index, issueType item);
     }
 
     private MaterialDialog dialog;
-    private List<Project> mItems;
+    private List<issueType> mItems;
     private Callback mCallback;
 
-    public MaterialSimpleListAdapter(Callback callback, List<Project> projectList) {
-       // mItems = new ArrayList<>();
-        mItems = projectList;
+    public NewIssueTypeSimpleListAdapter(Callback callback, List<issueType> issueTypeList) {
+        // mItems = new ArrayList<>();
+        mItems = issueTypeList;
         mCallback = callback;
     }
 
-    public void add(Project item) {
+    public void add(issueType item) {
         mItems.add(item);
         notifyItemInserted(mItems.size() - 1);
     }
@@ -50,7 +49,7 @@ public class MaterialSimpleListAdapter extends RecyclerView.Adapter<MaterialSimp
         notifyDataSetChanged();
     }
 
-    public Project getItem(int index) {
+    public issueType getItem(int index) {
         return mItems.get(index);
     }
 
@@ -62,7 +61,7 @@ public class MaterialSimpleListAdapter extends RecyclerView.Adapter<MaterialSimp
     @Override
     public SimpleListVH onCreateViewHolder(ViewGroup parent, int viewType) {
         final View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.test_test_test, parent, false);
+                .inflate(R.layout.material_singlelist_issue_type, parent, false);
         return new SimpleListVH(view, this);
     }
 
@@ -70,15 +69,8 @@ public class MaterialSimpleListAdapter extends RecyclerView.Adapter<MaterialSimp
     public void onBindViewHolder(SimpleListVH holder, int position) {
         if (dialog != null) {
 
-            final Project item = mItems.get(position);
-
-            if (item.getImageType() == ImageType.SVG) {
-                ResourceManager.loadImageSVG(holder.context,item.getAvatarUrls().getSmall(),holder.icon);
-
-            } else {
-
-                ResourceManager.loadImage(holder.context,item.getAvatarUrls().getSmall(),holder.icon);
-            }
+            final issueType item = mItems.get(position);
+            ResourceManager.loadImageSVG(holder.context,item.getIconUrl(),holder.icon);
             holder.title.setTextColor(dialog.getBuilder().getItemColor());
             holder.title.setText(item.getName());
             dialog.setTypeface(holder.title, dialog.getBuilder().getRegularFont());
@@ -94,10 +86,10 @@ public class MaterialSimpleListAdapter extends RecyclerView.Adapter<MaterialSimp
 
         final ImageView icon;
         final TextView title;
-        final MaterialSimpleListAdapter adapter;
+        final NewIssueTypeSimpleListAdapter adapter;
         Context context;
 
-        public SimpleListVH(View itemView, final MaterialSimpleListAdapter adapter) {
+        public SimpleListVH(View itemView, final NewIssueTypeSimpleListAdapter adapter) {
             super(itemView);
             this.context = itemView.getContext();
             icon = (ImageView) itemView.findViewById(android.R.id.icon);
@@ -111,9 +103,10 @@ public class MaterialSimpleListAdapter extends RecyclerView.Adapter<MaterialSimp
         public void onClick(View view) {
             if (adapter.mCallback != null)
             {
-                adapter.mCallback.onMaterialListItemSelected(getAdapterPosition(), adapter.getItem(getAdapterPosition()));
+                adapter.mCallback.onIssueTypeItemSelected(getAdapterPosition(), adapter.getItem(getAdapterPosition()));
                 adapter.dialog.dismiss();
             }
         }
     }
 }
+

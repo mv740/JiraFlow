@@ -4,14 +4,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.jakewharton.rxbinding.widget.RxTextView;
@@ -24,7 +28,7 @@ import ca.michalwozniak.jiraflow.MVP.Login.LoginView;
 import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Func1;
-import rx.functions.Func2;
+import rx.functions.Func3;
 import top.wefor.circularanim.CircularAnim;
 
 public class LoginActivity extends AppCompatActivity implements LoginView {
@@ -43,6 +47,12 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
     Button loginButton;
     @BindView(R.id.checkBoxRememberMe)
     CheckBox rememberMe;
+    @BindView(R.id.input_serverUrl)
+    TextInputEditText serverUrl;
+    @BindView(R.id.spinnerHttpType)
+    Spinner spinnerHttpType;
+    @BindView(R.id.loginLayout)
+    RelativeLayout snackbarMessagePosition;
 
 
     private View loginView;
@@ -53,8 +63,14 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
     public void logIn(View view) {
         final String user = mUsername.getText().toString();
         final String pass = mPassword.getText().toString();
+        final String protocol = spinnerHttpType.getSelectedItem().toString();
+        final String url = serverUrl.getText().toString();
         final boolean isChecked = rememberMe.isChecked();
+        view.setFocusable(true);
+        view.setFocusableInTouchMode(true);
+        view.requestFocus();
 
+        final String jiraUrl = protocol.concat(url);
         hideKeyboard(view);
 
         loginView = view;
@@ -64,7 +80,7 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                presenter.validateCredentials("mv740", "Q1w2e3r4", isChecked);
+                presenter.validateCredentials("mv740", "Q1w2e3r4",jiraUrl, isChecked);
                 //presenter.validateCredentials(user, pass);
             }
         }, 1000);
@@ -72,11 +88,15 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
 
     }
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
+
+        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(this,R.layout.spinner_item,getResources().getStringArray(R.array.http_protocols));
+        spinnerHttpType.setAdapter(spinnerArrayAdapter);
 
         progressBar.setVisibility(View.GONE);
         loginButton.setVisibility(View.VISIBLE);
@@ -107,13 +127,24 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
                 })
                 .distinctUntilChanged();
 
+        Observable<Boolean> serverUrlObservable = RxTextView.textChanges(serverUrl)
+                .map(new Func1<CharSequence, Boolean>() {
+                    @Override
+                    public Boolean call(CharSequence charSequence) {
+                        return (charSequence.length() != 0);
+                    }
+                })
+                .distinctUntilChanged();
+
+
         Observable.combineLatest(
                 usernameObservable,
                 passwordObservable,
-                new Func2<Boolean, Boolean, Boolean>() {
+                serverUrlObservable,
+                new Func3<Boolean, Boolean, Boolean, Boolean>() {
                     @Override
-                    public Boolean call(Boolean usernameValid, Boolean passwordValid) {
-                        return (usernameValid && passwordValid);
+                    public Boolean call(Boolean usernameValid, Boolean passwordValid, Boolean serverUrlValid) {
+                        return (usernameValid && passwordValid && serverUrlValid);
                     }
                 })
                 .distinctUntilChanged()
@@ -171,6 +202,20 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
                 finish();
             }
         });
+    }
+
+    @Override
+    public void timeout() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                //Toast.makeText(LoginActivity.this, "Failed To connect to server! \n\n Make sure the address is correct or that your server is online", Toast.LENGTH_LONG).show();
+                Snackbar.make(snackbarMessagePosition,"Failed To connect to server!",Snackbar.LENGTH_LONG).show();
+                loginButton.setEnabled(true);
+                progressBar.setVisibility(View.GONE);
+                CircularAnim.show(loginButton).go();
+            }
+        }, 2000);
     }
 
     @Override

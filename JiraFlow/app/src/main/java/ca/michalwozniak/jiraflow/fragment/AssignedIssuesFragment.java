@@ -119,7 +119,7 @@ public class AssignedIssuesFragment extends Fragment implements SwipeRefreshLayo
 
     private void getProjects() {
 
-        JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword());
+        JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword(),sessionManager.getServerUrl());
 
 
 

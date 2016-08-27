@@ -101,7 +101,7 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     private void getActivityStream() {
 
-        JiraSoftwareService jiraService = ServiceGenerator.createServiceXML(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword());
+        JiraSoftwareService jiraService = ServiceGenerator.createServiceXML(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword(),sessionManager.getServerUrl());
 
         jiraService.getActivityFeed()
                 .subscribeOn(Schedulers.newThread())

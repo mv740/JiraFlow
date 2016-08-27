@@ -56,4 +56,5 @@ dependencies {
     compile 'com.github.woxthebox:draglistview:1.2.8'
     compile 'com.afollestad.material-dialogs:core:0.9.0.1'
     compile 'com.afollestad.material-dialogs:commons:0.9.0.1'
+    compile 'com.jaredrummler:material-spinner:1.1.0'
 }

@@ -20,6 +20,8 @@ public interface LoginInteractor {
         void rememberProfile();
 
         void onTimeout();
+
+        void connectionError(String s);
     }
 
     void login(String username, String password, String url, boolean isChecked, OnLoginFinishedListener listener);

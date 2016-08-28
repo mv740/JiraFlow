@@ -5,12 +5,12 @@ import android.util.Log;
 
 import java.io.IOException;
 
+import ca.michalwozniak.jiraflow.service.ErrorHTTP.RxErrorHandlingCallAdapterFactory;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 import retrofit2.converter.simplexml.SimpleXmlConverterFactory;
 
@@ -19,14 +19,22 @@ import retrofit2.converter.simplexml.SimpleXmlConverterFactory;
  */
 public class ServiceGenerator {
 
-    private static OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+    private static OkHttpClient.Builder httpClient = getHttpClient();
+
+    private static OkHttpClient.Builder getHttpClient()
+    {
+        //created this function if we later want to add some custom options
+        // specific timeout ...
+        OkHttpClient.Builder client =   new OkHttpClient.Builder();
+        return  client;
+    }
 
     private static  Retrofit.Builder getBuilder(String jiraBaseUrl)
     {
         return new Retrofit.Builder()
                 .baseUrl(jiraBaseUrl)
                 .addConverterFactory(JacksonConverterFactory.create())
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create());
+                .addCallAdapterFactory(RxErrorHandlingCallAdapterFactory.create());
     }
 
     private static  Retrofit.Builder getBuilderXML(String jiraBaseUrl)
@@ -34,7 +42,7 @@ public class ServiceGenerator {
        return new Retrofit.Builder()
                 .baseUrl(jiraBaseUrl)
                 .addConverterFactory(SimpleXmlConverterFactory.create())
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create());
+                .addCallAdapterFactory(RxErrorHandlingCallAdapterFactory.create());
     }
 
     public static <S> S createService(Class<S> serviceClass) {
@@ -64,6 +72,7 @@ public class ServiceGenerator {
                     return chain.proceed(request);
                 }
             });
+
         }
 
         OkHttpClient client = httpClient.build();

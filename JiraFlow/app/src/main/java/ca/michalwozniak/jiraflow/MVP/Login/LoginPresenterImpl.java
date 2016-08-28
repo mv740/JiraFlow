@@ -78,4 +78,11 @@ public class LoginPresenterImpl implements LoginPresenter, LoginInteractor.OnLog
         if(loginView !=null)
             loginView.timeout();
     }
+
+    @Override
+    public void connectionError(String errorMsg) {
+        if(loginView != null)
+            loginView.connectionError(errorMsg);
+    }
+
 }

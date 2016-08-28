@@ -9,4 +9,5 @@ public interface LoginView  {
     void showProgressIndicator();
     void navigateToDashboard();
     void timeout();
+    void connectionError(String errorMsg);
 }

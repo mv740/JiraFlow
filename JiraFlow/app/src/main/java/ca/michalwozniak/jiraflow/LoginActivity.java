@@ -8,6 +8,7 @@ import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Patterns;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
@@ -16,7 +17,6 @@ import android.widget.CheckBox;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import com.jakewharton.rxbinding.widget.RxTextView;
 
@@ -30,6 +30,10 @@ import rx.Subscriber;
 import rx.functions.Func1;
 import rx.functions.Func3;
 import top.wefor.circularanim.CircularAnim;
+
+/**
+ * Created by Michal Wozniak on 8/8/2016.
+ */
 
 public class LoginActivity extends AppCompatActivity implements LoginView {
 
@@ -70,6 +74,7 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
         view.setFocusableInTouchMode(true);
         view.requestFocus();
 
+
         final String jiraUrl = protocol.concat(url);
         hideKeyboard(view);
 
@@ -80,8 +85,13 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                presenter.validateCredentials("mv740", "Q1w2e3r4",jiraUrl, isChecked);
-                //presenter.validateCredentials(user, pass);
+
+                if (Patterns.WEB_URL.matcher(url).matches() || Patterns.IP_ADDRESS.matcher(url).matches()) {
+                    presenter.validateCredentials(user, pass, jiraUrl, isChecked);
+                } else {
+                    invalidUrl();
+                }
+
             }
         }, 1000);
 
@@ -95,7 +105,10 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
 
-        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(this,R.layout.spinner_item,getResources().getStringArray(R.array.http_protocols));
+        mUsername.setText("mv740");
+        mPassword.setText("Q1w2e3r4");
+
+        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, getResources().getStringArray(R.array.http_protocols));
         spinnerHttpType.setAdapter(spinnerArrayAdapter);
 
         progressBar.setVisibility(View.GONE);
@@ -167,20 +180,6 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
     }
 
     @Override
-    public void loginFailed(final String errorMessage) {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(LoginActivity.this, errorMessage, Toast.LENGTH_LONG).show();
-                loginButton.setEnabled(true);
-                progressBar.setVisibility(View.GONE);
-                CircularAnim.show(loginButton).go();
-            }
-        }, 2000);
-
-    }
-
-    @Override
     public void showProgressIndicator() {
         this.progressBar.setVisibility(View.VISIBLE);
         this.loginButton.setVisibility(View.GONE);
@@ -193,15 +192,15 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
                 .colorOrImageRes(R.color.cardview_light_background)
                 .duration(500)
                 .go(new CircularAnim.OnAnimationEndListener() {
-            @Override
-            public void onAnimationEnd() {
-                loginButton.setEnabled(true);
-                progressBar.setVisibility(View.GONE);
-                loginButton.setVisibility(View.VISIBLE);
-                startActivity(new Intent(LoginActivity.this,DashboardActivity.class));
-                finish();
-            }
-        });
+                    @Override
+                    public void onAnimationEnd() {
+                        loginButton.setEnabled(true);
+                        progressBar.setVisibility(View.GONE);
+                        loginButton.setVisibility(View.VISIBLE);
+                        startActivity(new Intent(LoginActivity.this, DashboardActivity.class));
+                        finish();
+                    }
+                });
     }
 
     @Override
@@ -210,13 +209,41 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
             @Override
             public void run() {
                 //Toast.makeText(LoginActivity.this, "Failed To connect to server! \n\n Make sure the address is correct or that your server is online", Toast.LENGTH_LONG).show();
-                Snackbar.make(snackbarMessagePosition,"Failed To connect to server!",Snackbar.LENGTH_LONG).show();
-                loginButton.setEnabled(true);
-                progressBar.setVisibility(View.GONE);
-                CircularAnim.show(loginButton).go();
+                Snackbar.make(snackbarMessagePosition, "Failed To connect to server!", Snackbar.LENGTH_LONG).show();
+                resetLoginButton();
             }
         }, 2000);
     }
+
+    @Override
+    public void connectionError(String errorMsg) {
+        Snackbar.make(snackbarMessagePosition, errorMsg, Snackbar.LENGTH_LONG).show();
+        resetLoginButton();
+    }
+
+    @Override
+    public void loginFailed(final String errorMessage) {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Snackbar.make(snackbarMessagePosition, errorMessage, Snackbar.LENGTH_LONG).show();
+                resetLoginButton();
+            }
+        }, 2000);
+
+    }
+
+    private void resetLoginButton() {
+        loginButton.setEnabled(true);
+        progressBar.setVisibility(View.GONE);
+        CircularAnim.show(loginButton).go();
+    }
+
+    private void invalidUrl() {
+        Snackbar.make(snackbarMessagePosition, "Invalid Url", Snackbar.LENGTH_LONG).show();
+        resetLoginButton();
+    }
+
 
     @Override
     protected void onDestroy() {

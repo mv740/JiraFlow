@@ -34,7 +34,7 @@ import rx.schedulers.Schedulers;
 
 public class ProjectIssuesFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
 
-    @BindView(R.id.swiperefresh)
+    @BindView(R.id.swipeRefresh)
     SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.rv)
     RecyclerView rv;

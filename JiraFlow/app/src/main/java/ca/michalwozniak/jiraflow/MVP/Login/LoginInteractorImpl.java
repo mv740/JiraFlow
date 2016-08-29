@@ -3,7 +3,7 @@ package ca.michalwozniak.jiraflow.MVP.Login;
 import android.util.Log;
 
 import ca.michalwozniak.jiraflow.model.User;
-import ca.michalwozniak.jiraflow.service.ErrorHTTP.RetrofitException;
+import ca.michalwozniak.jiraflow.service.Error.RetrofitException;
 import ca.michalwozniak.jiraflow.service.JiraSoftwareService;
 import ca.michalwozniak.jiraflow.service.ServiceGenerator;
 import rx.Subscriber;

@@ -39,7 +39,7 @@ import top.wefor.circularanim.CircularAnim;
 public class AssignedIssuesFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
 
-    @BindView(R.id.swiperefresh)
+    @BindView(R.id.swipeRefresh)
     SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.rv)
     RecyclerView rv;

@@ -29,32 +29,72 @@ public class Project {
         return expand;
     }
 
+    public void setExpand(String expand) {
+        this.expand = expand;
+    }
+
     public String getSelf() {
         return self;
+    }
+
+    public void setSelf(String self) {
+        this.self = self;
     }
 
     public String getId() {
         return id;
     }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public String getKey() {
         return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public String getName() {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public Avatar getAvatarUrls() {
         return avatarUrls;
+    }
+
+    public void setAvatarUrls(Avatar avatarUrls) {
+        this.avatarUrls = avatarUrls;
     }
 
     public String getProjectTypeKey() {
         return projectTypeKey;
     }
 
+    public void setProjectTypeKey(String projectTypeKey) {
+        this.projectTypeKey = projectTypeKey;
+    }
+
     public Category getProjectCategory() {
         return projectCategory;
+    }
+
+    public void setProjectCategory(Category projectCategory) {
+        this.projectCategory = projectCategory;
+    }
+
+    public List<issueType> getIssuetypes() {
+        return issuetypes;
+    }
+
+    public void setIssuetypes(List<issueType> issuetypes) {
+        this.issuetypes = issuetypes;
     }
 
     public Drawable getAvatar() {
@@ -71,13 +111,5 @@ public class Project {
 
     public void setImageType(ImageType imageType) {
         this.imageType = imageType;
-    }
-
-    public void setAvatarBigUrls(String avatarUrls) {
-        this.avatarUrls.setBig(avatarUrls);
-    }
-
-    public List<issueType> getIssuetypes() {
-        return issuetypes;
     }
 }

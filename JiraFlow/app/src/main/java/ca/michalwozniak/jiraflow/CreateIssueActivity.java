@@ -2,6 +2,7 @@ package ca.michalwozniak.jiraflow;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -9,15 +10,24 @@ import android.util.Log;
 import android.view.View;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import java.io.IOException;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.OnFocusChange;
 import ca.michalwozniak.jiraflow.adapter.NewIssueProjectSimpleListAdapter;
 import ca.michalwozniak.jiraflow.adapter.NewIssueTypeSimpleListAdapter;
 import ca.michalwozniak.jiraflow.model.CreateIssueMetaField;
+import ca.michalwozniak.jiraflow.model.CreateIssueModel;
+import ca.michalwozniak.jiraflow.model.EmptyResponse;
+import ca.michalwozniak.jiraflow.model.Issue.Field;
 import ca.michalwozniak.jiraflow.model.Issue.issueType;
 import ca.michalwozniak.jiraflow.model.Project;
 import ca.michalwozniak.jiraflow.service.JiraSoftwareService;
@@ -37,15 +47,23 @@ public class CreateIssueActivity extends AppCompatActivity {
     TextInputEditText issueType;
     @BindView(R.id.input_project)
     TextInputEditText project;
+    @BindView(R.id.fabCreateNewIssue)
+    FloatingActionButton createNewIssueButton;
+    @BindView(R.id.issueSummary)
+    TextInputEditText summary;
+    @BindView(R.id.issueReporter)
+    TextInputEditText reporter;
+
 
     private int projectIndexSelected;
+    private int issueTypeSelected;
 
     private SessionManager sessionManager;
 
     CreateIssueMetaField  issueMetaFieldData;
 
     @OnFocusChange(R.id.input_project)
-    public void actionOneditText(View v,boolean hasFocus)
+    public void onInputProjectFocusChange(View v,boolean hasFocus)
     {
         if(hasFocus)
         {
@@ -73,16 +91,23 @@ public class CreateIssueActivity extends AppCompatActivity {
         }
     }
     @OnFocusChange(R.id.input_issueType)
-    public void actionOneditText1(View v,boolean hasFocus)
+    public void onInputIssueTypeFocusChange(View v,boolean hasFocus)
     {
         if(hasFocus)
         {
-            Log.e("wtf","wtf------------------------");
             final NewIssueTypeSimpleListAdapter simpleListAdapter = new NewIssueTypeSimpleListAdapter(new NewIssueTypeSimpleListAdapter.Callback() {
                 @Override
                 public void onIssueTypeItemSelected(int index, issueType item) {
                     issueType.setText(item.getName());
+                    issueTypeSelected = index;
                     issueType.clearFocus();
+
+                    //for now show here
+                    //Todo only show button when all required information for a minimal issue is available
+                    createNewIssueButton.show();
+                    summary.setEnabled(true);
+
+
                 }
             },this.issueMetaFieldData.getProjects().get(projectIndexSelected).getIssuetypes());
 
@@ -98,7 +123,78 @@ public class CreateIssueActivity extends AppCompatActivity {
                     .show();
         }
 
+    }
 
+    @OnClick(R.id.fabCreateNewIssue)
+    public void newIssueClick()
+    {
+        createIssue();
+        finish();
+    }
+
+
+
+
+    /**
+     * Generate a issue base on selected options - Post Request
+     */
+    private void createIssue() {
+
+
+
+
+        List<Project> projects = issueMetaFieldData.getProjects();
+
+        CreateIssueModel issueModel = new CreateIssueModel();
+
+
+        Field field = new Field();
+        field.setSummary(summary.getText().toString());
+        field.setDescription("Creating of an issue using project keys and issue type names using the REST API");
+        Project project = new Project();
+        project.setKey(projects.get(projectIndexSelected).getKey());
+        issueType issueType = new issueType();
+        issueType.setName(projects.get(projectIndexSelected).getIssuetypes().get(issueTypeSelected).getName());
+        field.setProject(project);
+        field.setIssuetype(issueType);
+
+        issueModel.setFields(field);
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_DEFAULT);
+        try {
+
+            String json = mapper.writeValueAsString(issueModel);
+            Log.e("JSON",json);
+
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword(),sessionManager.getServerUrl());
+
+        jiraService.createIssue(issueModel)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<EmptyResponse>() {
+                    @Override
+                    public void onCompleted() {
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(EmptyResponse response) {
+
+                    }
+
+                });
     }
 
     @Override
@@ -123,6 +219,7 @@ public class CreateIssueActivity extends AppCompatActivity {
         }
         issueType.setEnabled(false);
         getIssueMetaFieldData();
+
     }
 
     private void getIssueMetaFieldData() {

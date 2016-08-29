@@ -7,8 +7,10 @@ import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Patterns;
+import android.view.Gravity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
@@ -17,6 +19,7 @@ import android.widget.CheckBox;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.jakewharton.rxbinding.widget.RxTextView;
 
@@ -90,6 +93,7 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
                     presenter.validateCredentials(user, pass, jiraUrl, isChecked);
                 } else {
                     invalidUrl();
+
                 }
 
             }
@@ -105,6 +109,7 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
 
+        //testing
         mUsername.setText("mv740");
         mPassword.setText("Q1w2e3r4");
 
@@ -208,17 +213,14 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                //Toast.makeText(LoginActivity.this, "Failed To connect to server! \n\n Make sure the address is correct or that your server is online", Toast.LENGTH_LONG).show();
-                Snackbar.make(snackbarMessagePosition, "Failed To connect to server!", Snackbar.LENGTH_LONG).show();
-                resetLoginButton();
+                showErrorSnackBar("Failed To connect to server!");
             }
         }, 2000);
     }
 
     @Override
     public void connectionError(String errorMsg) {
-        Snackbar.make(snackbarMessagePosition, errorMsg, Snackbar.LENGTH_LONG).show();
-        resetLoginButton();
+        showErrorSnackBar(errorMsg);
     }
 
     @Override
@@ -226,7 +228,7 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Snackbar.make(snackbarMessagePosition, errorMessage, Snackbar.LENGTH_LONG).show();
+                showErrorSnackBar(errorMessage);
                 resetLoginButton();
             }
         }, 2000);
@@ -239,11 +241,25 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
         CircularAnim.show(loginButton).go();
     }
 
+    /**
+     * Snackbar error notification
+     */
     private void invalidUrl() {
-        Snackbar.make(snackbarMessagePosition, "Invalid Url", Snackbar.LENGTH_LONG).show();
-        resetLoginButton();
+        showErrorSnackBar("Invalid Url");
     }
 
+
+    public void showErrorSnackBar(String message) {
+        Snackbar snackbar = Snackbar.make(snackbarMessagePosition, message, Snackbar.LENGTH_LONG);
+        View view = snackbar.getView();
+        view.setBackgroundColor(ContextCompat.getColor(LoginActivity.this,R.color.md_red_900));
+        TextView textView = ButterKnife.findById(view, android.support.design.R.id.snackbar_text);
+        textView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
+        textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        textView.setTextSize(15);
+        snackbar.show();
+        resetLoginButton();
+    }
 
     @Override
     protected void onDestroy() {

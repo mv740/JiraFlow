@@ -3,9 +3,13 @@ package ca.michalwozniak.jiraflow.service;
 import android.util.Base64;
 import android.util.Log;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
 import java.io.IOException;
 
-import ca.michalwozniak.jiraflow.service.ErrorHTTP.RxErrorHandlingCallAdapterFactory;
+import ca.michalwozniak.jiraflow.service.Error.RxErrorHandlingCallAdapterFactory;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -31,9 +35,17 @@ public class ServiceGenerator {
 
     private static  Retrofit.Builder getBuilder(String jiraBaseUrl)
     {
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+
+        //mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_DEFAULT);
+
+
         return new Retrofit.Builder()
                 .baseUrl(jiraBaseUrl)
-                .addConverterFactory(JacksonConverterFactory.create())
+                .addConverterFactory(JacksonConverterFactory.create(mapper))
                 .addCallAdapterFactory(RxErrorHandlingCallAdapterFactory.create());
     }
 

@@ -1,4 +1,4 @@
-package ca.michalwozniak.jiraflow.service.ErrorHTTP;
+package ca.michalwozniak.jiraflow.service.Error;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;

@@ -112,6 +112,8 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
         //testing
         mUsername.setText("mv740");
         mPassword.setText("Q1w2e3r4");
+        serverUrl.setText("173.176.41.65:8000");
+
 
         ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, getResources().getStringArray(R.array.http_protocols));
         spinnerHttpType.setAdapter(spinnerArrayAdapter);

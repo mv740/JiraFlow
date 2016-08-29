@@ -4,7 +4,7 @@ import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 
 /**
- * Created by micha on 6/11/2016.
+ * Created by Michal Wozniak on 6/11/2016.
  */
 @Element(name = "link")
 public class Link {

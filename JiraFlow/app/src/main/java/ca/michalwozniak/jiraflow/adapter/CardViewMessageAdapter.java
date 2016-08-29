@@ -91,6 +91,8 @@ public class CardViewMessageAdapter extends RecyclerView.Adapter<CardViewMessage
 
     @Override
     public void onBindViewHolder(ProjectViewHolder holder, int position) {
+        //initialized to empty, or else view will used previous object text if it isn't overwritten
+        holder.message_content.setText(null);
 
         //Svg picture are not protected on jira : public
         if (messages.get(position).getImageType() == ImageType.SVG) {
@@ -136,16 +138,21 @@ public class CardViewMessageAdapter extends RecyclerView.Adapter<CardViewMessage
                 holder.message_content.setText(result);
             }
 
-            if(!title.contains("commented"))
-            {
-                holder.message_content.setText(null);
-            }
 
         }else{
             holder.message_content.setText(null);
         }
 
-        ResourceManager.loadImageSVG(context, messages.get(position).getLink().get(1).getHref(), holder.messageTypeIcon);
+        //if it is a issue (bug/story ... ) it will have icons links
+        if(messages.get(position).getLink().size()>1)
+        {
+            ResourceManager.loadImageSVG(context, messages.get(position).getLink().get(1).getHref(), holder.messageTypeIcon);
+        }else
+        {
+            holder.messageTypeIcon.setImageDrawable(null);
+        }
+
+
         String newFormat = ResourceManager.getDate(messages.get(position).getUpdated());
         holder.dateUpdated.setText(newFormat);
     }

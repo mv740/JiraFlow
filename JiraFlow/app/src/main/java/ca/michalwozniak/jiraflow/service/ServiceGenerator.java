@@ -4,6 +4,7 @@ import android.util.Base64;
 import android.util.Log;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
@@ -25,23 +26,21 @@ public class ServiceGenerator {
 
     private static OkHttpClient.Builder httpClient = getHttpClient();
 
-    private static OkHttpClient.Builder getHttpClient()
-    {
+    private static OkHttpClient.Builder getHttpClient() {
         //created this function if we later want to add some custom options
         // specific timeout ...
-        OkHttpClient.Builder client =   new OkHttpClient.Builder();
-        return  client;
+        OkHttpClient.Builder client = new OkHttpClient.Builder();
+        return client;
     }
 
-    private static  Retrofit.Builder getBuilder(String jiraBaseUrl)
-    {
+    private static Retrofit.Builder getBuilder(String jiraBaseUrl) {
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
 
         //mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_DEFAULT);
-
 
         return new Retrofit.Builder()
                 .baseUrl(jiraBaseUrl)
@@ -49,16 +48,15 @@ public class ServiceGenerator {
                 .addCallAdapterFactory(RxErrorHandlingCallAdapterFactory.create());
     }
 
-    private static  Retrofit.Builder getBuilderXML(String jiraBaseUrl)
-    {
-       return new Retrofit.Builder()
+    private static Retrofit.Builder getBuilderXML(String jiraBaseUrl) {
+        return new Retrofit.Builder()
                 .baseUrl(jiraBaseUrl)
-                .addConverterFactory(SimpleXmlConverterFactory.create())
+                .addConverterFactory(SimpleXmlConverterFactory.createNonStrict())
                 .addCallAdapterFactory(RxErrorHandlingCallAdapterFactory.create());
     }
 
     public static <S> S createService(Class<S> serviceClass) {
-        return createService(serviceClass, null, null,null);
+        return createService(serviceClass, null, null, null);
     }
 
     public static <S> S createService(final Class<S> serviceClass, String username, String password, String url) {
@@ -79,7 +77,7 @@ public class ServiceGenerator {
                             .method(original.method(), original.body());
                     Request request = requestBuilder.build();
 
-                    Log.e("url",request.headers().toString());
+                    Log.e("url", request.headers().toString());
 
                     return chain.proceed(request);
                 }

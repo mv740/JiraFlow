@@ -33,12 +33,20 @@ public class ServiceGenerator {
         return client;
     }
 
+    private static Request getAuthenticationHeader(String username, String password, Request original) {
+        String credentials = username + ":" + password;
+        final String basic = "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+        Request.Builder requestBuilder = original.newBuilder()
+                .header("Authorization", basic)
+                .header("Accept", "application/json")
+                .method(original.method(), original.body());
+        return requestBuilder.build();
+    }
+
     private static Retrofit.Builder getBuilder(String jiraBaseUrl) {
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-
-        //mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_DEFAULT);
 
@@ -59,7 +67,7 @@ public class ServiceGenerator {
         return createService(serviceClass, null, null, null);
     }
 
-    public static <S> S createService(final Class<S> serviceClass, String username, String password, String url) {
+    public static <S> S createService(final Class<S> serviceClass, final String username, final String password, String url) {
         if (username != null && password != null) {
             String credentials = username + ":" + password;
             final String basic =
@@ -69,17 +77,8 @@ public class ServiceGenerator {
                 @Override
                 public Response intercept(Interceptor.Chain chain) throws IOException {
                     Request original = chain.request();
-
-                    Log.e("url", String.valueOf(original.url()));
-                    Request.Builder requestBuilder = original.newBuilder()
-                            .header("Authorization", basic)
-                            .header("Accept", "application/json")
-                            .method(original.method(), original.body());
-                    Request request = requestBuilder.build();
-
-                    Log.e("url", request.headers().toString());
-
-                    return chain.proceed(request);
+                    Log.e("urlLog", original.url().toString());
+                    return chain.proceed(getAuthenticationHeader(username, password, original));
                 }
             });
 
@@ -91,7 +90,7 @@ public class ServiceGenerator {
         return retrofit.create(serviceClass);
     }
 
-    public static <S> S createServiceXML(Class<S> serviceClass, String username, String password, String url) {
+    public static <S> S createServiceXML(Class<S> serviceClass, final String username, final String password, String url) {
         if (username != null && password != null) {
             String credentials = username + ":" + password;
             final String basic =
@@ -100,14 +99,7 @@ public class ServiceGenerator {
             httpClient.addInterceptor(new Interceptor() {
                 @Override
                 public Response intercept(Interceptor.Chain chain) throws IOException {
-                    Request original = chain.request();
-
-                    Request.Builder requestBuilder = original.newBuilder()
-                            .header("Authorization", basic)
-                            .header("Accept", "application/json")
-                            .method(original.method(), original.body());
-                    Request request = requestBuilder.build();
-                    return chain.proceed(request);
+                    return chain.proceed(getAuthenticationHeader(username, password, chain.request()));
                 }
             });
         }

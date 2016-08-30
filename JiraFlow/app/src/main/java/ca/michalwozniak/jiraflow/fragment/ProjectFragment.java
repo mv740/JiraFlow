@@ -21,7 +21,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import ca.michalwozniak.jiraflow.R;
-import ca.michalwozniak.jiraflow.adapter.CardViewAdapter;
+import ca.michalwozniak.jiraflow.adapter.CardViewProjectAdapter;
 import ca.michalwozniak.jiraflow.model.Project;
 import ca.michalwozniak.jiraflow.service.JiraSoftwareService;
 import ca.michalwozniak.jiraflow.service.ServiceGenerator;
@@ -42,7 +42,7 @@ public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRe
     RecyclerView rv;
     private Activity myActivity;
     private List<Project> projects;
-    private CardViewAdapter cardView;
+    private CardViewProjectAdapter cardView;
     private Unbinder unbinder;
     private SessionManager sessionManager;
 
@@ -69,7 +69,7 @@ public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRe
         rv.setHasFixedSize(true);
 
         projects = new ArrayList<>();
-        cardView = new CardViewAdapter(projects);
+        cardView = new CardViewProjectAdapter(projects);
         rv.setAdapter(cardView);
         swipeRefreshLayout.setOnRefreshListener(this);
         swipeRefreshLayout.post(new Runnable() {

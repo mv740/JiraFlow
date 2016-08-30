@@ -7,7 +7,7 @@ import java.util.List;
 import ca.michalwozniak.jiraflow.model.Issue.issueType;
 
 /**
- * Created by michal on 4/17/2016.
+ * Created by Michal Wozniak on 4/17/2016.
  */
 public class Project {
 

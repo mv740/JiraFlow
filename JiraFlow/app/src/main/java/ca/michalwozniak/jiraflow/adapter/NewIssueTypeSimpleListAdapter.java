@@ -70,7 +70,14 @@ public class NewIssueTypeSimpleListAdapter extends RecyclerView.Adapter<NewIssue
         if (dialog != null) {
 
             final issueType item = mItems.get(position);
-            ResourceManager.loadImageSVG(holder.context,item.getIconUrl(),holder.icon);
+            if(!item.getIconUrl().isEmpty())
+            {
+                ResourceManager.loadImageSVG(holder.context,item.getIconUrl(),holder.icon);
+            }else
+            {
+                //custom type could be without a icon
+                holder.icon.setImageDrawable(null);
+            }
             holder.title.setTextColor(dialog.getBuilder().getItemColor());
             holder.title.setText(item.getName());
             dialog.setTypeface(holder.title, dialog.getBuilder().getRegularFont());

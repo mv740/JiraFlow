@@ -17,7 +17,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import butterknife.BindView;
@@ -49,6 +51,8 @@ public class AssignedIssuesFragment extends Fragment implements SwipeRefreshLayo
     private Unbinder unbinder;
     private SessionManager sessionManager;
     private Menu menu;
+    private List<Boolean> menuValues;
+    private Map<String, Boolean> menuChecked;
 
     public AssignedIssuesFragment() {
         // Required empty public constructor
@@ -84,6 +88,13 @@ public class AssignedIssuesFragment extends Fragment implements SwipeRefreshLayo
         LinearLayoutManager llm = new LinearLayoutManager(super.getActivity());
         rv.setLayoutManager(llm);
         rv.setHasFixedSize(true);
+
+        //initialized checked menu items
+        menuChecked = new HashMap<>();
+        menuChecked.put("todo", Boolean.TRUE);
+        menuChecked.put("inProgress", Boolean.TRUE);
+        menuChecked.put("done", Boolean.FALSE);
+
 
         issues = new ArrayList<>();
         cardView = new CardViewIssueAdapter(issues);
@@ -133,7 +144,6 @@ public class AssignedIssuesFragment extends Fragment implements SwipeRefreshLayo
             if (swipeRefreshLayout != null) {
                 if (swipeRefreshLayout.isRefreshing())
                     swipeRefreshLayout.setRefreshing(false);
-                //cardView.getFilter().filter("Tone"); testing filter
             }
         }, 1000);
     }
@@ -164,6 +174,8 @@ public class AssignedIssuesFragment extends Fragment implements SwipeRefreshLayo
                 issues.add(newProject);
             }
         }
+
+        startFilter();
     }
 
 
@@ -177,40 +189,51 @@ public class AssignedIssuesFragment extends Fragment implements SwipeRefreshLayo
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        menu.findItem(R.id.filter_issue_status_done).setVisible(true).setCheckable(true);
-        menu.findItem(R.id.filter_issue_status_todo).setVisible(true).setCheckable(true);
-        menu.findItem(R.id.filter_issue_status_inProgress).setVisible(true).setCheckable(true);
+        menu.findItem(R.id.filter_issue_status_done).setVisible(true).setCheckable(true).setChecked(menuChecked.get("done"));
+        menu.findItem(R.id.filter_issue_status_todo).setVisible(true).setCheckable(true).setChecked(menuChecked.get("todo"));
+        menu.findItem(R.id.filter_issue_status_inProgress).setVisible(true).setCheckable(true).setChecked(menuChecked.get("inProgress"));
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        resetMenuCheckable();
-
+        Boolean isChecked;
         switch (item.getItemId()) {
             case R.id.filter_issue_status_done:
-                item.setChecked(true);
-                cardView.getFilter().filter("Done");
-                return true;
+
+                isChecked = menuChecked.get("done");
+                item.setChecked(!isChecked);
+                menuChecked.put("done", !isChecked);
+                break;
             case R.id.filter_issue_status_todo:
-                item.setChecked(true);
-                cardView.getFilter().filter("Todo");
-                return true;
+                isChecked = menuChecked.get("todo");
+                item.setChecked(!isChecked);
+                menuChecked.put("todo", !isChecked);
+                break;
             case R.id.filter_issue_status_inProgress:
-                item.setChecked(true);
-                cardView.getFilter().filter("Todo");
-                return true;
+                isChecked = menuChecked.get("inProgress");
+                item.setChecked(!isChecked);
+                menuChecked.put("inProgress", !isChecked);
+                break;
         }
+
+        startFilter();
+
         return super.onOptionsItemSelected(item);
     }
 
-    public void resetMenuCheckable() {
-        if (this.menu != null) {
-            menu.getItem(0).setChecked(false);
-            menu.getItem(1).setChecked(false);
-            menu.getItem(2).setChecked(false);
+    private void startFilter() {
+        String filterConstraint = "";
+        if (menuChecked.get("todo")) {
+            filterConstraint = filterConstraint.concat(" to do ");
+        }
+        if (menuChecked.get("inProgress")) {
+            filterConstraint = filterConstraint.concat(" in progress ");
+        }
+        if (menuChecked.get("done")) {
+            filterConstraint = filterConstraint.concat(" done ");
         }
 
+        cardView.getFilter().filter(filterConstraint);
     }
-
 }

@@ -8,13 +8,9 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
-import java.io.IOException;
-
 import ca.michalwozniak.jiraflow.service.Error.RxErrorHandlingCallAdapterFactory;
-import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 import retrofit2.converter.simplexml.SimpleXmlConverterFactory;
@@ -69,17 +65,10 @@ public class ServiceGenerator {
 
     public static <S> S createService(final Class<S> serviceClass, final String username, final String password, String url) {
         if (username != null && password != null) {
-            String credentials = username + ":" + password;
-            final String basic =
-                    "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-
-            httpClient.addInterceptor(new Interceptor() {
-                @Override
-                public Response intercept(Interceptor.Chain chain) throws IOException {
-                    Request original = chain.request();
-                    Log.e("urlLog", original.url().toString());
-                    return chain.proceed(getAuthenticationHeader(username, password, original));
-                }
+            httpClient.addInterceptor(chain -> {
+                Request original = chain.request();
+                Log.e("urlLog", original.url().toString());
+                return chain.proceed(getAuthenticationHeader(username, password, original));
             });
 
         }
@@ -92,16 +81,8 @@ public class ServiceGenerator {
 
     public static <S> S createServiceXML(Class<S> serviceClass, final String username, final String password, String url) {
         if (username != null && password != null) {
-            String credentials = username + ":" + password;
-            final String basic =
-                    "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
 
-            httpClient.addInterceptor(new Interceptor() {
-                @Override
-                public Response intercept(Interceptor.Chain chain) throws IOException {
-                    return chain.proceed(getAuthenticationHeader(username, password, chain.request()));
-                }
-            });
+            httpClient.addInterceptor(chain -> chain.proceed(getAuthenticationHeader(username, password, chain.request())));
         }
 
         OkHttpClient client = httpClient.build();

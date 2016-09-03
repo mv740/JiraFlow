@@ -11,18 +11,18 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".LoginActivity"
+            android:name=".features.login.LoginActivity"
             android:theme="@style/AppTheme.Main" />
         <activity
-            android:name=".ProjectActivity"
+            android:name=".features.dashboard.projects.issues.ProjectActivity"
             android:label="@string/title_activity_project"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".DashboardActivity"
+            android:name=".features.dashboard.DashboardActivity"
             android:label="@string/title_activity_dashboard"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".SplashActivity"
+            android:name=".features.splashscreen.SplashActivity"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -31,7 +31,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".CreateIssueActivity"
+            android:name=".features.IssueCreator.CreateIssueActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 

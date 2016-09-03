@@ -227,12 +227,6 @@ public class ResourceManager {
     {
         GenericRequestBuilder<Uri, InputStream, SVG, PictureDrawable> requestBuilder = ResourceManager.getGenericRequestBuilderForSVG(context);
 
-
-        if(imageView== null)
-        {
-            Log.e("ImageView", "null");
-        }
-
         requestBuilder
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .load(Uri.parse(Href))

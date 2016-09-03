@@ -1,9 +1,9 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.neenbedankt.android-apt'
+//apply plugin: 'com.neenbedankt.android-apt'
 
 android {
     compileSdkVersion 24
-    buildToolsVersion "23.0.3"
+    buildToolsVersion '24.0.2'
 
     defaultConfig {
         applicationId "ca.michalwozniak.jiraflow"
@@ -12,7 +12,25 @@ android {
         versionCode 1
         versionName "1.0"
         vectorDrawables.useSupportLibrary = true
+
+        jackOptions {
+            enabled true
+        }
+
+        testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
     }
+
+    dexOptions {
+        dexInProcess = true
+    }
+
+    compileOptions {
+        incremental true
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+
 //    buildTypes {
 //        release {
 //            minifyEnabled true
@@ -23,12 +41,14 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
+    //butterknife
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
+    compile 'com.jakewharton:butterknife:8.4.0'
     compile('com.mikepenz:materialdrawer:5.2.2@aar') {
         transitive = true
     }
-    apt 'com.jakewharton:butterknife-compiler:8.0.1'
     compile('com.squareup.retrofit2:converter-simplexml:2.0.2') {
         exclude module: 'stax'
         exclude module: 'stax-api'
@@ -49,7 +69,6 @@ dependencies {
     compile 'com.jakewharton.rxbinding:rxbinding-design:0.4.0'
     compile 'com.squareup.retrofit2:adapter-rxjava:2.0.2'
     compile 'com.balysv:material-ripple:1.0.2'
-    compile 'com.jakewharton:butterknife:8.0.1'
     compile 'com.pavelsikun:materialdesignicons:1.0'
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'com.github.XunMengWinter:CircularAnim:0.3.2'
@@ -57,4 +76,8 @@ dependencies {
     compile 'com.afollestad.material-dialogs:core:0.9.0.1'
     compile 'com.afollestad.material-dialogs:commons:0.9.0.1'
     compile 'com.jaredrummler:material-spinner:1.1.0'
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
+    compile 'com.android.support.test.espresso:espresso-idling-resource:2.2.2'
 }

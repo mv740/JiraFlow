@@ -136,18 +136,24 @@ public class CardViewIssueAdapter extends RecyclerView.Adapter<CardViewIssueAdap
             FilterResults results = new FilterResults();
             // We implement here the filter logic
 
-            // We perform filtering operation
-            List<Issue> newIssueList = new ArrayList<>();
+            if(constraint.length() > 0)
+            {
+                // We perform filtering operation
+                List<Issue> newIssueList = new ArrayList<>();
 
-            //always filter from original backup list
-            for (Issue i : backup) {
+                //always filter from original backup list
+                for (Issue i : backup) {
+                    if(constraint.toString().toUpperCase().contains(i.getFields().getStatus().getName().toUpperCase()))
+                        newIssueList.add(i);
+                }
 
-                if (i.getFields().getStatus().getName().toUpperCase().contains(constraint.toString().toUpperCase()))
-                    newIssueList.add(i);
+                results.values = newIssueList;
+                results.count = newIssueList.size();
+            }else
+            {
+                results.values = backup;
+                results.count = backup.size();
             }
-
-            results.values = newIssueList;
-            results.count = newIssueList.size();
 
             return results;
         }
@@ -156,13 +162,9 @@ public class CardViewIssueAdapter extends RecyclerView.Adapter<CardViewIssueAdap
         protected void publishResults(CharSequence constraint,
                                       FilterResults results) {
 
-            // Now we have to inform the adapter about the new list filtered
-
-            //issueList = (List<Issue>) results.values;
             issueList = (List<Issue>) results.values;
             notifyDataSetChanged();
-
-
+            
         }
 
     }

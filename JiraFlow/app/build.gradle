@@ -30,6 +30,11 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+    lintOptions{
+        // if true, stop the gradle build if errors are found
+        abortOnError false
+    }
+
 
 //    buildTypes {
 //        release {

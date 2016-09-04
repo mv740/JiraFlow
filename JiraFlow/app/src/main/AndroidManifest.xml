@@ -31,7 +31,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".features.IssueCreator.CreateIssueActivity"
+            android:name=".features.createIssue.CreateIssueActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 

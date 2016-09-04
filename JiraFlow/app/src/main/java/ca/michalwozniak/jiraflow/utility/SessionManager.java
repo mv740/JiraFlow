@@ -36,7 +36,7 @@ public class SessionManager {
         if (sharedPref != null) {
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putString(USERNAME, username);
-            editor.commit();
+            editor.apply();
         }
     }
 
@@ -55,7 +55,7 @@ public class SessionManager {
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putString(PASSWORD, password);
 
-            editor.commit();
+            editor.apply();
         }
     }
 
@@ -72,7 +72,7 @@ public class SessionManager {
         if (sharedPref != null) {
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putString(EMAIL, email);
-            editor.commit();
+            editor.apply();
         }
     }
 
@@ -91,7 +91,7 @@ public class SessionManager {
         if (sharedPref != null) {
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putString(PROFILE_ICON_URL, url);
-            editor.commit();
+            editor.apply();
         }
     }
 
@@ -108,7 +108,7 @@ public class SessionManager {
         SharedPreferences preferences = context.getSharedPreferences(USER_PREFERENCE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.clear();
-        editor.commit();
+        editor.apply();
     }
 
     public boolean doesProfileExist() {
@@ -121,7 +121,7 @@ public class SessionManager {
         if (sharedPref != null) {
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putBoolean(REMEMBER_ME, true);
-            editor.commit();
+            editor.apply();
         }
     }
 
@@ -130,7 +130,7 @@ public class SessionManager {
         if (sharedPref != null) {
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putString(SERVER_URL, url);
-            editor.commit();
+            editor.apply();
         }
     }
 

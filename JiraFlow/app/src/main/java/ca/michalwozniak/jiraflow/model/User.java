@@ -65,4 +65,8 @@ public class User {
     public String getExpand() {
         return expand;
     }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }

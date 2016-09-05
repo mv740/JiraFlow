@@ -14,7 +14,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -47,12 +46,12 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import ca.michalwozniak.jiraflow.features.login.LoginActivity;
 import ca.michalwozniak.jiraflow.R;
-import ca.michalwozniak.jiraflow.features.dashboard.myIssues.AssignedIssuesFragment;
 import ca.michalwozniak.jiraflow.features.dashboard.board.BoardFragment;
+import ca.michalwozniak.jiraflow.features.dashboard.myIssues.AssignedIssuesFragment;
 import ca.michalwozniak.jiraflow.features.dashboard.projects.ProjectFragment;
 import ca.michalwozniak.jiraflow.features.dashboard.stream.StreamFragment;
+import ca.michalwozniak.jiraflow.features.login.LoginActivity;
 import ca.michalwozniak.jiraflow.utility.ResourceManager;
 import ca.michalwozniak.jiraflow.utility.SessionManager;
 
@@ -97,17 +96,17 @@ public class DashboardActivity extends AppCompatActivity {
                 GenericRequestBuilder<Uri, InputStream, SVG, PictureDrawable> requestBuilder = ResourceManager.getGenericRequestBuilderForSVG(imageView.getContext());
 
                 requestBuilder
-                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+                        .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                         .load(uri)
                         .listener(new RequestListener<Uri, PictureDrawable>() {
                             @Override
                             public boolean onException(Exception e, Uri model, Target<PictureDrawable> target, boolean isFirstResource) {
-                                Log.v("Profile Icon", "png");
 
                                 Glide.with(imageView.getContext())
                                         .load(glideUrl)
-                                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+                                        .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                                         .dontAnimate()
+                                        .dontTransform()
                                         .into(imageView);
 
                                 return false;
@@ -115,10 +114,11 @@ public class DashboardActivity extends AppCompatActivity {
 
                             @Override
                             public boolean onResourceReady(PictureDrawable resource, Uri model, Target<PictureDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                                Log.v("Profile Icon ", "svg");
                                 return false;
                             }
                         })
+                        .dontAnimate()
+                        .dontTransform()
                         .into(imageView);
             }
 

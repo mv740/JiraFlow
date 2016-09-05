@@ -50,8 +50,6 @@ public class AssignedIssuesFragment extends Fragment implements SwipeRefreshLayo
     private CardViewIssueAdapter cardView;
     private Unbinder unbinder;
     private SessionManager sessionManager;
-    private Menu menu;
-    private List<Boolean> menuValues;
     private Map<String, Boolean> menuChecked;
 
     public AssignedIssuesFragment() {
@@ -183,7 +181,6 @@ public class AssignedIssuesFragment extends Fragment implements SwipeRefreshLayo
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_filter_issue, menu);
-        this.menu = menu;
     }
 
     @Override

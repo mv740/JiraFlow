@@ -137,10 +137,9 @@ public class ResourceManager {
                 .sourceEncoder(new StreamEncoder())
                 .cacheDecoder(new FileToStreamDecoder<>(new SvgDecoder()))
                 .decoder(new SvgDecoder())
-                .placeholder(R.drawable.ic_check)
-                .error(R.drawable.zzz_controller_xbox)
+                .error(R.drawable.zzz_emoticon_sad)
                 .animate(android.R.anim.fade_in)
-                .listener(new SvgSoftwareLayerSetter<Uri>());
+                .listener(new SvgSoftwareLayerSetter<>());
 
         return requestBuilder;
     }
@@ -199,7 +198,6 @@ public class ResourceManager {
         Matcher m = Patterns.WEB_URL.matcher(text);
         while (m.find()) {
             String url = m.group();
-           // Log.d("extractLinks", "URL extracted: " + url);
             links.add(url);
         }
 
@@ -216,10 +214,9 @@ public class ResourceManager {
         Glide
                 .with(context)
                 .load(glideUrl)
-                .error(R.drawable.zzz_controller_xbox)
+                .error(R.drawable.zzz_emoticon_sad)
                 .dontAnimate()
-                .fitCenter()
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .into(imageView);
     }
 

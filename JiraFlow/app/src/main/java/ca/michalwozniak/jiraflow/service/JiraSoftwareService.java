@@ -84,4 +84,8 @@ public interface JiraSoftwareService {
     @POST("rest/api/2/issue")
     Observable<EmptyResponse> createIssue(@Body CreateIssueModel createIssueModel);
 
+    //https://docs.atlassian.com/jira/REST/cloud/#api/2/user-findAssignableUsers
+    @GET("rest/api/2/user/assignable/search")
+    Observable<List<User>> findAssignableUsers(@Query("username") String username, @Query("project") String project, @Query("issueKey") String issueKey, @Query("startAt") Integer startAt, @Query("maxResults") Integer maxResults);
+
 }

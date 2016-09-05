@@ -73,14 +73,21 @@ public class NewIssueProjectSimpleListAdapter extends RecyclerView.Adapter<NewIs
             final Project item = mItems.get(position);
 
             if (item.getImageType() == ImageType.SVG) {
-                ResourceManager.loadImageSVG(holder.context,item.getAvatarUrls().getSmall(),holder.icon);
+                ResourceManager.loadImageSVG(holder.context,item.getAvatarUrls().getBig(),holder.icon);
 
             } else {
 
-                ResourceManager.loadImage(holder.context,item.getAvatarUrls().getSmall(),holder.icon);
+                ResourceManager.loadImage(holder.context,item.getAvatarUrls().getBig(),holder.icon);
             }
             holder.title.setTextColor(dialog.getBuilder().getItemColor());
-            holder.title.setText(item.getName());
+
+            if(item.getName().length()> 15)
+            {
+                String projectName = item.getName().substring(0,15);
+                projectName = projectName.concat("...");
+                holder.title.setText(projectName);
+            }else
+                holder.title.setText(item.getName());
             dialog.setTypeface(holder.title, dialog.getBuilder().getRegularFont());
         }
     }

@@ -6,7 +6,7 @@
     android:layout_height="fill_parent"
     android:fitsSystemWindows="true"
     android:orientation="vertical"
-    tools:context="ca.michalwozniak.jiraflow.features.IssueCreator.CreateIssueActivity">
+    tools:context="ca.michalwozniak.jiraflow.features.createIssue.CreateIssueActivity">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/view2"

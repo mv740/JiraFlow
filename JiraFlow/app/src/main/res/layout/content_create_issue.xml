@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout android:layout_width="fill_parent"
+    android:id="@+id/search_view"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -44,6 +45,7 @@
             android:inputType="textPersonName"
             android:textSize="14sp"
             android:minEms="45"
+            android:cursorVisible="false"
             />
 
     </android.support.design.widget.TextInputLayout>

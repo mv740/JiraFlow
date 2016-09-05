@@ -91,7 +91,7 @@ public class BoardFragment extends Fragment {
         mBoardView.setBoardListener(new BoardView.BoardListener() {
             @Override
             public void onItemDragStarted(int column, int row) {
-               // Toast.makeText(mBoardView.getContext(), "Start - column: " + column + " row: " + row, Toast.LENGTH_SHORT).show();
+                // Toast.makeText(mBoardView.getContext(), "Start - column: " + column + " row: " + row, Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -158,7 +158,8 @@ public class BoardFragment extends Fragment {
         jiraService.doTransition(currentDraggedIssueKey, model)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(error -> Log.e("getPossibleTransition", error.getMessage()));
+                .doOnError(error -> Log.e("getPossibleTransition", error.getMessage()))
+                .subscribe(emptyResponse -> {});
     }
 
     private void getBoardConfiguration() {

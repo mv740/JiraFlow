@@ -13,7 +13,9 @@ import ca.michalwozniak.jiraflow.model.Issue.issueType;
 import ca.michalwozniak.jiraflow.model.Issue.userIssues;
 import ca.michalwozniak.jiraflow.model.Project;
 import ca.michalwozniak.jiraflow.model.Sprint;
+import ca.michalwozniak.jiraflow.model.transition.TransitionModel;
 import ca.michalwozniak.jiraflow.model.User;
+import ca.michalwozniak.jiraflow.model.transition.TransitionPossible;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
@@ -87,5 +89,12 @@ public interface JiraSoftwareService {
     //https://docs.atlassian.com/jira/REST/cloud/#api/2/user-findAssignableUsers
     @GET("rest/api/2/user/assignable/search")
     Observable<List<User>> findAssignableUsers(@Query("username") String username, @Query("project") String project, @Query("issueKey") String issueKey, @Query("startAt") Integer startAt, @Query("maxResults") Integer maxResults);
+
+    //https://docs.atlassian.com/jira/REST/cloud/#api/2/issue-doTransition
+    @POST("/rest/api/2/issue/{issueIdOrKey}/transitions")
+    Observable<EmptyResponse> doTransition(@Path("issueIdOrKey") String issueIdOrKey, @Body TransitionModel transitionModel);
+
+    @GET("/rest/api/2/issue/{issueIdOrKey}/transitions")
+    Observable<TransitionPossible> getTransitions(@Path("issueIdOrKey") String issueIdOrKey);
 
 }

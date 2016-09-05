@@ -24,12 +24,12 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.woxthebox.draglistview.BoardView;
 import com.woxthebox.draglistview.DragItem;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -40,8 +40,11 @@ import ca.michalwozniak.jiraflow.model.BoardConfiguration;
 import ca.michalwozniak.jiraflow.model.Issue.Issue;
 import ca.michalwozniak.jiraflow.model.Sprint;
 import ca.michalwozniak.jiraflow.model.other.Column;
+import ca.michalwozniak.jiraflow.model.transition.Transition;
+import ca.michalwozniak.jiraflow.model.transition.TransitionModel;
 import ca.michalwozniak.jiraflow.service.JiraSoftwareService;
 import ca.michalwozniak.jiraflow.service.ServiceGenerator;
+import ca.michalwozniak.jiraflow.utility.LogManager;
 import ca.michalwozniak.jiraflow.utility.SessionManager;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -54,6 +57,11 @@ public class BoardFragment extends Fragment {
     private Unbinder unbinder;
     private SessionManager sessionManager;
     private Activity myActivity;
+
+    static List<String> columnStatusId;
+    static List<String> columnStatus;
+    static String currentDraggedIssueKey;
+    static int dropColumnIndex;
 
 
     public static BoardFragment newInstance() {
@@ -72,7 +80,8 @@ public class BoardFragment extends Fragment {
         View view = inflater.inflate(R.layout.test_board_layout, container, false);
         unbinder = ButterKnife.bind(this, view);
         sessionManager = SessionManager.getInstance(myActivity);
-
+        columnStatusId = new ArrayList<>();
+        columnStatus = new ArrayList<>();
 
         mBoardView = (BoardView) view.findViewById(R.id.board_view);
         mBoardView.setSnapToColumnsWhenScrolling(true);
@@ -82,7 +91,7 @@ public class BoardFragment extends Fragment {
         mBoardView.setBoardListener(new BoardView.BoardListener() {
             @Override
             public void onItemDragStarted(int column, int row) {
-                Toast.makeText(mBoardView.getContext(), "Start - column: " + column + " row: " + row, Toast.LENGTH_SHORT).show();
+               // Toast.makeText(mBoardView.getContext(), "Start - column: " + column + " row: " + row, Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -96,7 +105,8 @@ public class BoardFragment extends Fragment {
             @Override
             public void onItemDragEnded(int fromColumn, int fromRow, int toColumn, int toRow) {
                 if (fromColumn != toColumn || fromRow != toRow) {
-                    Toast.makeText(mBoardView.getContext(), "End - column: " + toColumn + " row: " + toRow, Toast.LENGTH_SHORT).show();
+                    dropColumnIndex = toColumn;
+                    getPossibleTransition();
                 }
             }
         });
@@ -105,6 +115,50 @@ public class BoardFragment extends Fragment {
         getBoardConfiguration();
 
         return view;
+    }
+
+    private void getPossibleTransition() {
+        String name = columnStatus.get(dropColumnIndex);
+
+        JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword(), sessionManager.getServerUrl());
+
+        jiraService.getTransitions(currentDraggedIssueKey)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnError(error -> Log.e("getPossibleTransition", error.getMessage()))
+                .subscribe(transitionPossible -> {
+
+                            String transitionId = "";
+                            for (Transition t : transitionPossible.getTransitions()) {
+                                if (t.getName().equalsIgnoreCase(name)) {
+                                    transitionId = t.getId();
+                                }
+                            }
+
+                            doTransition(transitionId, name, jiraService);
+                        }
+                );
+
+    }
+
+    /**
+     * @param id
+     * @param name
+     * @param jiraService
+     */
+    private void doTransition(String id, String name, JiraSoftwareService jiraService) {
+        TransitionModel model = new TransitionModel();
+        Transition transition = new Transition();
+        transition.setName(name);
+        transition.setId(id);
+        model.setTransition(transition);
+
+        LogManager.displayJSON("doTransition", model);
+
+        jiraService.doTransition(currentDraggedIssueKey, model)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnError(error -> Log.e("getPossibleTransition", error.getMessage()));
     }
 
     private void getBoardConfiguration() {
@@ -138,6 +192,8 @@ public class BoardFragment extends Fragment {
 
         for (Column current : boardConfig.getColumnConfig().getColumns()) {
             addCustomColumnList(current, sprint);
+            columnStatusId.add(current.getStatuses().get(0).getId());
+            columnStatus.add(current.getName());
         }
     }
 
@@ -218,7 +274,9 @@ public class BoardFragment extends Fragment {
         @Override
         public void onBindDragView(View clickedView, View dragView) {
             CharSequence text = ((TextView) clickedView.findViewById(R.id.text)).getText();
+            CharSequence textKey = ((TextView) clickedView.findViewById(R.id.textKey)).getText();
             ((TextView) dragView.findViewById(R.id.text)).setText(text);
+            ((TextView) dragView.findViewById(R.id.textKey)).setText(textKey);
 
             ImageView clickedViewImage = (ImageView) clickedView.findViewById(R.id.head_image);
             ImageView dragImage = (ImageView) dragView.findViewById(R.id.head_image);
@@ -261,6 +319,7 @@ public class BoardFragment extends Fragment {
             anim.setInterpolator(new DecelerateInterpolator());
             anim.setDuration(ANIMATION_DURATION);
             anim.start();
+
         }
 
         @Override
@@ -270,6 +329,10 @@ public class BoardFragment extends Fragment {
             anim.setInterpolator(new DecelerateInterpolator());
             anim.setDuration(ANIMATION_DURATION);
             anim.start();
+
+            TextView key = ButterKnife.findById(dragView, R.id.textKey);
+            currentDraggedIssueKey = key.getText().toString();
+
         }
     }
 

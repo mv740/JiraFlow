@@ -51,6 +51,7 @@ public class dragItemAdapter extends DragItemAdapter<Pair<Long, DragCardData>, d
         String text =data.getSummary();
         holder.mText.setText(text);
         holder.itemView.setTag(text);
+        holder.mTextKey.setText(data.getKey());
 
         holder.mImage.setImageResource(ResourceManager.getIssueTypeIconId(data.getIconType()));
     }
@@ -63,6 +64,8 @@ public class dragItemAdapter extends DragItemAdapter<Pair<Long, DragCardData>, d
 public class ViewHolder extends DragItemAdapter<Pair<Long, DragCardData>, dragItemAdapter.ViewHolder>.ViewHolder {
     @BindView(R.id.text)
     TextView mText;
+    @BindView(R.id.textKey)
+    TextView mTextKey;
     @BindView(R.id.head_image)
     ImageView mImage;
 

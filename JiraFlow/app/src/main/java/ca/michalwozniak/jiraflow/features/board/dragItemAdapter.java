@@ -1,4 +1,4 @@
-package ca.michalwozniak.jiraflow.features.dashboard.board;
+package ca.michalwozniak.jiraflow.features.board;
 
 /**
  * Created by Michal Wozniak on 8/4/2016.
@@ -49,10 +49,9 @@ public class dragItemAdapter extends DragItemAdapter<Pair<Long, DragCardData>, d
         DragCardData data = mItemList.get(position).second;
 
         String text =data.getSummary();
-        holder.mText.setText(text);
+        holder.title.setText(text);
+        holder.subTitle.setText(data.getKey());
         holder.itemView.setTag(text);
-        holder.mTextKey.setText(data.getKey());
-
         holder.mImage.setImageResource(ResourceManager.getIssueTypeIconId(data.getIconType()));
     }
 
@@ -63,9 +62,9 @@ public class dragItemAdapter extends DragItemAdapter<Pair<Long, DragCardData>, d
 
 public class ViewHolder extends DragItemAdapter<Pair<Long, DragCardData>, dragItemAdapter.ViewHolder>.ViewHolder {
     @BindView(R.id.text)
-    TextView mText;
+    TextView title;
     @BindView(R.id.textKey)
-    TextView mTextKey;
+    TextView subTitle;
     @BindView(R.id.head_image)
     ImageView mImage;
 

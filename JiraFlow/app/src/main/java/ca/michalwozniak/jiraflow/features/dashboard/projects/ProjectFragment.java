@@ -71,9 +71,9 @@ public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRe
         rv.setAdapter(cardView);
         swipeRefreshLayout.setOnRefreshListener(this);
         swipeRefreshLayout.post(() -> {
-            swipeRefreshLayout.setRefreshing(true);
-            getProjects();
-        }
+                    swipeRefreshLayout.setRefreshing(true);
+                    getProjects();
+                }
         );
 
         myActivity = super.getActivity();
@@ -93,7 +93,7 @@ public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     private void getProjects() {
 
-        JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword(),sessionManager.getServerUrl());
+        JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword(), sessionManager.getServerUrl());
 
         jiraService.getAllProjects()
                 .subscribeOn(Schedulers.newThread())

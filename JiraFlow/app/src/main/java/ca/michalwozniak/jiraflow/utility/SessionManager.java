@@ -10,12 +10,14 @@ public class SessionManager {
 
     private static final String USER_PREFERENCE = "userPreference";
     private static final String NOT_FOUND = "notFound";
+    private static final int NOT_FOUND_INT = -1;
     private static final String PASSWORD = "password";
     private static final String EMAIL = "email";
     private static final String USERNAME = "username";
     private static final String PROFILE_ICON_URL = "profileIconUrl";
     private static final String REMEMBER_ME = "rememberMe";
     private static final String SERVER_URL = "JiraServerURL";
+    private static final String BOARD = "BOARD";
     private static SessionManager instance = null;
     private Context context;
 
@@ -141,5 +143,32 @@ public class SessionManager {
 
         }
         return NOT_FOUND;
+    }
+
+    public void saveSelectedBoard(int boardId) {
+        SharedPreferences sharedPref = context.getSharedPreferences(USER_PREFERENCE, Context.MODE_PRIVATE);
+        if (sharedPref != null) {
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putInt(BOARD, boardId);
+            editor.apply();
+        }
+    }
+
+    public int getSelectedBoard() {
+        SharedPreferences sharedPref = context.getSharedPreferences(USER_PREFERENCE, Context.MODE_PRIVATE);
+        if (sharedPref != null) {
+            return sharedPref.getInt(BOARD, NOT_FOUND_INT);
+
+        }
+        return NOT_FOUND_INT;
+    }
+
+    public boolean hasSelectedBoard() {
+        SharedPreferences sharedPref = context.getSharedPreferences(USER_PREFERENCE, Context.MODE_PRIVATE);
+        if (sharedPref != null) {
+            return NOT_FOUND_INT != sharedPref.getInt(BOARD, NOT_FOUND_INT);
+
+        }
+        return false;
     }
 }

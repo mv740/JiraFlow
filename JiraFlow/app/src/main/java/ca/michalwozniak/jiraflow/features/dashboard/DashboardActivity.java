@@ -47,11 +47,12 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ca.michalwozniak.jiraflow.R;
-import ca.michalwozniak.jiraflow.features.dashboard.board.BoardFragment;
+import ca.michalwozniak.jiraflow.features.board.BoardFragment;
 import ca.michalwozniak.jiraflow.features.dashboard.myIssues.AssignedIssuesFragment;
 import ca.michalwozniak.jiraflow.features.dashboard.projects.ProjectFragment;
 import ca.michalwozniak.jiraflow.features.dashboard.stream.StreamFragment;
 import ca.michalwozniak.jiraflow.features.login.LoginActivity;
+import ca.michalwozniak.jiraflow.fragment.Two;
 import ca.michalwozniak.jiraflow.utility.ResourceManager;
 import ca.michalwozniak.jiraflow.utility.SessionManager;
 
@@ -64,6 +65,8 @@ public class DashboardActivity extends AppCompatActivity {
     ViewPager viewPager;
     @BindView(R.id.viewFlipper)
     ViewFlipper viewFlipper;
+
+    private SessionManager sm;
 
 
     @Override
@@ -80,7 +83,7 @@ public class DashboardActivity extends AppCompatActivity {
             toolbar.setNavigationOnClickListener(v -> onBackPressed());
         }
 
-        final SessionManager pm = SessionManager.getInstance(this);
+        sm = SessionManager.getInstance(this);
 
 
         DrawerImageLoader.init(new AbstractDrawerImageLoader() {
@@ -88,7 +91,7 @@ public class DashboardActivity extends AppCompatActivity {
             public void set(final ImageView imageView, final Uri uri, final Drawable placeholder) {
                 //super.set(imageView, uri, placeholder);
 
-                final GlideUrl glideUrl = new GlideUrl(pm.getProfileIconUrl(), new LazyHeaders.Builder()
+                final GlideUrl glideUrl = new GlideUrl(sm.getProfileIconUrl(), new LazyHeaders.Builder()
                         .addHeader("Authorization", ResourceManager.getEncoredCredentialString(DashboardActivity.this))
                         .addHeader("Accept", "application/json")
                         .build());
@@ -140,7 +143,7 @@ public class DashboardActivity extends AppCompatActivity {
                 .withActivity(this)
                 .withHeaderBackground(R.drawable.background_account_header)
                 .addProfiles(
-                        new ProfileDrawerItem().withName(pm.getUsername()).withEmail(pm.getEmail()).withIcon(Uri.parse(pm.getProfileIconUrl()))
+                        new ProfileDrawerItem().withName(sm.getUsername()).withEmail(sm.getEmail()).withIcon(Uri.parse(sm.getProfileIconUrl()))
                 )
                 .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
                     @Override
@@ -181,14 +184,22 @@ public class DashboardActivity extends AppCompatActivity {
                                     tabLayout.setVisibility(View.GONE);
                                 }
                                 viewFlipper.setDisplayedChild(1);
-                                showFragment(BoardFragment.newInstance());
+
+                                if(sm.hasSelectedBoard())
+                                {
+                                    showFragment(BoardFragment.newInstance());
+                                }else
+                                {
+                                    showFragment(new Two());
+                                }
+
                             }
                             return false;
                         }),
                         new DividerDrawerItem(),
                         new ProfileSettingDrawerItem().withName("Logout").withIcon(R.drawable.ic_settings_grey600_48dp).withOnDrawerItemClickListener((view, position, drawerItem) -> {
                             //// TODO: 8/10/2016 for now testing logout will
-                            pm.deleteUser();
+                            sm.deleteUser();
                             Intent intent = new Intent(DashboardActivity.this,LoginActivity.class);
                             startActivity(intent);
                             finish();

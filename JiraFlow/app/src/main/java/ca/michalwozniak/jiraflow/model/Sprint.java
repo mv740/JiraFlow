@@ -14,6 +14,8 @@ public class Sprint {
     private int maxResults;
     private int total;
     private List<Issue> issues;
+    private boolean isLast;
+    private List<SprintData> values;
 
     public String getExpand() {
         return expand;
@@ -33,5 +35,13 @@ public class Sprint {
 
     public List<Issue> getIssues() {
         return issues;
+    }
+
+    public boolean isLast() {
+        return isLast;
+    }
+
+    public List<SprintData> getValues() {
+        return values;
     }
 }

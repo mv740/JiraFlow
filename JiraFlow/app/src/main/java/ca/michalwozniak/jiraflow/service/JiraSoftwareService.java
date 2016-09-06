@@ -60,7 +60,7 @@ public interface JiraSoftwareService {
     Observable<ActivityFeed> getActivityFeed();
 
     @GET("rest/agile/1.0/board")
-    Observable<BoardList> getAllBoards(@Query("maxResults") int max, @Query("startAt") int start, @Query("projectKeyOrId") String keyId, @Query("type") String type);
+    Observable<BoardList> getAllBoards(@Query("maxResults") Integer max, @Query("startAt") Integer start, @Query("projectKeyOrId") String keyId, @Query("type") String type);
 
     @GET("rest/agile/1.0/board/{boardId}/configuration")
     Observable<BoardConfiguration> getBoardConfiguration(@Path("boardId") int i);

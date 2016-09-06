@@ -13,10 +13,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.jakewharton.rxbinding.widget.RxTextView;
 
 import java.io.IOException;
@@ -36,6 +32,7 @@ import ca.michalwozniak.jiraflow.model.Project;
 import ca.michalwozniak.jiraflow.model.User;
 import ca.michalwozniak.jiraflow.service.JiraSoftwareService;
 import ca.michalwozniak.jiraflow.service.ServiceGenerator;
+import ca.michalwozniak.jiraflow.utility.LogManager;
 import ca.michalwozniak.jiraflow.utility.ResourceManager;
 import ca.michalwozniak.jiraflow.utility.SessionManager;
 import okhttp3.OkHttpClient;
@@ -235,11 +232,8 @@ public class CreateIssueActivity extends AppCompatActivity {
      */
     private void createIssue() {
 
-
         List<Project> projects = issueMetaFieldData.getProjects();
-
         CreateIssueModel issueModel = new CreateIssueModel();
-
 
         Field field = new Field();
         if(!summary.getText().toString().isEmpty())
@@ -265,17 +259,7 @@ public class CreateIssueActivity extends AppCompatActivity {
 
         issueModel.setFields(field);
 
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_DEFAULT);
-        try {
-
-            String json = mapper.writeValueAsString(issueModel);
-            Log.e("JSON", json);
-
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
+        LogManager.displayJSON("createIssue",issueModel);
 
         JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword(), sessionManager.getServerUrl());
 

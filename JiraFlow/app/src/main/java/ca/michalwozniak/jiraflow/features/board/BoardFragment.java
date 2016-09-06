@@ -1,4 +1,4 @@
-package ca.michalwozniak.jiraflow.features.dashboard.board;
+package ca.michalwozniak.jiraflow.features.board;
 
 /**
  * Created by Michal Wozniak on 8/4/2016.
@@ -35,7 +35,6 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import ca.michalwozniak.jiraflow.R;
 import ca.michalwozniak.jiraflow.helper.DragCardData;
-import ca.michalwozniak.jiraflow.helper.JQLHelper;
 import ca.michalwozniak.jiraflow.model.BoardConfiguration;
 import ca.michalwozniak.jiraflow.model.Issue.Issue;
 import ca.michalwozniak.jiraflow.model.Sprint;
@@ -62,6 +61,8 @@ public class BoardFragment extends Fragment {
     static List<String> columnStatus;
     static String currentDraggedIssueKey;
     static int dropColumnIndex;
+    private int boardID;
+    private int sprintID;
 
 
     public static BoardFragment newInstance() {
@@ -82,6 +83,14 @@ public class BoardFragment extends Fragment {
         sessionManager = SessionManager.getInstance(myActivity);
         columnStatusId = new ArrayList<>();
         columnStatus = new ArrayList<>();
+
+        Bundle bundle = this.getArguments();
+        if (bundle != null) {
+            boardID = bundle.getInt("boardID", -1);
+            sprintID = bundle.getInt("sprintID", -1);
+        }
+
+
 
         mBoardView = (BoardView) view.findViewById(R.id.board_view);
         mBoardView.setSnapToColumnsWhenScrolling(true);
@@ -167,20 +176,17 @@ public class BoardFragment extends Fragment {
 
         final JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword(), sessionManager.getServerUrl());
 
-        final int boardID = 1;
+        final int boardID = this.boardID; //1;
         jiraService.getBoardConfiguration(boardID)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnError(error -> Log.e("getBoardConfiguration", error.getMessage()))
                 .subscribe(boardConfig -> {
-
-                    JQLHelper jqlHelper = new JQLHelper(JQLHelper.Query.PROJECT, "HEL AND sprint in openSprints()");
-
-                    jiraService.getIssuesForActiveSprint(jqlHelper.toString())
+                    
+                    jiraService.getIssuesForSprint(this.sprintID,null,null)
                             .subscribeOn(Schedulers.newThread())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(sprint -> generateBoard(boardConfig, sprint));
-
                 });
     }
 

@@ -4,15 +4,15 @@
 
     <item
         android:id="@+id/filter_issue_status_done"
-        android:title="Done"
+        android:title="@string/done"
         app:showAsAction="never"/>
     <item
         android:id="@+id/filter_issue_status_todo"
-        android:title="Todo"
+        android:title="@string/todo"
         app:showAsAction="never"/>
     <item
         android:id="@+id/filter_issue_status_inProgress"
-        android:title="In Progress"
+        android:title="@string/in_progress"
         app:showAsAction="never"/>
 </menu>
 

@@ -10,7 +10,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ca.michalwozniak.jiraflow.R;
 import ca.michalwozniak.jiraflow.features.dashboard.projects.ViewPagerAdapter;
-import ca.michalwozniak.jiraflow.fragment.Two;
+import ca.michalwozniak.jiraflow.fragment.BoardSelectionFragment;
 
 public class ProjectActivity extends AppCompatActivity {
     @BindView(R.id.toolbar) Toolbar toolbar;
@@ -46,7 +46,7 @@ public class ProjectActivity extends AppCompatActivity {
         bundle.putString("project", projectTitle);
         projectIssuesFragment.setArguments(bundle);
         adapter.addFragment(projectIssuesFragment, "ONE");
-        adapter.addFragment(new Two(), "TWO");
+        adapter.addFragment(new BoardSelectionFragment(), "TWO");
         viewPager.setAdapter(adapter);
     }
 

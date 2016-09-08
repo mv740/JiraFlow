@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -32,7 +33,7 @@ import rx.schedulers.Schedulers;
 import static android.content.ContentValues.TAG;
 
 
-public class Two extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+public class BoardSelectionFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
     @BindView(R.id.swipeRefresh)
     SwipeRefreshLayout swipeRefreshLayout;
@@ -44,13 +45,14 @@ public class Two extends Fragment implements SwipeRefreshLayout.OnRefreshListene
     private CardViewActiveSprintAdapter sprintAdapter;
     private List<SprintData> boardSprint;
 
-    public Two() {
+    public BoardSelectionFragment() {
         // Required empty public constructor
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
     }
 
     @Override
@@ -60,11 +62,16 @@ public class Two extends Fragment implements SwipeRefreshLayout.OnRefreshListene
         View view = inflater.inflate(R.layout.fragment_board_selection, container, false);
         unbinder = ButterKnife.bind(this, view);
         myActivity = super.getActivity();
+
+        if (getActivity() != null) {
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Select board");
+        }
+
         sessionManager = SessionManager.getInstance(myActivity);
         boardSprint = new ArrayList<>();
 
         FragmentManager fragmentManager = getFragmentManager();
-        sprintAdapter = new CardViewActiveSprintAdapter(boardSprint,fragmentManager);
+        sprintAdapter = new CardViewActiveSprintAdapter(boardSprint,fragmentManager,sessionManager);
 
         LinearLayoutManager llm = new LinearLayoutManager(super.getActivity());
         rv.setLayoutManager(llm);
@@ -140,4 +147,5 @@ public class Two extends Fragment implements SwipeRefreshLayout.OnRefreshListene
     public void onRefresh() {
         getBoardList();
     }
+
 }

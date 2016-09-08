@@ -17,7 +17,8 @@ public class SessionManager {
     private static final String PROFILE_ICON_URL = "profileIconUrl";
     private static final String REMEMBER_ME = "rememberMe";
     private static final String SERVER_URL = "JiraServerURL";
-    private static final String BOARD = "BOARD";
+    private static final String BOARD_ID = "BOARD_ID";
+    private static final String SPRINT_ID = "SPRINT_ID";
     private static SessionManager instance = null;
     private Context context;
 
@@ -145,28 +146,46 @@ public class SessionManager {
         return NOT_FOUND;
     }
 
-    public void saveSelectedBoard(int boardId) {
+    public void saveFavoriteBoardId(int boardId) {
         SharedPreferences sharedPref = context.getSharedPreferences(USER_PREFERENCE, Context.MODE_PRIVATE);
         if (sharedPref != null) {
             SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putInt(BOARD, boardId);
+            editor.putInt(BOARD_ID, boardId);
             editor.apply();
         }
     }
 
-    public int getSelectedBoard() {
+    public int getFavoriteBoardId() {
         SharedPreferences sharedPref = context.getSharedPreferences(USER_PREFERENCE, Context.MODE_PRIVATE);
         if (sharedPref != null) {
-            return sharedPref.getInt(BOARD, NOT_FOUND_INT);
+            return sharedPref.getInt(BOARD_ID, NOT_FOUND_INT);
 
         }
         return NOT_FOUND_INT;
     }
 
-    public boolean hasSelectedBoard() {
+    public void saveFavoriteSprintId(int boardId) {
         SharedPreferences sharedPref = context.getSharedPreferences(USER_PREFERENCE, Context.MODE_PRIVATE);
         if (sharedPref != null) {
-            return NOT_FOUND_INT != sharedPref.getInt(BOARD, NOT_FOUND_INT);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putInt(SPRINT_ID, boardId);
+            editor.apply();
+        }
+    }
+
+    public int getFavoriteSprintId() {
+        SharedPreferences sharedPref = context.getSharedPreferences(USER_PREFERENCE, Context.MODE_PRIVATE);
+        if (sharedPref != null) {
+            return sharedPref.getInt(SPRINT_ID, NOT_FOUND_INT);
+
+        }
+        return NOT_FOUND_INT;
+    }
+
+    public boolean hasFavoriteBoard() {
+        SharedPreferences sharedPref = context.getSharedPreferences(USER_PREFERENCE, Context.MODE_PRIVATE);
+        if (sharedPref != null) {
+            return NOT_FOUND_INT != sharedPref.getInt(BOARD_ID, NOT_FOUND_INT);
 
         }
         return false;

@@ -52,7 +52,7 @@ import ca.michalwozniak.jiraflow.features.dashboard.myIssues.AssignedIssuesFragm
 import ca.michalwozniak.jiraflow.features.dashboard.projects.ProjectFragment;
 import ca.michalwozniak.jiraflow.features.dashboard.stream.StreamFragment;
 import ca.michalwozniak.jiraflow.features.login.LoginActivity;
-import ca.michalwozniak.jiraflow.fragment.Two;
+import ca.michalwozniak.jiraflow.fragment.BoardSelectionFragment;
 import ca.michalwozniak.jiraflow.utility.ResourceManager;
 import ca.michalwozniak.jiraflow.utility.SessionManager;
 
@@ -174,6 +174,8 @@ public class DashboardActivity extends AppCompatActivity {
                                 // toolbar.getMenu().setGroupEnabled(0,false);
                                 toolbar.getMenu().setGroupVisible(0, false);
                                 viewFlipper.setDisplayedChild(0);
+                                tabLayout.getTabAt(0).select(); // default at first tab
+
                             }
                             return false;
                         }),
@@ -185,12 +187,15 @@ public class DashboardActivity extends AppCompatActivity {
                                 }
                                 viewFlipper.setDisplayedChild(1);
 
-                                if(sm.hasSelectedBoard())
+                                //todo  set to false for , remove this after creating a clear favorite/go to change favorite action sequence
+                                if(sm.hasFavoriteBoard() && false)
                                 {
-                                    showFragment(BoardFragment.newInstance());
+                                    BoardFragment boardFragment = BoardFragment.newInstance();
+                                    boardFragment.setArguments(ResourceManager.getFavoriteBoardSetting(sm.getFavoriteBoardId(),sm.getFavoriteBoardId()));
+                                    showFragment(boardFragment);
                                 }else
                                 {
-                                    showFragment(new Two());
+                                    showFragment(new BoardSelectionFragment());
                                 }
 
                             }

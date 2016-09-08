@@ -185,10 +185,16 @@ public class AssignedIssuesFragment extends Fragment implements SwipeRefreshLayo
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
+        menu.clear();
         super.onPrepareOptionsMenu(menu);
+        menu.add(0,R.id.filter_issue_status_done,0,R.string.done);
+        menu.add(0,R.id.filter_issue_status_todo,0,R.string.todo);
+        menu.add(0,R.id.filter_issue_status_inProgress,0,R.string.in_progress);
+
         menu.findItem(R.id.filter_issue_status_done).setVisible(true).setCheckable(true).setChecked(menuChecked.get("done"));
         menu.findItem(R.id.filter_issue_status_todo).setVisible(true).setCheckable(true).setChecked(menuChecked.get("todo"));
         menu.findItem(R.id.filter_issue_status_inProgress).setVisible(true).setCheckable(true).setChecked(menuChecked.get("inProgress"));
+
     }
 
     @Override

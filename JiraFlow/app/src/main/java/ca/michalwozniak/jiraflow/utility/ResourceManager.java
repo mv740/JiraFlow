@@ -6,6 +6,7 @@ import android.graphics.Picture;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.PictureDrawable;
 import android.net.Uri;
+import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
 import android.util.Patterns;
@@ -258,6 +259,15 @@ public class ResourceManager {
             return Color.parseColor("#E8F5E9");
         }
         return Color.GRAY;
+    }
+
+    public static Bundle getFavoriteBoardSetting(int boardId, int sprintID)
+    {
+        Bundle bundle = new Bundle();
+        bundle.putInt("boardID", boardId);
+        bundle.putInt("sprintID", sprintID);
+
+        return  bundle;
     }
 
 }

@@ -80,6 +80,7 @@ public class BoardFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.test_board_layout, container, false);
         unbinder = ButterKnife.bind(this, view);
+
         sessionManager = SessionManager.getInstance(myActivity);
         columnStatusId = new ArrayList<>();
         columnStatus = new ArrayList<>();
@@ -194,6 +195,7 @@ public class BoardFragment extends Fragment {
 
 
         if (getActivity() != null) {
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Dashboard");
             ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle(boardConfig.getName());
         }
 
@@ -218,9 +220,13 @@ public class BoardFragment extends Fragment {
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
+        menu.clear();
         super.onPrepareOptionsMenu(menu);
+
+        menu.add(0,R.id.action_disable_drag,0,"dragEnabled");
+
+
         menu.findItem(R.id.action_disable_drag).setVisible(mBoardView.isDragEnabled());
-        menu.findItem(R.id.action_enable_drag).setVisible(!mBoardView.isDragEnabled());
     }
 
     @Override
@@ -228,10 +234,6 @@ public class BoardFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.action_disable_drag:
                 mBoardView.setDragEnabled(false);
-                getActivity().invalidateOptionsMenu();
-                return true;
-            case R.id.action_enable_drag:
-                mBoardView.setDragEnabled(true);
                 getActivity().invalidateOptionsMenu();
                 return true;
         }

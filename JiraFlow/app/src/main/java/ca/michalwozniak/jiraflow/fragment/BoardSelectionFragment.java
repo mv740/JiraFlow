@@ -1,6 +1,5 @@
 package ca.michalwozniak.jiraflow.fragment;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -24,8 +23,7 @@ import ca.michalwozniak.jiraflow.R;
 import ca.michalwozniak.jiraflow.model.Board;
 import ca.michalwozniak.jiraflow.model.BoardList;
 import ca.michalwozniak.jiraflow.model.SprintData;
-import ca.michalwozniak.jiraflow.service.JiraSoftwareService;
-import ca.michalwozniak.jiraflow.service.ServiceGenerator;
+import ca.michalwozniak.jiraflow.utility.NetworkManager;
 import ca.michalwozniak.jiraflow.utility.SessionManager;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -39,11 +37,11 @@ public class BoardSelectionFragment extends Fragment implements SwipeRefreshLayo
     SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.rv)
     RecyclerView rv;
-    private Activity myActivity;
     private Unbinder unbinder;
     private SessionManager sessionManager;
     private CardViewActiveSprintAdapter sprintAdapter;
     private List<SprintData> boardSprint;
+    private NetworkManager networkManager;
 
     public BoardSelectionFragment() {
         // Required empty public constructor
@@ -61,13 +59,13 @@ public class BoardSelectionFragment extends Fragment implements SwipeRefreshLayo
 
         View view = inflater.inflate(R.layout.fragment_board_selection, container, false);
         unbinder = ButterKnife.bind(this, view);
-        myActivity = super.getActivity();
 
         if (getActivity() != null) {
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Select board");
         }
 
-        sessionManager = SessionManager.getInstance(myActivity);
+        sessionManager = SessionManager.getInstance(getContext());
+        networkManager = NetworkManager.getInstance(getContext());
         boardSprint = new ArrayList<>();
 
         FragmentManager fragmentManager = getFragmentManager();
@@ -94,25 +92,20 @@ public class BoardSelectionFragment extends Fragment implements SwipeRefreshLayo
 
     private void getBoardList() {
 
-        JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword(), sessionManager.getServerUrl());
-
-        jiraService.getAllBoards(null, null, null, null)
-                .subscribeOn(Schedulers.newThread())
+        networkManager.getAllBoards()
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(error -> Log.e("getAllBoards", error.getMessage()))
+                .subscribeOn(Schedulers.io())
                 .subscribe(this::getActiveSprint);
     }
 
     private void getActiveSprint(BoardList boardList) {
-        JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword(), sessionManager.getServerUrl());
 
         for (Board b : boardList.getValues()) {
 
             Log.d(TAG, "getActiveSprint: ");
-            jiraService.getSprintsForBoard(b.getId(), null, null)
-                    .subscribeOn(Schedulers.newThread())
+            networkManager.getSprintsForBoard(b.getId())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .doOnError(error -> Log.e("getSprintsForBoard", error.getMessage()))
+                    .subscribeOn(Schedulers.io())
                     .subscribe(sprint -> {
                         {
                             for (SprintData sd : sprint.getValues()) {

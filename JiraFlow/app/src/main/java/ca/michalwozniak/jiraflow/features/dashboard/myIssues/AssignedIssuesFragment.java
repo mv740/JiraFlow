@@ -8,7 +8,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,11 +27,8 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 import ca.michalwozniak.jiraflow.R;
 import ca.michalwozniak.jiraflow.features.createIssue.CreateIssueActivity;
-import ca.michalwozniak.jiraflow.helper.JQLHelper;
 import ca.michalwozniak.jiraflow.model.Issue.Issue;
-import ca.michalwozniak.jiraflow.service.JiraSoftwareService;
-import ca.michalwozniak.jiraflow.service.ServiceGenerator;
-import ca.michalwozniak.jiraflow.utility.SessionManager;
+import ca.michalwozniak.jiraflow.utility.NetworkManager;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import top.wefor.circularanim.CircularAnim;
@@ -45,12 +41,12 @@ public class AssignedIssuesFragment extends Fragment implements SwipeRefreshLayo
     SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.rv)
     RecyclerView rv;
-    private Activity myActivity;
     private List<Issue> issues;
     private CardViewIssueAdapter cardView;
     private Unbinder unbinder;
-    private SessionManager sessionManager;
     private Map<String, Boolean> menuChecked;
+
+    private NetworkManager networkManager;
 
     public AssignedIssuesFragment() {
         // Required empty public constructor
@@ -80,7 +76,7 @@ public class AssignedIssuesFragment extends Fragment implements SwipeRefreshLayo
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_assigned_issues, container, false);
         unbinder = ButterKnife.bind(this, view);
-        this.sessionManager = SessionManager.getInstance(myActivity);
+        this.networkManager =  NetworkManager.getInstance(this.getContext());
 
 
         LinearLayoutManager llm = new LinearLayoutManager(super.getActivity());
@@ -100,11 +96,10 @@ public class AssignedIssuesFragment extends Fragment implements SwipeRefreshLayo
         swipeRefreshLayout.setOnRefreshListener(this);
         swipeRefreshLayout.post(() -> {
                     swipeRefreshLayout.setRefreshing(true);
-                    getProjects();
+                    getUserIssuesCard();
                 }
         );
 
-        myActivity = super.getActivity();
         return view;
     }
 
@@ -116,34 +111,15 @@ public class AssignedIssuesFragment extends Fragment implements SwipeRefreshLayo
 
     @Override
     public void onRefresh() {
-        getProjects();
+        getUserIssuesCard();
     }
 
-    private void getProjects() {
+    private void getUserIssuesCard() {
 
-        JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword(), sessionManager.getServerUrl());
-
-
-        JQLHelper jqlHelper = new JQLHelper(JQLHelper.Query.ASSIGNEE, sessionManager.getUsername());
-        jiraService.getUserIssues(jqlHelper.toString())
-                .subscribeOn(Schedulers.newThread())
+        networkManager.getUserIssues()
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(error -> Log.e("getUserIssues", error.getMessage()))
-                .subscribe(userIssues -> generateIssueCards(userIssues.getIssues()));
-    }
-
-    private void generateIssueCards(final List<Issue> issueList) {
-
-        updateCardList(issueList);
-        final Handler handler = new Handler();
-        handler.postDelayed(() -> {
-            cardView.notifyDataSetChanged();
-            // stopping swipe refresh
-            if (swipeRefreshLayout != null) {
-                if (swipeRefreshLayout.isRefreshing())
-                    swipeRefreshLayout.setRefreshing(false);
-            }
-        }, 1000);
+                .subscribeOn(Schedulers.io())
+                .subscribe(this::updateCardList);
     }
 
     public void updateCardList(List<Issue> issueList) {
@@ -174,6 +150,16 @@ public class AssignedIssuesFragment extends Fragment implements SwipeRefreshLayo
         }
 
         startFilter();
+
+        final Handler handler = new Handler();
+        handler.postDelayed(() -> {
+            cardView.notifyDataSetChanged();
+            // stopping swipe refresh
+            if (swipeRefreshLayout != null) {
+                if (swipeRefreshLayout.isRefreshing())
+                    swipeRefreshLayout.setRefreshing(false);
+            }
+        }, 1000);
     }
 
 

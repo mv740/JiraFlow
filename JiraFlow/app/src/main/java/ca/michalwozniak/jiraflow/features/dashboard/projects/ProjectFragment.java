@@ -1,13 +1,11 @@
 package ca.michalwozniak.jiraflow.features.dashboard.projects;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,10 +20,8 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import ca.michalwozniak.jiraflow.R;
 import ca.michalwozniak.jiraflow.model.Project;
-import ca.michalwozniak.jiraflow.service.JiraSoftwareService;
-import ca.michalwozniak.jiraflow.service.ServiceGenerator;
+import ca.michalwozniak.jiraflow.utility.NetworkManager;
 import ca.michalwozniak.jiraflow.utility.ResourceManager;
-import ca.michalwozniak.jiraflow.utility.SessionManager;
 import okhttp3.OkHttpClient;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -38,11 +34,10 @@ public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRe
     SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.rv)
     RecyclerView rv;
-    private Activity myActivity;
     private List<Project> projects;
     private CardViewProjectAdapter cardView;
     private Unbinder unbinder;
-    private SessionManager sessionManager;
+    private NetworkManager networkManager;
 
     public ProjectFragment() {
         // Required empty public constructor
@@ -59,8 +54,8 @@ public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRe
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_project, container, false);
         unbinder = ButterKnife.bind(this, view);
-        this.sessionManager = SessionManager.getInstance(myActivity);
 
+        networkManager = NetworkManager.getInstance(getContext());
 
         LinearLayoutManager llm = new LinearLayoutManager(super.getActivity());
         rv.setLayoutManager(llm);
@@ -76,7 +71,6 @@ public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 }
         );
 
-        myActivity = super.getActivity();
         return view;
     }
 
@@ -93,12 +87,9 @@ public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     private void getProjects() {
 
-        JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword(), sessionManager.getServerUrl());
-
-        jiraService.getAllProjects()
-                .subscribeOn(Schedulers.newThread())
+        networkManager.getAllProjects()
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(error -> Log.e("getAllProjects", error.getMessage()))
                 .subscribe(this::generateProjectCards);
     }
 

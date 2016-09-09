@@ -5,7 +5,6 @@ package ca.michalwozniak.jiraflow.features.board;
  */
 
 import android.animation.ObjectAnimator;
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -13,7 +12,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -41,10 +39,8 @@ import ca.michalwozniak.jiraflow.model.Sprint;
 import ca.michalwozniak.jiraflow.model.other.Column;
 import ca.michalwozniak.jiraflow.model.transition.Transition;
 import ca.michalwozniak.jiraflow.model.transition.TransitionModel;
-import ca.michalwozniak.jiraflow.service.JiraSoftwareService;
-import ca.michalwozniak.jiraflow.service.ServiceGenerator;
 import ca.michalwozniak.jiraflow.utility.LogManager;
-import ca.michalwozniak.jiraflow.utility.SessionManager;
+import ca.michalwozniak.jiraflow.utility.NetworkManager;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -54,9 +50,7 @@ public class BoardFragment extends Fragment {
     private BoardView mBoardView;
     private int mColumns;
     private Unbinder unbinder;
-    private SessionManager sessionManager;
-    private Activity myActivity;
-
+    private NetworkManager networkManager;
     static List<String> columnStatusId;
     static List<String> columnStatus;
     static String currentDraggedIssueKey;
@@ -81,7 +75,8 @@ public class BoardFragment extends Fragment {
         View view = inflater.inflate(R.layout.test_board_layout, container, false);
         unbinder = ButterKnife.bind(this, view);
 
-        sessionManager = SessionManager.getInstance(myActivity);
+        networkManager = NetworkManager.getInstance(getContext());
+
         columnStatusId = new ArrayList<>();
         columnStatus = new ArrayList<>();
 
@@ -120,7 +115,6 @@ public class BoardFragment extends Fragment {
                 }
             }
         });
-        myActivity = super.getActivity();
 
         getBoardConfiguration();
 
@@ -130,12 +124,9 @@ public class BoardFragment extends Fragment {
     private void getPossibleTransition() {
         String name = columnStatus.get(dropColumnIndex);
 
-        JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword(), sessionManager.getServerUrl());
-
-        jiraService.getTransitions(currentDraggedIssueKey)
-                .subscribeOn(Schedulers.newThread())
+        networkManager.getTransitions(currentDraggedIssueKey)
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(error -> Log.e("getPossibleTransition", error.getMessage()))
                 .subscribe(transitionPossible -> {
 
                             String transitionId = "";
@@ -145,18 +136,16 @@ public class BoardFragment extends Fragment {
                                 }
                             }
 
-                            doTransition(transitionId, name, jiraService);
+                            doTransition(transitionId, name);
                         }
                 );
-
     }
 
     /**
      * @param id
      * @param name
-     * @param jiraService
      */
-    private void doTransition(String id, String name, JiraSoftwareService jiraService) {
+    private void doTransition(String id, String name) {
         TransitionModel model = new TransitionModel();
         Transition transition = new Transition();
         transition.setName(name);
@@ -165,27 +154,21 @@ public class BoardFragment extends Fragment {
 
         LogManager.displayJSON("doTransition", model);
 
-        jiraService.doTransition(currentDraggedIssueKey, model)
-                .subscribeOn(Schedulers.newThread())
+        networkManager.doTransition(currentDraggedIssueKey, model)
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(error -> Log.e("getPossibleTransition", error.getMessage()))
                 .subscribe(emptyResponse -> {});
     }
 
     private void getBoardConfiguration() {
 
-
-        final JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword(), sessionManager.getServerUrl());
-
-        final int boardID = this.boardID; //1;
-        jiraService.getBoardConfiguration(boardID)
-                .subscribeOn(Schedulers.newThread())
+        networkManager.getBoardConfiguration(boardID)
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(error -> Log.e("getBoardConfiguration", error.getMessage()))
                 .subscribe(boardConfig -> {
                     
-                    jiraService.getIssuesForSprint(this.sprintID,null,null)
-                            .subscribeOn(Schedulers.newThread())
+                    networkManager.getIssuesForSprint(sprintID)
+                            .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(sprint -> generateBoard(boardConfig, sprint));
                 });

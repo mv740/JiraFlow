@@ -10,7 +10,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ca.michalwozniak.jiraflow.R;
 import ca.michalwozniak.jiraflow.features.dashboard.projects.ViewPagerAdapter;
-import ca.michalwozniak.jiraflow.fragment.BoardSelectionFragment;
+import ca.michalwozniak.jiraflow.features.boardSelection.BoardSelectionFragment;
 
 public class ProjectActivity extends AppCompatActivity {
     @BindView(R.id.toolbar) Toolbar toolbar;

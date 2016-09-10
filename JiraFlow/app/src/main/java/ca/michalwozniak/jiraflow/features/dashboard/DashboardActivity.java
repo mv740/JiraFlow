@@ -52,7 +52,7 @@ import ca.michalwozniak.jiraflow.features.dashboard.myIssues.AssignedIssuesFragm
 import ca.michalwozniak.jiraflow.features.dashboard.projects.ProjectFragment;
 import ca.michalwozniak.jiraflow.features.dashboard.stream.StreamFragment;
 import ca.michalwozniak.jiraflow.features.login.LoginActivity;
-import ca.michalwozniak.jiraflow.fragment.BoardSelectionFragment;
+import ca.michalwozniak.jiraflow.features.boardSelection.BoardSelectionFragment;
 import ca.michalwozniak.jiraflow.utility.ResourceManager;
 import ca.michalwozniak.jiraflow.utility.SessionManager;
 
@@ -170,6 +170,7 @@ public class DashboardActivity extends AppCompatActivity {
                                 if (tabLayout.getVisibility() == View.GONE) {
                                     tabLayout.setVisibility(View.VISIBLE);
                                     toolbar.setSubtitle(null);
+                                    toolbar.setTitle("Dashboard");
                                 }
                                 // toolbar.getMenu().setGroupEnabled(0,false);
                                 toolbar.getMenu().setGroupVisible(0, false);
@@ -237,9 +238,9 @@ public class DashboardActivity extends AppCompatActivity {
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new StreamFragment(), "Stream");
-        adapter.addFragment(new AssignedIssuesFragment(), "My Issues");
-        adapter.addFragment(new ProjectFragment(), "Projects");
+        adapter.addFragment(new StreamFragment(), getString(R.string.TabStreamName));
+        adapter.addFragment(new AssignedIssuesFragment(), getString(R.string.TabIssuesName));
+        adapter.addFragment(new ProjectFragment(), getString(R.string.TabProjectName));
         viewPager.setAdapter(adapter);
     }
 

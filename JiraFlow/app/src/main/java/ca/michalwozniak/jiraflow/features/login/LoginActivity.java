@@ -177,6 +177,11 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
     }
 
     @Override
+    public Context getViewContext() {
+        return getApplicationContext();
+    }
+
+    @Override
     public void loginFailed(final String errorMessage) {
         new Handler().postDelayed(() -> {
             showErrorSnackBar(errorMessage);

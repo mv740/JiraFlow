@@ -29,8 +29,6 @@ import ca.michalwozniak.jiraflow.R;
 import ca.michalwozniak.jiraflow.features.createIssue.CreateIssueActivity;
 import ca.michalwozniak.jiraflow.model.Issue.Issue;
 import ca.michalwozniak.jiraflow.utility.NetworkManager;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 import top.wefor.circularanim.CircularAnim;
 
 
@@ -115,11 +113,7 @@ public class AssignedIssuesFragment extends Fragment implements SwipeRefreshLayo
     }
 
     private void getUserIssuesCard() {
-
-        networkManager.getUserIssues()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(this::updateCardList);
+        networkManager.getUserIssues().subscribe(this::updateCardList);
     }
 
     public void updateCardList(List<Issue> issueList) {

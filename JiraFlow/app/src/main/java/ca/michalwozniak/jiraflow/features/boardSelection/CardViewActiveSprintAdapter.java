@@ -1,4 +1,4 @@
-package ca.michalwozniak.jiraflow.fragment;
+package ca.michalwozniak.jiraflow.features.boardSelection;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.github.ivbaranov.mfb.MaterialFavoriteButton;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ca.michalwozniak.jiraflow.R;
@@ -29,14 +30,16 @@ public class CardViewActiveSprintAdapter extends RecyclerView.Adapter<CardViewAc
 
     private FragmentManager fragmentManager;
     private List<SprintData> sprints;
+    private List<SprintData> previousKeepSprints;
     private SparseIntArray sprintIds;
     private SparseIntArray boardIds;
     private int favoriteBoardPosition;
-    SessionManager sm;
+    private SessionManager sm;
 
 
     public CardViewActiveSprintAdapter(List<SprintData> sprints, FragmentManager fragmentManager, SessionManager sessionManager) {
         this.sprints = sprints;
+        this.previousKeepSprints = new ArrayList<>();
         this.fragmentManager = fragmentManager;
         this.sprintIds = new SparseIntArray();
         this.boardIds = new SparseIntArray();
@@ -44,6 +47,8 @@ public class CardViewActiveSprintAdapter extends RecyclerView.Adapter<CardViewAc
         this.favoriteBoardPosition = sessionManager.getFavoriteBoardId();
 
     }
+
+
 
     public class ProjectViewHolder extends RecyclerView.ViewHolder {
 

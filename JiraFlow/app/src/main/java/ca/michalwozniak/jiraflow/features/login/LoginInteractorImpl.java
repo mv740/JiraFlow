@@ -3,22 +3,24 @@ package ca.michalwozniak.jiraflow.features.login;
 import android.util.Log;
 
 import ca.michalwozniak.jiraflow.service.Error.RetrofitException;
-import ca.michalwozniak.jiraflow.service.JiraSoftwareService;
-import ca.michalwozniak.jiraflow.service.ServiceGenerator;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import ca.michalwozniak.jiraflow.utility.NetworkManager;
 
 /**
  * Created by Michal Wozniak on 8/8/2016.
  */
 public class LoginInteractorImpl implements LoginInteractor {
+
+
+    private NetworkManager networkManager;
+
+    public LoginInteractorImpl(NetworkManager networkManager) {
+        this.networkManager = networkManager;
+    }
+
     @Override
     public void login(final String username, final String password, final String url, final boolean rememberMe, final OnLoginFinishedListener listener) {
 
-        final JiraSoftwareService jiraSoftwareService = ServiceGenerator.createService(JiraSoftwareService.class, username, password, url);
-        jiraSoftwareService.getUser()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+        networkManager.logIn(username,password,url)
                 .doOnError(e -> {
                     RetrofitException error = (RetrofitException) e;
 
@@ -51,7 +53,6 @@ public class LoginInteractorImpl implements LoginInteractor {
                     Log.e("error", e.getMessage());
                 })
                 .subscribe(user -> {
-
                             listener.saveUser(username, password, user, url);
                             if (rememberMe) {
                                 listener.rememberProfile();

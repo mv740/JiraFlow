@@ -41,8 +41,6 @@ import ca.michalwozniak.jiraflow.model.transition.Transition;
 import ca.michalwozniak.jiraflow.model.transition.TransitionModel;
 import ca.michalwozniak.jiraflow.utility.LogManager;
 import ca.michalwozniak.jiraflow.utility.NetworkManager;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 public class BoardFragment extends Fragment {
 
@@ -87,7 +85,6 @@ public class BoardFragment extends Fragment {
         }
 
 
-
         mBoardView = (BoardView) view.findViewById(R.id.board_view);
         mBoardView.setSnapToColumnsWhenScrolling(true);
         mBoardView.setSnapToColumnWhenDragging(true);
@@ -96,7 +93,7 @@ public class BoardFragment extends Fragment {
         mBoardView.setBoardListener(new BoardView.BoardListener() {
             @Override
             public void onItemDragStarted(int column, int row) {
-                // Toast.makeText(mBoardView.getContext(), "Start - column: " + column + " row: " + row, Toast.LENGTH_SHORT).show();
+                // Toast.makeText(mBoardView.getViewContext(), "Start - column: " + column + " row: " + row, Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -124,21 +121,10 @@ public class BoardFragment extends Fragment {
     private void getPossibleTransition() {
         String name = columnStatus.get(dropColumnIndex);
 
-        networkManager.getTransitions(currentDraggedIssueKey)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(transitionPossible -> {
+        networkManager.getTransitions(currentDraggedIssueKey, name)
+                .subscribe(transition -> doTransition(transition.getId(), name));
 
-                            String transitionId = "";
-                            for (Transition t : transitionPossible.getTransitions()) {
-                                if (t.getName().equalsIgnoreCase(name)) {
-                                    transitionId = t.getId();
-                                }
-                            }
 
-                            doTransition(transitionId, name);
-                        }
-                );
     }
 
     /**
@@ -155,21 +141,16 @@ public class BoardFragment extends Fragment {
         LogManager.displayJSON("doTransition", model);
 
         networkManager.doTransition(currentDraggedIssueKey, model)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(emptyResponse -> {});
+                .subscribe(emptyResponse -> {
+                });
     }
 
     private void getBoardConfiguration() {
 
         networkManager.getBoardConfiguration(boardID)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(boardConfig -> {
-                    
+
                     networkManager.getIssuesForSprint(sprintID)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(sprint -> generateBoard(boardConfig, sprint));
                 });
     }
@@ -206,7 +187,7 @@ public class BoardFragment extends Fragment {
         menu.clear();
         super.onPrepareOptionsMenu(menu);
 
-        menu.add(0,R.id.action_disable_drag,0,"dragEnabled");
+        menu.add(0, R.id.action_disable_drag, 0, "dragEnabled");
 
 
         menu.findItem(R.id.action_disable_drag).setVisible(mBoardView.isDragEnabled());

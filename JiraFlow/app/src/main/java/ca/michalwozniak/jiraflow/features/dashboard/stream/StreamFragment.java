@@ -7,12 +7,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -23,13 +21,7 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import ca.michalwozniak.jiraflow.R;
 import ca.michalwozniak.jiraflow.model.Feed.Entry;
-import ca.michalwozniak.jiraflow.service.JiraSoftwareService;
-import ca.michalwozniak.jiraflow.service.ServiceGenerator;
-import ca.michalwozniak.jiraflow.utility.ResourceManager;
-import ca.michalwozniak.jiraflow.utility.SessionManager;
-import okhttp3.OkHttpClient;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import ca.michalwozniak.jiraflow.utility.NetworkManager;
 
 
 public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
@@ -45,7 +37,7 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
     private List<Entry> messages;
     private CardViewMessageAdapter cardView;
     private Unbinder unbinder;
-    private SessionManager sessionManager;
+    private NetworkManager networkManager;
 
     public StreamFragment() {
         // Required empty public constructor
@@ -62,7 +54,8 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_stream, container, false);
         unbinder = ButterKnife.bind(this, view);
-        sessionManager = SessionManager.getInstance(myActivity);
+
+        networkManager = NetworkManager.getInstance(getContext());
 
         LinearLayoutManager llm = new LinearLayoutManager(super.getActivity());
         rv.setLayoutManager(llm);
@@ -78,7 +71,7 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 }
         );
 
-        myActivity = super.getActivity();
+
         return view;
     }
 
@@ -95,40 +88,9 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     private void getActivityStream() {
 
-        JiraSoftwareService jiraService = ServiceGenerator.createServiceXML(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword(), sessionManager.getServerUrl());
-
-        jiraService.getActivityFeed()
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(error -> Log.e("getActivityFeed", error.getMessage()))
-                .subscribe(feed -> generateMessageFeedCards(feed.getEntry()));
-
-    }
-
-    private void generateMessageFeedCards(final List<Entry> activityFeed) {
-        for (final Entry entry : activityFeed) {
-
-
-            OkHttpClient httpClient = new OkHttpClient();
-            okhttp3.Request request = new okhttp3.Request.Builder().url(entry.getAuthor().getLink().get(0).getHref()).build();
-
-            okhttp3.Call call1 = httpClient.newCall(request);
-            call1.enqueue(new okhttp3.Callback() {
-                @Override
-                public void onFailure(okhttp3.Call call, IOException e) {
-
-                }
-
-                @Override
-                public void onResponse(final okhttp3.Call call, okhttp3.Response response) throws IOException {
-
-                    entry.setImageType(ResourceManager.getImageType(response.headers().get("Content-type")));
-                    response.body().close();
-                }
-            });
-        }
-
-        updateCardList(activityFeed);
+        networkManager.getActivityStream()
+                .subscribe(this::updateCardList);
+        
         final Handler handler = new Handler();
         handler.postDelayed(() -> {
 
@@ -138,7 +100,9 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
                     swipeRefreshLayout.setRefreshing(false);
             }
         }, 1000);
+
     }
+
 
     /**
      * Update card view list, add unique entry on refresh and delete removed entries

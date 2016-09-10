@@ -23,8 +23,6 @@ import ca.michalwozniak.jiraflow.model.Project;
 import ca.michalwozniak.jiraflow.utility.NetworkManager;
 import ca.michalwozniak.jiraflow.utility.ResourceManager;
 import okhttp3.OkHttpClient;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 
 public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
@@ -88,8 +86,6 @@ public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRe
     private void getProjects() {
 
         networkManager.getAllProjects()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::generateProjectCards);
     }
 

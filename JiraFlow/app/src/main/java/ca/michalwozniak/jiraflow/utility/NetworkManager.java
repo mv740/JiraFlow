@@ -13,6 +13,7 @@ import ca.michalwozniak.jiraflow.model.EmptyResponse;
 import ca.michalwozniak.jiraflow.model.Feed.ActivityFeed;
 import ca.michalwozniak.jiraflow.model.Feed.Entry;
 import ca.michalwozniak.jiraflow.model.Issue.Issue;
+import ca.michalwozniak.jiraflow.model.Issue.issueType;
 import ca.michalwozniak.jiraflow.model.Issue.userIssues;
 import ca.michalwozniak.jiraflow.model.Project;
 import ca.michalwozniak.jiraflow.model.Sprint;
@@ -42,9 +43,11 @@ public class NetworkManager {
     private final JiraSoftwareService jiraServiceXML;
     private final SessionManager sessionManager;
     private static NetworkManager instance = null;
+    private final Context myContext;
 
     private NetworkManager(Context context) {
 
+        this.myContext = context;
         this.sessionManager = SessionManager.getInstance(context);
         this.jiraService = ServiceGenerator.createService(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword(), sessionManager.getServerUrl());
         this.jiraServiceXML = ServiceGenerator.createServiceXML(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword(), sessionManager.getServerUrl());
@@ -174,4 +177,52 @@ public class NetworkManager {
 
     }
 
+    public Observable<List<Project>> getProjectWithUpdatedIconType() {
+        return getAllProjects()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .flatMapIterable(projects -> projects)
+                .doOnNext(project -> {
+                    OkHttpClient httpClient = new OkHttpClient();
+                    Request request = new Request.Builder().url(project.getAvatarUrls().getExtraSmall()).build();
+
+                    Call call1 = httpClient.newCall(request);
+                    call1.enqueue(new Callback() {
+
+                        @Override
+                        public void onFailure(Call call, IOException e) {
+
+                        }
+
+                        @Override
+                        public void onResponse(final Call call, Response response) throws IOException {
+
+                            project.setImageType(ResourceManager.getImageType(response.headers().get("Content-type")));
+                            response.body().close();
+                        }
+                    });
+                })
+                .toList();
+    }
+
+    public Observable<List<issueType>> getAllIssueType() {
+
+        return jiraService.getAllIssueType()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+//        return jiraService.getAllIssueType()
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .flatMapIterable(issueTypeList -> issueTypeList)
+//                .map(issueType -> {
+//
+//                    ImageView temp = new ImageView(myContext);
+//
+//                    ResourceManager.loadImageSVG(myContext,issueType.getIconUrl(),temp);
+//
+//                    return Pair.create(issueType.getName(), temp);
+//
+//                })
+//                .toList();
+    }
 }

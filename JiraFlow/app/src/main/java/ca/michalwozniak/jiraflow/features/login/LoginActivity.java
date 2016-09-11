@@ -103,11 +103,13 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
 
-        //testing
-        mUsername.setText("mv740");
+//        //testing
+//        mUsername.setText("mv740");
+//        mPassword.setText("Q1w2e3r4");
+//        serverUrl.setText("173.176.41.65:8000");
+        mUsername.setText("riyazuyu@lackmail.ru");
         mPassword.setText("Q1w2e3r4");
-        serverUrl.setText("173.176.41.65:8000");
-
+        serverUrl.setText("jiramobile.atlassian.net");
 
         ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, getResources().getStringArray(R.array.http_protocols));
         spinnerHttpType.setAdapter(spinnerArrayAdapter);

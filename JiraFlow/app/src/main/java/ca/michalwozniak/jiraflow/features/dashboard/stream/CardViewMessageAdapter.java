@@ -143,7 +143,7 @@ public class CardViewMessageAdapter extends RecyclerView.Adapter<CardViewMessage
             holder.message_content.setText(null);
         }
 
-        //if it is a issue (bug/story ... ) it will have icons links
+        //if it is a issue (ic_bug/ic_story ... ) it will have icons links
         if(messages.get(position).getLink().size()>1)
         {
             ResourceManager.loadImageSVG(context, messages.get(position).getLink().get(1).getHref(), holder.messageTypeIcon);
@@ -160,8 +160,18 @@ public class CardViewMessageAdapter extends RecyclerView.Adapter<CardViewMessage
 
     public void add(int position, Entry newItem) {
         messages.add(position, newItem);
-        notifyItemInserted(position);
+        //notifyItemInserted(position);
+    }
 
+    public void notifyInserted(int position)
+    {
+        notifyItemInserted(position);
+    }
+
+
+    public void addNoNotify(int position, Entry newItem)
+    {
+        messages.add(position, newItem);
     }
 
     // This removes the data from our Dataset and Updates the Recycler View.

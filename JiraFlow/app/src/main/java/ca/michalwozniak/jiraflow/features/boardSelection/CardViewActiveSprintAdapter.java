@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +14,6 @@ import android.widget.TextView;
 
 import com.github.ivbaranov.mfb.MaterialFavoriteButton;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import ca.michalwozniak.jiraflow.R;
@@ -30,21 +30,22 @@ public class CardViewActiveSprintAdapter extends RecyclerView.Adapter<CardViewAc
 
     private FragmentManager fragmentManager;
     private List<SprintData> sprints;
-    private List<SprintData> previousKeepSprints;
     private SparseIntArray sprintIds;
     private SparseIntArray boardIds;
     private int favoriteBoardPosition;
+    private int currentSavedSprintId;
     private SessionManager sm;
 
 
     public CardViewActiveSprintAdapter(List<SprintData> sprints, FragmentManager fragmentManager, SessionManager sessionManager) {
         this.sprints = sprints;
-        this.previousKeepSprints = new ArrayList<>();
         this.fragmentManager = fragmentManager;
         this.sprintIds = new SparseIntArray();
         this.boardIds = new SparseIntArray();
         this.sm = sessionManager;
-        this.favoriteBoardPosition = sessionManager.getFavoriteBoardId();
+        this.favoriteBoardPosition =-1;
+        this.currentSavedSprintId = sessionManager.getFavoriteSprintId();
+
 
     }
 
@@ -88,8 +89,9 @@ public class CardViewActiveSprintAdapter extends RecyclerView.Adapter<CardViewAc
             favoriteBoardButton.setOnFavoriteChangeListener((buttonView, favorite) -> {
                 if (favorite) {
                     favoriteBoardPosition = getAdapterPosition();
+                    currentSavedSprintId = sprintIds.get(getAdapterPosition());;
                     sm.saveFavoriteBoardId(boardIds.get(getAdapterPosition()));
-                    sm.saveFavoriteSprintId(sprintIds.get(getAdapterPosition()));
+                    sm.saveFavoriteSprintId(currentSavedSprintId);
                 }
             });
             favoriteBoardButton.setOnFavoriteAnimationEndListener((buttonView, favorite) -> {
@@ -120,7 +122,20 @@ public class CardViewActiveSprintAdapter extends RecyclerView.Adapter<CardViewAc
 
         boardIds.append(position, sprints.get(position).getOriginBoardId());
         sprintIds.append(position, sprints.get(position).getId());
-        holder.favoriteBoardButton.setFavorite(position == favoriteBoardPosition);
+
+        Log.e("favoriteBoardPosition", String.valueOf(favoriteBoardPosition));
+        Log.e("currentSavedSprintId", String.valueOf(currentSavedSprintId));
+        Log.e("sprints.get(position)", String.valueOf(sprints.get(position).getId()));
+
+        if(favoriteBoardPosition != -1)
+        {
+            holder.favoriteBoardButton.setFavorite(position == favoriteBoardPosition);
+        }else
+        {
+            holder.favoriteBoardButton.setFavorite(sprints.get(position).getId() == currentSavedSprintId);
+        }
+
+
 
 
 //        if (sprint.get(position).getImageType() == ImageType.SVG) {

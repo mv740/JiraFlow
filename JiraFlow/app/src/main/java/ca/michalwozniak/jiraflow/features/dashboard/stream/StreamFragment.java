@@ -21,6 +21,7 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import ca.michalwozniak.jiraflow.R;
 import ca.michalwozniak.jiraflow.model.Feed.Entry;
+import ca.michalwozniak.jiraflow.utility.AnimationUtil;
 import ca.michalwozniak.jiraflow.utility.NetworkManager;
 
 
@@ -65,11 +66,10 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
         cardView = new CardViewMessageAdapter(messages, getContext());
         rv.setAdapter(cardView);
         swipeRefreshLayout.setOnRefreshListener(this);
-        swipeRefreshLayout.post(() -> {
-                    swipeRefreshLayout.setRefreshing(true);
-                    getActivityStream();
-                }
-        );
+
+        getActivityStream();
+
+
 
 
         return view;
@@ -88,21 +88,13 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     private void getActivityStream() {
 
-        networkManager.getActivityStream()
-                .subscribe(this::updateCardList);
-        
-        final Handler handler = new Handler();
-        handler.postDelayed(() -> {
-
-            // stopping swipe refresh
-            if (swipeRefreshLayout != null) {
-                if (swipeRefreshLayout.isRefreshing())
-                    swipeRefreshLayout.setRefreshing(false);
-            }
-        }, 1000);
-
+        swipeRefreshLayout.post(() -> {
+                    swipeRefreshLayout.setRefreshing(true);
+                    networkManager.getActivityStream()
+                            .subscribe(this::updateCardList);
+                }
+        );
     }
-
 
     /**
      * Update card view list, add unique entry on refresh and delete removed entries
@@ -153,23 +145,41 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
             //add new entries
             for (Entry item : newEntrytoAddList) {
                 cardView.add(0, item);
-                rv.scrollToPosition(0);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        cardView.notifyInserted(0);
+                        rv.scrollToPosition(0);
+                    }
+                },500);
+
             }
 
 
         }
+        boolean toNotify = false;
         if (cardView.getItemCount() == 0) {
             //reverse order, top card is most recent date
             Collections.reverse(activityFeed);
+            toNotify = true;
 
-            for (Entry item : activityFeed) {
-                cardView.add(0, item);
-                rv.scrollToPosition(0);
-            }
+//            for (Entry item : activityFeed) {
+//                cardView.addNoNotify(0, item);
+//                rv.scrollToPosition(0);
+//            }
+
+            messages.addAll(activityFeed);
         }
 
         //save cards history for later comparing if old entry were deleted or new were added
         messagesHistory = new ArrayList<>(messages);
-
+        Handler handler = new Handler();
+        boolean finalToNotify = toNotify;
+        handler.postDelayed(() -> {
+            if(finalToNotify) {
+                cardView.notifyDataSetChanged();
+            }
+            AnimationUtil.stopRefreshAnimation(swipeRefreshLayout);
+        },1000);
     }
 }

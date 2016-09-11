@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.woxthebox.draglistview.DragItemAdapter;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -26,13 +27,15 @@ public class dragItemAdapter extends DragItemAdapter<Pair<Long, DragCardData>, d
 
     private int mLayoutId;
     private int mGrabHandleId;
+    private Map<String,ImageView> issueTypeIcons;
 
-    public dragItemAdapter(ArrayList<Pair<Long, DragCardData>> list, int layoutId, int grabHandleId, boolean dragOnLongPress) {
+    public dragItemAdapter(ArrayList<Pair<Long, DragCardData>> list, int layoutId, int grabHandleId, boolean dragOnLongPress, Map<String, ImageView> issueTypeIcons) {
         super(dragOnLongPress);
         mLayoutId = layoutId;
         mGrabHandleId = grabHandleId;
         setHasStableIds(true);
         setItemList(list);
+        this.issueTypeIcons = issueTypeIcons;
     }
 
     @Override
@@ -53,6 +56,8 @@ public class dragItemAdapter extends DragItemAdapter<Pair<Long, DragCardData>, d
         holder.subTitle.setText(data.getKey());
         holder.itemView.setTag(text);
         holder.mImage.setImageResource(ResourceManager.getIssueTypeIconId(data.getIconType()));
+
+       // holder.mImage = issueTypeIcons.get(data.getIconType());   Log.e("getIcontype",data.getIconType());
     }
 
     @Override

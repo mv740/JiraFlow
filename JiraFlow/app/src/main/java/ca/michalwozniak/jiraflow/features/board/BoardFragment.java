@@ -27,7 +27,9 @@ import com.woxthebox.draglistview.BoardView;
 import com.woxthebox.draglistview.DragItem;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -55,6 +57,7 @@ public class BoardFragment extends Fragment {
     static int dropColumnIndex;
     private int boardID;
     private int sprintID;
+    private Map<String,ImageView> issueTypeIcons;
 
 
     public static BoardFragment newInstance() {
@@ -77,6 +80,7 @@ public class BoardFragment extends Fragment {
 
         columnStatusId = new ArrayList<>();
         columnStatus = new ArrayList<>();
+        issueTypeIcons = new HashMap<>();
 
         Bundle bundle = this.getArguments();
         if (bundle != null) {
@@ -113,10 +117,47 @@ public class BoardFragment extends Fragment {
             }
         });
 
+       // getAllIssueTypeIcons();
         getBoardConfiguration();
-
         return view;
     }
+
+    //todo need to get all icon in stored them in map
+//    private void getAllIssueTypeIcons() {
+//        networkManager.getAllIssueType()
+//                .subscribe(new Subscriber<List<issueType>>() {
+//                    @Override
+//                    public void onCompleted() {
+//
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onNext(List<issueType> issueTypeList) {
+//                        for (issueType i: issueTypeList
+//                             ) {
+//
+//                            ImageView image = new ImageView(getContext());
+//                            ResourceManager.loadImageSVG(getContext(),i.getIconUrl(),image);
+//                            issueTypeIcons.put(i.getName(), image);
+//
+//                        }
+//
+//                        Handler d = new Handler();
+//                        d.postDelayed(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                getBoardConfiguration();
+//                            }
+//                        },3000);
+//                    }
+//                });
+//
+//    }
 
     private void getPossibleTransition() {
         String name = columnStatus.get(dropColumnIndex);
@@ -141,8 +182,7 @@ public class BoardFragment extends Fragment {
         LogManager.displayJSON("doTransition", model);
 
         networkManager.doTransition(currentDraggedIssueKey, model)
-                .subscribe(emptyResponse -> {
-                });
+                .subscribe(emptyResponse -> {});
     }
 
     private void getBoardConfiguration() {
@@ -218,7 +258,7 @@ public class BoardFragment extends Fragment {
         }
 
         final int column = mColumns;
-        final dragItemAdapter listAdapter = new dragItemAdapter(mItemArray, R.layout.test_column_item, R.id.item_layout, true);
+        final dragItemAdapter listAdapter = new dragItemAdapter(mItemArray, R.layout.test_column_item, R.id.item_layout, true, issueTypeIcons);
         final View header = View.inflate(getActivity(), R.layout.test_column_header, null);
         ((TextView) header.findViewById(R.id.text)).setText(current.getName());
         ((TextView) header.findViewById(R.id.item_count)).setText("" + addItems);

@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -20,9 +19,8 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import ca.michalwozniak.jiraflow.R;
 import ca.michalwozniak.jiraflow.model.Project;
+import ca.michalwozniak.jiraflow.utility.AnimationUtil;
 import ca.michalwozniak.jiraflow.utility.NetworkManager;
-import ca.michalwozniak.jiraflow.utility.ResourceManager;
-import okhttp3.OkHttpClient;
 
 
 public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
@@ -63,11 +61,8 @@ public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRe
         cardView = new CardViewProjectAdapter(projects);
         rv.setAdapter(cardView);
         swipeRefreshLayout.setOnRefreshListener(this);
-        swipeRefreshLayout.post(() -> {
-                    swipeRefreshLayout.setRefreshing(true);
-                    getProjects();
-                }
-        );
+        getProjects();
+
 
         return view;
     }
@@ -85,46 +80,11 @@ public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     private void getProjects() {
 
-        networkManager.getAllProjects()
-                .subscribe(this::generateProjectCards);
-    }
+        swipeRefreshLayout.post(() -> {
+            swipeRefreshLayout.setRefreshing(true);
+            networkManager.getProjectWithUpdatedIconType().subscribe(this::updateCardList);
+        });
 
-    private void generateProjectCards(final List<Project> projects) {
-        for (final Project project : projects) {
-
-
-            OkHttpClient httpClient = new OkHttpClient();
-            okhttp3.Request request = new okhttp3.Request.Builder().url(project.getAvatarUrls().getExtraSmall()).build();
-
-            okhttp3.Call call1 = httpClient.newCall(request);
-            call1.enqueue(new okhttp3.Callback() {
-
-
-                @Override
-                public void onFailure(okhttp3.Call call, IOException e) {
-
-                }
-
-                @Override
-                public void onResponse(final okhttp3.Call call, okhttp3.Response response) throws IOException {
-
-                    project.setImageType(ResourceManager.getImageType(response.headers().get("Content-type")));
-                    response.body().close();
-                }
-            });
-        }
-
-        updateCardList(projects);
-        final Handler handler = new Handler();
-        handler.postDelayed(() -> {
-
-            cardView.notifyDataSetChanged();
-            // stopping swipe refresh
-            if (swipeRefreshLayout != null) {
-                if (swipeRefreshLayout.isRefreshing())
-                    swipeRefreshLayout.setRefreshing(false);
-            }
-        }, 1000);
     }
 
     public void updateCardList(List<Project> projectList) {
@@ -153,5 +113,12 @@ public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 projects.add(newProject);
             }
         }
+
+        Handler post = new Handler();
+        post.postDelayed(() -> {
+            cardView.notifyDataSetChanged();
+            AnimationUtil.stopRefreshAnimation(swipeRefreshLayout);
+        }, 500);
     }
+
 }

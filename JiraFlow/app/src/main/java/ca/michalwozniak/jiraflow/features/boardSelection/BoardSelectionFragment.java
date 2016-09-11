@@ -1,7 +1,6 @@
 package ca.michalwozniak.jiraflow.features.boardSelection;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -21,6 +20,7 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import ca.michalwozniak.jiraflow.R;
 import ca.michalwozniak.jiraflow.model.SprintData;
+import ca.michalwozniak.jiraflow.utility.AnimationUtil;
 import ca.michalwozniak.jiraflow.utility.NetworkManager;
 import ca.michalwozniak.jiraflow.utility.SessionManager;
 
@@ -72,18 +72,21 @@ public class BoardSelectionFragment extends Fragment implements SwipeRefreshLayo
 
         //  rv.setAdapter(cardView);
         swipeRefreshLayout.setOnRefreshListener(this);
-        swipeRefreshLayout.postDelayed(() -> {
-                    swipeRefreshLayout.setRefreshing(true);
-                    getBoardCardList();
-                }, 500 //prevent lag
-        );
+        getBoardCardList();
+
 
         // Inflate the layout for this fragment
         return view;
     }
 
     private void getBoardCardList() {
-        networkManager.getActiveSprintBoard().subscribe(this::updateCardList);
+
+        swipeRefreshLayout.post(() -> {
+                    swipeRefreshLayout.setRefreshing(true);
+                    networkManager.getActiveSprintBoard().subscribe(this::updateCardList);
+                }
+        );
+
     }
 
 
@@ -119,20 +122,9 @@ public class BoardSelectionFragment extends Fragment implements SwipeRefreshLayo
             }
         }
         sprintAdapter.notifyDataSetChanged();
-        stopRefreshAnimation();
+        AnimationUtil.stopRefreshAnimation(swipeRefreshLayout);
     }
 
-    private void stopRefreshAnimation() {
-        final Handler handler = new Handler();
-        handler.postDelayed(() -> {
-
-            // stopping swipe refresh
-            if (swipeRefreshLayout != null) {
-                if (swipeRefreshLayout.isRefreshing())
-                    swipeRefreshLayout.setRefreshing(false);
-            }
-        }, 1000);
-    }
 
     @Override
     public void onDestroyView() {

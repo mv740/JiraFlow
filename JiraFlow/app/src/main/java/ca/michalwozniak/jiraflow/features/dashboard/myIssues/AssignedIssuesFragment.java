@@ -3,7 +3,6 @@ package ca.michalwozniak.jiraflow.features.dashboard.myIssues;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -28,6 +27,7 @@ import butterknife.Unbinder;
 import ca.michalwozniak.jiraflow.R;
 import ca.michalwozniak.jiraflow.features.createIssue.CreateIssueActivity;
 import ca.michalwozniak.jiraflow.model.Issue.Issue;
+import ca.michalwozniak.jiraflow.utility.AnimationUtil;
 import ca.michalwozniak.jiraflow.utility.NetworkManager;
 import top.wefor.circularanim.CircularAnim;
 
@@ -74,7 +74,7 @@ public class AssignedIssuesFragment extends Fragment implements SwipeRefreshLayo
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_assigned_issues, container, false);
         unbinder = ButterKnife.bind(this, view);
-        this.networkManager =  NetworkManager.getInstance(this.getContext());
+        this.networkManager = NetworkManager.getInstance(this.getContext());
 
 
         LinearLayoutManager llm = new LinearLayoutManager(super.getActivity());
@@ -92,11 +92,7 @@ public class AssignedIssuesFragment extends Fragment implements SwipeRefreshLayo
         cardView = new CardViewIssueAdapter(issues);
         rv.setAdapter(cardView);
         swipeRefreshLayout.setOnRefreshListener(this);
-        swipeRefreshLayout.post(() -> {
-                    swipeRefreshLayout.setRefreshing(true);
-                    getUserIssuesCard();
-                }
-        );
+        getUserIssuesCard();
 
         return view;
     }
@@ -113,7 +109,13 @@ public class AssignedIssuesFragment extends Fragment implements SwipeRefreshLayo
     }
 
     private void getUserIssuesCard() {
-        networkManager.getUserIssues().subscribe(this::updateCardList);
+
+        swipeRefreshLayout.post(() -> {
+                    swipeRefreshLayout.setRefreshing(true);
+                    networkManager.getUserIssues().subscribe(this::updateCardList);
+                }
+        );
+
     }
 
     public void updateCardList(List<Issue> issueList) {
@@ -144,16 +146,9 @@ public class AssignedIssuesFragment extends Fragment implements SwipeRefreshLayo
         }
 
         startFilter();
+        cardView.notifyDataSetChanged();
+        AnimationUtil.stopRefreshAnimation(swipeRefreshLayout);
 
-        final Handler handler = new Handler();
-        handler.postDelayed(() -> {
-            cardView.notifyDataSetChanged();
-            // stopping swipe refresh
-            if (swipeRefreshLayout != null) {
-                if (swipeRefreshLayout.isRefreshing())
-                    swipeRefreshLayout.setRefreshing(false);
-            }
-        }, 1000);
     }
 
 
@@ -167,9 +162,9 @@ public class AssignedIssuesFragment extends Fragment implements SwipeRefreshLayo
     public void onPrepareOptionsMenu(Menu menu) {
         menu.clear();
         super.onPrepareOptionsMenu(menu);
-        menu.add(0,R.id.filter_issue_status_done,0,R.string.done);
-        menu.add(0,R.id.filter_issue_status_todo,0,R.string.todo);
-        menu.add(0,R.id.filter_issue_status_inProgress,0,R.string.in_progress);
+        menu.add(0, R.id.filter_issue_status_done, 0, R.string.done);
+        menu.add(0, R.id.filter_issue_status_todo, 0, R.string.todo);
+        menu.add(0, R.id.filter_issue_status_inProgress, 0, R.string.in_progress);
 
         menu.findItem(R.id.filter_issue_status_done).setVisible(true).setCheckable(true).setChecked(menuChecked.get("done"));
         menu.findItem(R.id.filter_issue_status_todo).setVisible(true).setCheckable(true).setChecked(menuChecked.get("todo"));

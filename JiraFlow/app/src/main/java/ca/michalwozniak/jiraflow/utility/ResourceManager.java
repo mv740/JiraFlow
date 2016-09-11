@@ -155,16 +155,19 @@ public class ResourceManager {
     public static int getIssueTypeIconId(String name) {
         switch (name) {
             case "Bug":
-                return R.drawable.bug;
+                return R.drawable.ic_bug;
 
             case "Story":
-                return R.drawable.story;
+                return R.drawable.ic_story;
 
             case "Task":
                 return R.drawable.task;
 
             case "Epic":
-                return R.drawable.epic;
+                return R.drawable.ic_epic;
+
+            case "Sub-task":
+                return R.drawable.ic_subtask;
 
         }
         return 0;
@@ -229,7 +232,10 @@ public class ResourceManager {
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .load(Uri.parse(Href))
                 .into(imageView);
+
     }
+
+
 
     public static int getStatusTextColor(String colorDescriptor)
     {

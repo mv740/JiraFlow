@@ -92,7 +92,7 @@ public class CreateIssueActivity extends AppCompatActivity {
         JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword(), sessionManager.getServerUrl());
 
         jiraService.getCreateIssueMeta(null, null, null, null)
-                .subscribeOn(Schedulers.newThread())
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnError(error -> Log.e("getCreateIssueMeta", error.getMessage()))
                 .subscribe(this::getProjectIconType);
@@ -209,7 +209,7 @@ public class CreateIssueActivity extends AppCompatActivity {
                 EditText searching = (EditText) searchDialog.findViewById(R.id.search_view_text);
 
                 jiraService.findAssignableUsers(searching.getText().toString(),issueMetaFieldData.getProjects().get(projectIndexSelected).getKey(),null,null,null)
-                        .subscribeOn(Schedulers.newThread())
+                        .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .doOnError(error -> Log.e("findAssignableUsers",error.getMessage()))
                         .subscribe(userList -> {
@@ -264,7 +264,7 @@ public class CreateIssueActivity extends AppCompatActivity {
         JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword(), sessionManager.getServerUrl());
 
         jiraService.createIssue(issueModel)
-                .subscribeOn(Schedulers.newThread())
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnError(error -> Log.e("createIssue",error.getMessage()))
                 .subscribe(emptyResponse -> {

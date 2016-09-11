@@ -15,7 +15,7 @@ public interface LoginInteractor {
 
         void onSuccess();
 
-        void saveUser(String username, String password, User user, String url);
+        void saveUser(String username, User user, String url);
 
         void rememberProfile();
 

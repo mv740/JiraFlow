@@ -145,12 +145,9 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
             //add new entries
             for (Entry item : newEntrytoAddList) {
                 cardView.add(0, item);
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        cardView.notifyInserted(0);
-                        rv.scrollToPosition(0);
-                    }
+                new Handler().postDelayed(() -> {
+                    cardView.notifyInserted(0);
+                    rv.scrollToPosition(0);
                 },500);
 
             }

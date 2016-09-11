@@ -59,10 +59,10 @@ public class LoginPresenterImpl implements LoginPresenter, LoginInteractor.OnLog
     }
 
     @Override
-    public void saveUser(String username, String password, User user, String url) {
+    public void saveUser(String username, User user, String url) {
 
         SessionManager pm = SessionManager.getInstance((Context) this.loginView);
-        pm.saveUsername(username);
+        pm.saveUsername(user.getName());
         pm.savePassword(password);
         pm.saveEmail(user.getEmailAddress());
         pm.saveProfileIconUrl(user.getAvatarUrls().getBig());

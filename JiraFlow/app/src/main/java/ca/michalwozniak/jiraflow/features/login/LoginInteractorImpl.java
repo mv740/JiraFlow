@@ -53,7 +53,7 @@ public class LoginInteractorImpl implements LoginInteractor {
                     Log.e("error", e.getMessage());
                 })
                 .subscribe(user -> {
-                            listener.saveUser(username, password, user, url);
+                            listener.saveUser(password, user, url);
                             if (rememberMe) {
                                 listener.rememberProfile();
                             }

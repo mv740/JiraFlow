@@ -9,6 +9,8 @@ import java.util.List;
 import ca.michalwozniak.jiraflow.helper.JQLHelper;
 import ca.michalwozniak.jiraflow.model.BoardConfiguration;
 import ca.michalwozniak.jiraflow.model.BoardList;
+import ca.michalwozniak.jiraflow.model.CreateIssueMetaField;
+import ca.michalwozniak.jiraflow.model.CreateIssueModel;
 import ca.michalwozniak.jiraflow.model.EmptyResponse;
 import ca.michalwozniak.jiraflow.model.Feed.ActivityFeed;
 import ca.michalwozniak.jiraflow.model.Feed.Entry;
@@ -224,5 +226,52 @@ public class NetworkManager {
 //
 //                })
 //                .toList();
+    }
+
+    public Observable<List<User>> findAssignableUsers(String username, String projectKey)
+    {
+        return jiraService.findAssignableUsers(username,projectKey, null,null,null)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnError(error -> Log.e("findAssignableUsers",error.getMessage()));
+    }
+
+    public Observable<CreateIssueMetaField> getCreateIssueMeta()
+    {
+       return jiraService.getCreateIssueMeta(null, null, null, null)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnError(error -> Log.e("getCreateIssueMeta", error.getMessage()));
+    }
+
+    public void getProjectIconType(Project project)
+    {
+        OkHttpClient httpClient = new OkHttpClient();
+        okhttp3.Request request = new okhttp3.Request.Builder().url(project.getAvatarUrls().getExtraSmall()).build();
+
+        okhttp3.Call call1 = httpClient.newCall(request);
+        call1.enqueue(new okhttp3.Callback() {
+            @Override
+            public void onFailure(okhttp3.Call call, IOException e) {
+
+            }
+            @Override
+            public void onResponse(final okhttp3.Call call, okhttp3.Response response) throws IOException {
+
+                project.setImageType(ResourceManager.getImageType(response.headers().get("Content-type")));
+                response.body().close();
+            }
+        });
+    }
+
+    public void createIssue(CreateIssueModel createIssueModel)
+    {
+        jiraService.createIssue(createIssueModel)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnError(error -> Log.e("createIssue",error.getMessage()))
+                .subscribe(emptyResponse -> {
+                    Log.d("createIssue", "successful");
+                });
     }
 }

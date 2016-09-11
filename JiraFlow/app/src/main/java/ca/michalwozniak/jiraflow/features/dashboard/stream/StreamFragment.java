@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -156,15 +155,8 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
         }
         boolean toNotify = false;
         if (cardView.getItemCount() == 0) {
-            //reverse order, top card is most recent date
-            Collections.reverse(activityFeed);
+
             toNotify = true;
-
-//            for (Entry item : activityFeed) {
-//                cardView.addNoNotify(0, item);
-//                rv.scrollToPosition(0);
-//            }
-
             messages.addAll(activityFeed);
         }
 

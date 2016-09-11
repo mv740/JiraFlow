@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -15,7 +14,6 @@ import android.widget.ImageButton;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.jakewharton.rxbinding.widget.RxTextView;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,15 +28,10 @@ import ca.michalwozniak.jiraflow.model.Issue.Field;
 import ca.michalwozniak.jiraflow.model.Issue.issueType;
 import ca.michalwozniak.jiraflow.model.Project;
 import ca.michalwozniak.jiraflow.model.User;
-import ca.michalwozniak.jiraflow.service.JiraSoftwareService;
-import ca.michalwozniak.jiraflow.service.ServiceGenerator;
 import ca.michalwozniak.jiraflow.utility.LogManager;
-import ca.michalwozniak.jiraflow.utility.ResourceManager;
+import ca.michalwozniak.jiraflow.utility.NetworkManager;
 import ca.michalwozniak.jiraflow.utility.SessionManager;
-import okhttp3.OkHttpClient;
 import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 public class CreateIssueActivity extends AppCompatActivity {
 
@@ -62,6 +55,7 @@ public class CreateIssueActivity extends AppCompatActivity {
     private int issueTypeSelected;
     private SessionManager sessionManager;
     private CreateIssueMetaField issueMetaFieldData;
+    private NetworkManager networkManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +73,7 @@ public class CreateIssueActivity extends AppCompatActivity {
             toolbar.setNavigationOnClickListener(v -> onBackPressed());
         }
 
+        networkManager = NetworkManager.getInstance(getApplicationContext());
         createNewIssueButton.setVisibility(View.INVISIBLE);
         reporterSearchResult= new ArrayList<>();
         issueType.setEnabled(false);
@@ -89,40 +84,19 @@ public class CreateIssueActivity extends AppCompatActivity {
 
     private void getIssueMetaFieldData() {
 
-        JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword(), sessionManager.getServerUrl());
+        networkManager.getCreateIssueMeta()
+                .subscribe(issueMetaField -> {
 
-        jiraService.getCreateIssueMeta(null, null, null, null)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(error -> Log.e("getCreateIssueMeta", error.getMessage()))
-                .subscribe(this::getProjectIconType);
+                    this.issueMetaFieldData = issueMetaField;
+
+                    for (final Project project : this.issueMetaFieldData.getProjects()) {
+
+                        networkManager.getProjectIconType(project);
+                    }
+                });
 
     }
 
-    private void getProjectIconType(CreateIssueMetaField issueMetaField) {
-
-        this.issueMetaFieldData = issueMetaField;
-
-        for (final Project project : this.issueMetaFieldData.getProjects()) {
-
-            OkHttpClient httpClient = new OkHttpClient();
-            okhttp3.Request request = new okhttp3.Request.Builder().url(project.getAvatarUrls().getExtraSmall()).build();
-
-            okhttp3.Call call1 = httpClient.newCall(request);
-            call1.enqueue(new okhttp3.Callback() {
-                @Override
-                public void onFailure(okhttp3.Call call, IOException e) {
-
-                }
-                @Override
-                public void onResponse(final okhttp3.Call call, okhttp3.Response response) throws IOException {
-
-                    project.setImageType(ResourceManager.getImageType(response.headers().get("Content-type")));
-                    response.body().close();
-                }
-            });
-        }
-    }
     @Override
     public void onBackPressed() {
         // super.onBackPressed();
@@ -204,20 +178,16 @@ public class CreateIssueActivity extends AppCompatActivity {
 
             button.setOnClickListener(v1 -> {
 
-                JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword(), sessionManager.getServerUrl());
+                EditText searching = ButterKnife.findById(searchDialog,R.id.search_view_text);
+                String username = searching.getText().toString();
+                String projectKey = issueMetaFieldData.getProjects().get(projectIndexSelected).getKey();
 
-                EditText searching = (EditText) searchDialog.findViewById(R.id.search_view_text);
-
-                jiraService.findAssignableUsers(searching.getText().toString(),issueMetaFieldData.getProjects().get(projectIndexSelected).getKey(),null,null,null)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .doOnError(error -> Log.e("findAssignableUsers",error.getMessage()))
+                networkManager.findAssignableUsers(username,projectKey)
                         .subscribe(userList -> {
                             simpleListAdapter.clear();
                             for(User user : userList)
                             {
                                 simpleListAdapter.add(user);
-
                             }
                         });
             });
@@ -256,20 +226,11 @@ public class CreateIssueActivity extends AppCompatActivity {
         userReporter.setName(reporter.getText().toString());
         field.setReporter(userReporter);
 
-
         issueModel.setFields(field);
 
         LogManager.displayJSON("createIssue",issueModel);
 
-        JiraSoftwareService jiraService = ServiceGenerator.createService(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword(), sessionManager.getServerUrl());
-
-        jiraService.createIssue(issueModel)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(error -> Log.e("createIssue",error.getMessage()))
-                .subscribe(emptyResponse -> {
-                    Log.d("createIssue", "successful");
-                });
+        networkManager.createIssue(issueModel);
     }
 
     private void setupCreateIssueButtonObserver() {

@@ -1,6 +1,5 @@
 package ca.michalwozniak.jiraflow.features.dashboard.stream;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -22,6 +21,7 @@ import ca.michalwozniak.jiraflow.R;
 import ca.michalwozniak.jiraflow.model.Feed.Entry;
 import ca.michalwozniak.jiraflow.utility.AnimationUtil;
 import ca.michalwozniak.jiraflow.utility.NetworkManager;
+import rx.Subscription;
 
 
 public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
@@ -31,13 +31,13 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
     SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.rv)
     RecyclerView rv;
-    private Activity myActivity;
 
     private List<Entry> messagesHistory;
     private List<Entry> messages;
     private CardViewMessageAdapter cardView;
     private Unbinder unbinder;
     private NetworkManager networkManager;
+    private Subscription subscription;
 
     public StreamFragment() {
         // Required empty public constructor
@@ -68,28 +68,15 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
         getActivityStream();
 
-
-
-
         return view;
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
-    }
-
-    @Override
-    public void onRefresh() {
-        getActivityStream();
     }
 
     private void getActivityStream() {
 
         swipeRefreshLayout.post(() -> {
                     swipeRefreshLayout.setRefreshing(true);
-                    networkManager.getActivityStream()
+                    subscription = networkManager
+                            .getActivityStream()
                             .subscribe(this::updateCardList);
                 }
         );
@@ -147,7 +134,7 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 new Handler().postDelayed(() -> {
                     cardView.notifyInserted(0);
                     rv.scrollToPosition(0);
-                },500);
+                }, 500);
 
             }
 
@@ -165,10 +152,22 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
         Handler handler = new Handler();
         boolean finalToNotify = toNotify;
         handler.postDelayed(() -> {
-            if(finalToNotify) {
+            if (finalToNotify) {
                 cardView.notifyDataSetChanged();
             }
             AnimationUtil.stopRefreshAnimation(swipeRefreshLayout);
-        },1000);
+        }, 1000);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+        if (subscription != null) subscription.unsubscribe();
+    }
+
+    @Override
+    public void onRefresh() {
+        getActivityStream();
     }
 }

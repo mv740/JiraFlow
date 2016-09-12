@@ -32,6 +32,7 @@ import ca.michalwozniak.jiraflow.utility.LogManager;
 import ca.michalwozniak.jiraflow.utility.NetworkManager;
 import ca.michalwozniak.jiraflow.utility.SessionManager;
 import rx.Observable;
+import rx.subscriptions.CompositeSubscription;
 
 public class CreateIssueActivity extends AppCompatActivity {
 
@@ -56,6 +57,7 @@ public class CreateIssueActivity extends AppCompatActivity {
     private SessionManager sessionManager;
     private CreateIssueMetaField issueMetaFieldData;
     private NetworkManager networkManager;
+    private CompositeSubscription subscriptions = new CompositeSubscription();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +77,7 @@ public class CreateIssueActivity extends AppCompatActivity {
 
         networkManager = NetworkManager.getInstance(getApplicationContext());
         createNewIssueButton.setVisibility(View.INVISIBLE);
-        reporterSearchResult= new ArrayList<>();
+        reporterSearchResult = new ArrayList<>();
         issueType.setEnabled(false);
         setupCreateIssueButtonObserver();
         getIssueMetaFieldData();
@@ -84,7 +86,7 @@ public class CreateIssueActivity extends AppCompatActivity {
 
     private void getIssueMetaFieldData() {
 
-        networkManager.getCreateIssueMeta()
+        subscriptions.add(networkManager.getCreateIssueMeta()
                 .subscribe(issueMetaField -> {
 
                     this.issueMetaFieldData = issueMetaField;
@@ -93,7 +95,7 @@ public class CreateIssueActivity extends AppCompatActivity {
 
                         networkManager.getProjectIconType(project);
                     }
-                });
+                }));
 
     }
 
@@ -158,11 +160,11 @@ public class CreateIssueActivity extends AppCompatActivity {
     public void onIssueReporterFocusChange(View v, boolean hasFocus) {
 
         if (hasFocus) {
-            final UserSimpleListAdapter simpleListAdapter = new UserSimpleListAdapter((index, user) -> reporter.setText(user.getKey()),reporterSearchResult);
+            final UserSimpleListAdapter simpleListAdapter = new UserSimpleListAdapter((index, user) -> reporter.setText(user.getKey()), reporterSearchResult);
 
 
             MaterialDialog searchDialog = new MaterialDialog.Builder(this)
-                    .customView(R.layout.search_view,false)
+                    .customView(R.layout.search_view, false)
                     .cancelListener(dialogInterface -> project.clearFocus())
                     .build();
 
@@ -178,18 +180,17 @@ public class CreateIssueActivity extends AppCompatActivity {
 
             button.setOnClickListener(v1 -> {
 
-                EditText searching = ButterKnife.findById(searchDialog,R.id.search_view_text);
+                EditText searching = ButterKnife.findById(searchDialog, R.id.search_view_text);
                 String username = searching.getText().toString();
                 String projectKey = issueMetaFieldData.getProjects().get(projectIndexSelected).getKey();
 
-                networkManager.findAssignableUsers(username,projectKey)
+                subscriptions.add(networkManager.findAssignableUsers(username, projectKey)
                         .subscribe(userList -> {
                             simpleListAdapter.clear();
-                            for(User user : userList)
-                            {
+                            for (User user : userList) {
                                 simpleListAdapter.add(user);
                             }
-                        });
+                        }));
             });
 
             searchDialog.show();
@@ -206,8 +207,7 @@ public class CreateIssueActivity extends AppCompatActivity {
         CreateIssueModel issueModel = new CreateIssueModel();
 
         Field field = new Field();
-        if(!summary.getText().toString().isEmpty())
-        {
+        if (!summary.getText().toString().isEmpty()) {
             field.setSummary(summary.getText().toString());
         }
 
@@ -228,9 +228,10 @@ public class CreateIssueActivity extends AppCompatActivity {
 
         issueModel.setFields(field);
 
-        LogManager.displayJSON("createIssue",issueModel);
+        LogManager.displayJSON("createIssue", issueModel);
 
-        networkManager.createIssue(issueModel);
+        subscriptions.add(networkManager.createIssue(issueModel).subscribe(emptyResponse -> {
+        }));
     }
 
     private void setupCreateIssueButtonObserver() {
@@ -242,14 +243,21 @@ public class CreateIssueActivity extends AppCompatActivity {
                 .map(charSequence -> (charSequence.length() != 0))
                 .distinctUntilChanged();
 
-        Observable.combineLatest(
+        subscriptions.add(Observable.combineLatest(
                 summaryObservable,
                 reporterObservable,
                 (summaryValid, reporterValid) -> (summaryValid && reporterValid))
                 .distinctUntilChanged()
                 .subscribe(isValid -> {
                     createNewIssueButton.setVisibility(isValid ? View.VISIBLE : View.INVISIBLE);
-                });
+                }));
+
+
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        subscriptions.unsubscribe();
+    }
 }

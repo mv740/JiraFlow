@@ -23,6 +23,7 @@ import ca.michalwozniak.jiraflow.model.SprintData;
 import ca.michalwozniak.jiraflow.utility.AnimationUtil;
 import ca.michalwozniak.jiraflow.utility.NetworkManager;
 import ca.michalwozniak.jiraflow.utility.SessionManager;
+import rx.Subscription;
 
 
 public class BoardSelectionFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
@@ -36,6 +37,7 @@ public class BoardSelectionFragment extends Fragment implements SwipeRefreshLayo
     private CardViewActiveSprintAdapter sprintAdapter;
     private List<SprintData> boardSprint;
     private NetworkManager networkManager;
+    private Subscription subscription;
 
     public BoardSelectionFragment() {
         // Required empty public constructor
@@ -83,7 +85,7 @@ public class BoardSelectionFragment extends Fragment implements SwipeRefreshLayo
 
         swipeRefreshLayout.post(() -> {
                     swipeRefreshLayout.setRefreshing(true);
-                    networkManager.getActiveSprintBoard().subscribe(this::updateCardList);
+                    subscription = networkManager.getActiveSprintBoard().subscribe(this::updateCardList);
                 }
         );
 
@@ -130,6 +132,7 @@ public class BoardSelectionFragment extends Fragment implements SwipeRefreshLayo
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+        if (subscription != null) subscription.unsubscribe();
     }
 
     @Override

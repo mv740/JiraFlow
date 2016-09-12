@@ -29,6 +29,7 @@ import ca.michalwozniak.jiraflow.features.createIssue.CreateIssueActivity;
 import ca.michalwozniak.jiraflow.model.Issue.Issue;
 import ca.michalwozniak.jiraflow.utility.AnimationUtil;
 import ca.michalwozniak.jiraflow.utility.NetworkManager;
+import rx.Subscription;
 import top.wefor.circularanim.CircularAnim;
 
 
@@ -45,6 +46,8 @@ public class AssignedIssuesFragment extends Fragment implements SwipeRefreshLayo
     private Map<String, Boolean> menuChecked;
 
     private NetworkManager networkManager;
+    private Subscription subscription;
+
 
     public AssignedIssuesFragment() {
         // Required empty public constructor
@@ -101,6 +104,7 @@ public class AssignedIssuesFragment extends Fragment implements SwipeRefreshLayo
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+        if (subscription != null) subscription.unsubscribe();
     }
 
     @Override
@@ -112,7 +116,7 @@ public class AssignedIssuesFragment extends Fragment implements SwipeRefreshLayo
 
         swipeRefreshLayout.post(() -> {
                     swipeRefreshLayout.setRefreshing(true);
-                    networkManager.getUserIssues().subscribe(this::updateCardList);
+                    subscription = networkManager.getUserIssues().subscribe(this::updateCardList);
                 }
         );
 

@@ -264,14 +264,11 @@ public class NetworkManager {
         });
     }
 
-    public void createIssue(CreateIssueModel createIssueModel)
+    public Observable<EmptyResponse> createIssue(CreateIssueModel createIssueModel)
     {
-        jiraService.createIssue(createIssueModel)
+       return jiraService.createIssue(createIssueModel)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(error -> Log.e("createIssue",error.getMessage()))
-                .subscribe(emptyResponse -> {
-                    Log.d("createIssue", "successful");
-                });
+                .doOnError(error -> Log.e("createIssue",error.getMessage()));
     }
 }

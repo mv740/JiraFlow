@@ -43,6 +43,7 @@ import ca.michalwozniak.jiraflow.model.transition.Transition;
 import ca.michalwozniak.jiraflow.model.transition.TransitionModel;
 import ca.michalwozniak.jiraflow.utility.LogManager;
 import ca.michalwozniak.jiraflow.utility.NetworkManager;
+import rx.subscriptions.CompositeSubscription;
 
 public class BoardFragment extends Fragment {
 
@@ -57,7 +58,8 @@ public class BoardFragment extends Fragment {
     static int dropColumnIndex;
     private int boardID;
     private int sprintID;
-    private Map<String,ImageView> issueTypeIcons;
+    private Map<String, ImageView> issueTypeIcons;
+    private CompositeSubscription subscriptions = new CompositeSubscription();
 
 
     public static BoardFragment newInstance() {
@@ -117,7 +119,7 @@ public class BoardFragment extends Fragment {
             }
         });
 
-       // getAllIssueTypeIcons();
+        // getAllIssueTypeIcons();
         getBoardConfiguration();
         return view;
     }
@@ -162,8 +164,8 @@ public class BoardFragment extends Fragment {
     private void getPossibleTransition() {
         String name = columnStatus.get(dropColumnIndex);
 
-        networkManager.getTransitions(currentDraggedIssueKey, name)
-                .subscribe(transition -> doTransition(transition.getId(), name));
+        subscriptions.add(networkManager.getTransitions(currentDraggedIssueKey, name)
+                .subscribe(transition -> doTransition(transition.getId(), name)));
 
 
     }
@@ -181,18 +183,19 @@ public class BoardFragment extends Fragment {
 
         LogManager.displayJSON("doTransition", model);
 
-        networkManager.doTransition(currentDraggedIssueKey, model)
-                .subscribe(emptyResponse -> {});
+        subscriptions.add(networkManager.doTransition(currentDraggedIssueKey, model)
+                .subscribe(emptyResponse -> {
+                }));
     }
 
     private void getBoardConfiguration() {
 
-        networkManager.getBoardConfiguration(boardID)
+        subscriptions.add(networkManager.getBoardConfiguration(boardID)
                 .subscribe(boardConfig -> {
 
-                    networkManager.getIssuesForSprint(sprintID)
-                            .subscribe(sprint -> generateBoard(boardConfig, sprint));
-                });
+                    subscriptions.add(networkManager.getIssuesForSprint(sprintID)
+                            .subscribe(sprint -> generateBoard(boardConfig, sprint)));
+                }));
     }
 
     private void generateBoard(BoardConfiguration boardConfig, Sprint sprint) {
@@ -353,5 +356,6 @@ public class BoardFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+        subscriptions.unsubscribe();
     }
 }

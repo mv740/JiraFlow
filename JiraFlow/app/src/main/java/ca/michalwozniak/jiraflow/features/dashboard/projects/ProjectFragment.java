@@ -21,6 +21,7 @@ import ca.michalwozniak.jiraflow.R;
 import ca.michalwozniak.jiraflow.model.Project;
 import ca.michalwozniak.jiraflow.utility.AnimationUtil;
 import ca.michalwozniak.jiraflow.utility.NetworkManager;
+import rx.Subscription;
 
 
 public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
@@ -34,6 +35,7 @@ public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRe
     private CardViewProjectAdapter cardView;
     private Unbinder unbinder;
     private NetworkManager networkManager;
+    private Subscription subscription;
 
     public ProjectFragment() {
         // Required empty public constructor
@@ -67,22 +69,11 @@ public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRe
         return view;
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
-    }
-
-    @Override
-    public void onRefresh() {
-        getProjects();
-    }
-
     private void getProjects() {
 
         swipeRefreshLayout.post(() -> {
             swipeRefreshLayout.setRefreshing(true);
-            networkManager.getProjectWithUpdatedIconType().subscribe(this::updateCardList);
+            subscription = networkManager.getProjectWithUpdatedIconType().subscribe(this::updateCardList);
         });
 
     }
@@ -121,4 +112,16 @@ public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRe
         }, 500);
     }
 
+    @Override
+    public void onRefresh() {
+        getProjects();
+    }
+
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+        if (subscription != null) subscription.unsubscribe();
+    }
 }

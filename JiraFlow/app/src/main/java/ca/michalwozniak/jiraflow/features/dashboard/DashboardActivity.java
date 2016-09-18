@@ -48,11 +48,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ca.michalwozniak.jiraflow.R;
 import ca.michalwozniak.jiraflow.features.board.BoardFragment;
+import ca.michalwozniak.jiraflow.features.boardSelection.BoardSelectionFragment;
 import ca.michalwozniak.jiraflow.features.dashboard.myIssues.AssignedIssuesFragment;
 import ca.michalwozniak.jiraflow.features.dashboard.projects.ProjectFragment;
 import ca.michalwozniak.jiraflow.features.dashboard.stream.StreamFragment;
 import ca.michalwozniak.jiraflow.features.login.LoginActivity;
-import ca.michalwozniak.jiraflow.features.boardSelection.BoardSelectionFragment;
 import ca.michalwozniak.jiraflow.utility.ResourceManager;
 import ca.michalwozniak.jiraflow.utility.SessionManager;
 
@@ -65,6 +65,8 @@ public class DashboardActivity extends AppCompatActivity {
     ViewPager viewPager;
     @BindView(R.id.viewFlipper)
     ViewFlipper viewFlipper;
+
+    private ViewPagerAdapter viewPagerAdapter;
 
     private SessionManager sm;
 
@@ -84,6 +86,7 @@ public class DashboardActivity extends AppCompatActivity {
         }
 
         sm = SessionManager.getInstance(this);
+        viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
 
 
         DrawerImageLoader.init(new AbstractDrawerImageLoader() {
@@ -172,9 +175,13 @@ public class DashboardActivity extends AppCompatActivity {
                                     toolbar.setSubtitle(null);
                                     toolbar.setTitle("Dashboard");
                                 }
-                                // toolbar.getMenu().setGroupEnabled(0,false);
-                                toolbar.getMenu().setGroupVisible(0, false);
+
                                 viewFlipper.setDisplayedChild(0);
+                                reloadViewPager();
+
+
+
+
                                 tabLayout.getTabAt(0).select(); // default at first tab
 
                             }
@@ -187,15 +194,12 @@ public class DashboardActivity extends AppCompatActivity {
                                     tabLayout.setVisibility(View.GONE);
                                 }
                                 viewFlipper.setDisplayedChild(1);
-
                                 //todo  set to false for , remove this after creating a clear favorite/go to change favorite action sequence
-                                if(sm.hasFavoriteBoard() && false)
-                                {
+                                if (sm.hasFavoriteBoard()) {
                                     BoardFragment boardFragment = BoardFragment.newInstance();
-                                    boardFragment.setArguments(ResourceManager.getFavoriteBoardSetting(sm.getFavoriteBoardId(),sm.getFavoriteBoardId()));
+                                    boardFragment.setArguments(ResourceManager.getFavoriteBoardSetting(sm.getFavoriteBoardId(), sm.getFavoriteBoardId()));
                                     showFragment(boardFragment);
-                                }else
-                                {
+                                } else {
                                     showFragment(new BoardSelectionFragment());
                                 }
 
@@ -206,7 +210,7 @@ public class DashboardActivity extends AppCompatActivity {
                         new ProfileSettingDrawerItem().withName("Logout").withIcon(R.drawable.ic_settings_grey600_48dp).withOnDrawerItemClickListener((view, position, drawerItem) -> {
                             //// TODO: 8/10/2016 for now testing logout will
                             sm.deleteUser();
-                            Intent intent = new Intent(DashboardActivity.this,LoginActivity.class);
+                            Intent intent = new Intent(DashboardActivity.this, LoginActivity.class);
                             startActivity(intent);
                             finish();
                             return false;
@@ -226,22 +230,30 @@ public class DashboardActivity extends AppCompatActivity {
         drawerResult.getActionBarDrawerToggle().setDrawerIndicatorEnabled(true);
 
         //viewPager.setVisibility(View.VISIBLE);
-        setupViewPager(viewPager);
-        tabLayout.setupWithViewPager(viewPager);
+        loadDashboard();
     }
 
     private void showFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.container, fragment, "fragment").commit();
+
     }
 
+    public void reloadViewPager()
+    {
+        viewPager.setAdapter(viewPagerAdapter);
+    }
 
-    private void setupViewPager(ViewPager viewPager) {
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new StreamFragment(), getString(R.string.TabStreamName));
-        adapter.addFragment(new AssignedIssuesFragment(), getString(R.string.TabIssuesName));
-        adapter.addFragment(new ProjectFragment(), getString(R.string.TabProjectName));
-        viewPager.setAdapter(adapter);
+    private void loadDashboard() {
+
+        //setup view pager
+        viewPagerAdapter.addFragment(new StreamFragment(), getString(R.string.TabStreamName));
+        viewPagerAdapter.addFragment(new AssignedIssuesFragment(), getString(R.string.TabIssuesName));
+        viewPagerAdapter.addFragment(new ProjectFragment(), getString(R.string.TabProjectName));
+
+        viewPager.setAdapter(viewPagerAdapter);
+
+        tabLayout.setupWithViewPager(viewPager);
     }
 
     //used to add icon to title  http://www.androidhive.info/2015/09/android-material-design-working-with-tabs/
@@ -273,10 +285,14 @@ public class DashboardActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             return mFragmentTitleList.get(position);
         }
+
     }
+
+
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
     }
+
 }

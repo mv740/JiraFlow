@@ -18,7 +18,7 @@
       xmlns:tools="http://schemas.android.com/tools"
       tools:context=".MainActivity">
     <item
-        android:id="@+id/action_disable_drag"
-        android:title="action_disable_drag"
+        android:id="@+id/action_change_board"
+        android:title="@string/change_board"
         app:showAsAction="never"/>
 </menu>

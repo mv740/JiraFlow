@@ -34,4 +34,5 @@
     <string name="TabProjectName">Projects</string>
     <string name="TabIssuesName">My Issues</string>
     <string name="TabStreamName">Stream</string>
+    <string name="change_board">change board</string>
 </resources>

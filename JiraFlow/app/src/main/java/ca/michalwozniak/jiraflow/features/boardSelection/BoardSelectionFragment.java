@@ -8,6 +8,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -46,6 +48,7 @@ public class BoardSelectionFragment extends Fragment implements SwipeRefreshLayo
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
 
     }
 
@@ -127,12 +130,24 @@ public class BoardSelectionFragment extends Fragment implements SwipeRefreshLayo
         AnimationUtil.stopRefreshAnimation(swipeRefreshLayout);
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        //super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        //super.onPrepareOptionsMenu(menu);
+        menu.clear();
+    }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
         if (subscription != null) subscription.unsubscribe();
+
     }
 
     @Override

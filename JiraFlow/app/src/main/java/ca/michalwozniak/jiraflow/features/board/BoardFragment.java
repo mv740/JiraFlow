@@ -9,6 +9,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -34,6 +35,7 @@ import java.util.Map;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import ca.michalwozniak.jiraflow.R;
+import ca.michalwozniak.jiraflow.features.boardSelection.BoardSelectionFragment;
 import ca.michalwozniak.jiraflow.helper.DragCardData;
 import ca.michalwozniak.jiraflow.model.BoardConfiguration;
 import ca.michalwozniak.jiraflow.model.Issue.Issue;
@@ -230,19 +232,20 @@ public class BoardFragment extends Fragment {
         menu.clear();
         super.onPrepareOptionsMenu(menu);
 
-        menu.add(0, R.id.action_disable_drag, 0, "dragEnabled");
+        menu.add(0, R.id.action_change_board, 0, R.string.change_board);
 
-
-        menu.findItem(R.id.action_disable_drag).setVisible(mBoardView.isDragEnabled());
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_disable_drag:
-                mBoardView.setDragEnabled(false);
+            case R.id.action_change_board:
+            {
+                FragmentTransaction transaction = getFragmentManager().beginTransaction();
                 getActivity().invalidateOptionsMenu();
+                transaction.replace(R.id.container, new BoardSelectionFragment(), "fragment").commit();
                 return true;
+            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -357,5 +360,7 @@ public class BoardFragment extends Fragment {
         super.onDestroyView();
         unbinder.unbind();
         subscriptions.unsubscribe();
+        getActivity().invalidateOptionsMenu();
     }
+
 }

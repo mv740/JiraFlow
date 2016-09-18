@@ -7,6 +7,8 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -46,6 +48,7 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -157,6 +160,18 @@ public class StreamFragment extends Fragment implements SwipeRefreshLayout.OnRef
             }
             AnimationUtil.stopRefreshAnimation(swipeRefreshLayout);
         }, 1000);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        //super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        //super.onPrepareOptionsMenu(menu);
+        menu.clear();
     }
 
     @Override

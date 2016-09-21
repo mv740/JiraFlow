@@ -7,7 +7,6 @@ import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +14,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -22,6 +22,7 @@ import butterknife.ButterKnife;
 import ca.michalwozniak.jiraflow.R;
 import ca.michalwozniak.jiraflow.model.Feed.Entry;
 import ca.michalwozniak.jiraflow.model.ImageType;
+import ca.michalwozniak.jiraflow.utility.CommentUtil;
 import ca.michalwozniak.jiraflow.utility.ResourceManager;
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -32,6 +33,7 @@ public class CardViewMessageAdapter extends RecyclerView.Adapter<CardViewMessage
 
 
     private Context context;
+    private static List<String> messagesIssueIds;
 
     public static class ProjectViewHolder extends RecyclerView.ViewHolder {
 
@@ -57,29 +59,30 @@ public class CardViewMessageAdapter extends RecyclerView.Adapter<CardViewMessage
             ButterKnife.bind(this, itemView);
             this.holderContext = itemView.getContext();
 
-            Drawable icon = ContextCompat.getDrawable(holderContext, R.drawable.zzz_message);
+            Drawable icon = ContextCompat.getDrawable(holderContext, R.drawable.zzz_message_reply_text);
             icon.setColorFilter(Color.GRAY, PorterDuff.Mode.SRC_ATOP);
 
             title.setPadding(0, 0, 0, 0);
             title.setTextSize(15);
 
             button.setImageDrawable(icon);
-            button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.d("buttonMesg", "click");
-                }
+            button.setOnClickListener(v -> {
+
+                String key = messagesIssueIds.get(getAdapterPosition());
+                CommentUtil.showCommentDialog(holderContext,key);
+
             });
 
         }
 
     }
 
-    List<Entry> messages;
+    private List<Entry> messages;
 
     public CardViewMessageAdapter(List<Entry> messages, Context context) {
         this.messages = messages;
         this.context = context;
+        messagesIssueIds = new ArrayList<>();
     }
 
     @Override
@@ -94,26 +97,32 @@ public class CardViewMessageAdapter extends RecyclerView.Adapter<CardViewMessage
         //initialized to empty, or else view will used previous object text if it isn't overwritten
         holder.message_content.setText(null);
 
-        //Svg picture are not protected on jira : public
-        if (messages.get(position).getImageType() == ImageType.SVG) {
+        Entry entry = messages.get(position);
 
-            ResourceManager.loadImageSVG(context, messages.get(position).getAuthor().getLink().get(0).getHref(), holder.circleImageView);
+        //Svg picture are not protected on jira : public
+        if (entry.getImageType() == ImageType.SVG) {
+
+            ResourceManager.loadImageSVG(context, entry.getAuthor().getLink().get(0).getHref(), holder.circleImageView);
 
         } else {
 
-            ResourceManager.loadImage(context, messages.get(position).getAuthor().getLink().get(0).getHref(), holder.circleImageView);
+            ResourceManager.loadImage(context, entry.getAuthor().getLink().get(0).getHref(), holder.circleImageView);
 
         }
 
-        String titleHTML = messages.get(position).getTitle();
+
+        //save issue key
+        messagesIssueIds.add(position, entry.getObject().getTitle() != null ? entry.getObject().getTitle() : entry.getTarget().getTitle());
+
+        String titleHTML = entry.getTitle();
         String title = String.valueOf(Html.fromHtml(titleHTML));
 
         holder.title.setText(Html.fromHtml(titleHTML));
-        if (messages.get(position).getContent() != null) {
+        if (entry.getContent() != null) {
 
             if (title.contains("attached")) {
 
-                String[] links = ResourceManager.extractLinks(messages.get(position).getContent());
+                String[] links = ResourceManager.extractLinks(entry.getContent());
 
                 //images
                 if (links.length != 0) {
@@ -125,35 +134,33 @@ public class CardViewMessageAdapter extends RecyclerView.Adapter<CardViewMessage
                     }
                 }
 
-            }else {
+            } else {
                 holder.messageContentImage.setImageDrawable(null); //don't show the content
 
                 String result;
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    result = String.valueOf(Html.fromHtml(messages.get(position).getContent(), Html.FROM_HTML_MODE_LEGACY));
+                    result = String.valueOf(Html.fromHtml(entry.getContent(), Html.FROM_HTML_MODE_LEGACY));
                 } else {
-                    result = String.valueOf(Html.fromHtml(messages.get(position).getContent()));
+                    result = String.valueOf(Html.fromHtml(entry.getContent()));
 
                 }
                 holder.message_content.setText(result);
             }
 
 
-        }else{
+        } else {
             holder.message_content.setText(null);
         }
 
         //if it is a issue (ic_bug/ic_story ... ) it will have icons links
-        if(messages.get(position).getLink().size()>1)
-        {
-            ResourceManager.loadImageSVG(context, messages.get(position).getLink().get(1).getHref(), holder.messageTypeIcon);
-        }else
-        {
+        if (entry.getLink().size() > 1) {
+            ResourceManager.loadImageSVG(context, entry.getLink().get(1).getHref(), holder.messageTypeIcon);
+        } else {
             holder.messageTypeIcon.setImageDrawable(null);
         }
 
 
-        String newFormat = ResourceManager.getDate(messages.get(position).getUpdated());
+        String newFormat = ResourceManager.getDate(entry.getUpdated());
         holder.dateUpdated.setText(newFormat);
     }
 
@@ -163,14 +170,12 @@ public class CardViewMessageAdapter extends RecyclerView.Adapter<CardViewMessage
         //notifyItemInserted(position);
     }
 
-    public void notifyInserted(int position)
-    {
+    public void notifyInserted(int position) {
         notifyItemInserted(position);
     }
 
 
-    public void addNoNotify(int position, Entry newItem)
-    {
+    public void addNoNotify(int position, Entry newItem) {
         messages.add(position, newItem);
     }
 
@@ -179,6 +184,9 @@ public class CardViewMessageAdapter extends RecyclerView.Adapter<CardViewMessage
 
         int currPosition = messages.indexOf(entryToRemove);
         messages.remove(currPosition);
+        if (currPosition <= messagesIssueIds.size()) {
+            messagesIssueIds.remove(currPosition);
+        }
         notifyItemRemoved(currPosition);
     }
 

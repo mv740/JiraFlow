@@ -35,6 +35,11 @@ android {
         abortOnError false
     }
 
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
+    }
+
 
 //    buildTypes {
 //        release {
@@ -51,7 +56,7 @@ dependencies {
     //butterknife
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
     compile 'com.jakewharton:butterknife:8.4.0'
-    compile('com.mikepenz:materialdrawer:5.2.2@aar') {
+    compile('com.mikepenz:materialdrawer:5.4.0@aar') {
         transitive = true
     }
     compile('com.squareup.retrofit2:converter-simplexml:2.0.2') {

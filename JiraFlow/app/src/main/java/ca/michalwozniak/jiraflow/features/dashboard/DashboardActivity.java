@@ -67,7 +67,6 @@ public class DashboardActivity extends AppCompatActivity {
     ViewFlipper viewFlipper;
 
     private ViewPagerAdapter viewPagerAdapter;
-
     private SessionManager sm;
 
 
@@ -104,6 +103,7 @@ public class DashboardActivity extends AppCompatActivity {
                 requestBuilder
                         .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                         .load(uri)
+                        .skipMemoryCache(true)
                         .listener(new RequestListener<Uri, PictureDrawable>() {
                             @Override
                             public boolean onException(Exception e, Uri model, Target<PictureDrawable> target, boolean isFirstResource) {
@@ -111,6 +111,7 @@ public class DashboardActivity extends AppCompatActivity {
                                 Glide.with(imageView.getContext())
                                         .load(glideUrl)
                                         .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                                        .skipMemoryCache(true)
                                         .dontAnimate()
                                         .dontTransform()
                                         .into(imageView);
@@ -233,13 +234,13 @@ public class DashboardActivity extends AppCompatActivity {
         loadDashboard();
     }
 
-    private void showFragment(Fragment fragment) {
+    public void showFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.container, fragment, "fragment").commit();
 
     }
 
-    public void reloadViewPager()
+    private void reloadViewPager()
     {
         viewPager.setAdapter(viewPagerAdapter);
     }

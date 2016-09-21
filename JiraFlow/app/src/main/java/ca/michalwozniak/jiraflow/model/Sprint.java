@@ -15,7 +15,7 @@ public class Sprint {
     private int total;
     private List<Issue> issues;
     private boolean isLast;
-    private List<SprintData> values;
+    private List<SprintState> values;
 
     public String getExpand() {
         return expand;
@@ -41,7 +41,7 @@ public class Sprint {
         return isLast;
     }
 
-    public List<SprintData> getValues() {
+    public List<SprintState> getValues() {
         return values;
     }
 }

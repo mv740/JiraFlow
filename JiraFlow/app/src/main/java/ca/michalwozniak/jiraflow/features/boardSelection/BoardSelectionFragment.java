@@ -21,7 +21,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import ca.michalwozniak.jiraflow.R;
-import ca.michalwozniak.jiraflow.model.SprintData;
+import ca.michalwozniak.jiraflow.model.SprintState;
 import ca.michalwozniak.jiraflow.utility.AnimationUtil;
 import ca.michalwozniak.jiraflow.utility.NetworkManager;
 import ca.michalwozniak.jiraflow.utility.SessionManager;
@@ -37,7 +37,7 @@ public class BoardSelectionFragment extends Fragment implements SwipeRefreshLayo
     private Unbinder unbinder;
     private SessionManager sessionManager;
     private CardViewActiveSprintAdapter sprintAdapter;
-    private List<SprintData> boardSprint;
+    private List<SprintState> boardSprint;
     private NetworkManager networkManager;
     private Subscription subscription;
 
@@ -98,32 +98,32 @@ public class BoardSelectionFragment extends Fragment implements SwipeRefreshLayo
     /**
      * Prevent duplicate and remove deleted sprint from view
      *
-     * @param sprintDatas
+     * @param sprintStates
      */
-    public void updateCardList(List<SprintData> sprintDatas) {
+    public void updateCardList(List<SprintState> sprintStates) {
         //remove deleted projects
-        for (SprintData oldSprintData : boardSprint) {
+        for (SprintState oldSprintState : boardSprint) {
             boolean stillExist = false;
-            for (SprintData currentProject : sprintDatas) {
+            for (SprintState currentProject : sprintStates) {
 
-                if (Objects.equals(currentProject.getName(), oldSprintData.getName())) {
+                if (Objects.equals(currentProject.getName(), oldSprintState.getName())) {
                     stillExist = true;
                 }
             }
             if (!stillExist) {
-                boardSprint.remove(oldSprintData);
+                boardSprint.remove(oldSprintState);
             }
         }
         //add only new sprintData
-        for (SprintData newSprintData : sprintDatas) {
+        for (SprintState newSprintState : sprintStates) {
             boolean duplicate = false;
-            for (SprintData currentProject : boardSprint) {
-                if (Objects.equals(currentProject.getName(), newSprintData.getName())) {
+            for (SprintState currentProject : boardSprint) {
+                if (Objects.equals(currentProject.getName(), newSprintState.getName())) {
                     duplicate = true;
                 }
             }
             if (!duplicate) {
-                boardSprint.add(newSprintData);
+                boardSprint.add(newSprintState);
             }
         }
         sprintAdapter.notifyDataSetChanged();

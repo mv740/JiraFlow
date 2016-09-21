@@ -9,6 +9,8 @@ import java.util.List;
 import ca.michalwozniak.jiraflow.helper.JQLHelper;
 import ca.michalwozniak.jiraflow.model.BoardConfiguration;
 import ca.michalwozniak.jiraflow.model.BoardList;
+import ca.michalwozniak.jiraflow.model.Comment;
+import ca.michalwozniak.jiraflow.model.CommentResponse;
 import ca.michalwozniak.jiraflow.model.CreateIssueMetaField;
 import ca.michalwozniak.jiraflow.model.CreateIssueModel;
 import ca.michalwozniak.jiraflow.model.EmptyResponse;
@@ -19,7 +21,7 @@ import ca.michalwozniak.jiraflow.model.Issue.issueType;
 import ca.michalwozniak.jiraflow.model.Issue.userIssues;
 import ca.michalwozniak.jiraflow.model.Project;
 import ca.michalwozniak.jiraflow.model.Sprint;
-import ca.michalwozniak.jiraflow.model.SprintData;
+import ca.michalwozniak.jiraflow.model.SprintState;
 import ca.michalwozniak.jiraflow.model.User;
 import ca.michalwozniak.jiraflow.model.transition.Transition;
 import ca.michalwozniak.jiraflow.model.transition.TransitionModel;
@@ -95,7 +97,7 @@ public class NetworkManager {
                 .doOnError(error -> Log.e("getSprintsForBoard", error.getMessage()));
     }
 
-    public Observable<List<SprintData>> getActiveSprintBoard() {
+    public Observable<List<SprintState>> getActiveSprintBoard() {
         return getAllBoards()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
@@ -270,5 +272,24 @@ public class NetworkManager {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnError(error -> Log.e("createIssue",error.getMessage()));
+    }
+
+    public Observable<SprintState> getSprintState(int boardID) {
+
+        return jiraService.getSprintState(boardID)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnError(error -> Log.e("getSprintState",error.getMessage()));
+    }
+
+    public Observable<CommentResponse> addComment(String key, final String comment)
+    {
+        Comment newComment = new Comment();
+        newComment.setBody(comment);
+
+        return jiraService.addComment(key,newComment)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnError(error -> Log.e("addComment",error.getMessage()));
     }
 }

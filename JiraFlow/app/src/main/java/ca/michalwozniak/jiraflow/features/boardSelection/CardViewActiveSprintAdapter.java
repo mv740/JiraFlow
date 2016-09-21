@@ -18,7 +18,7 @@ import java.util.List;
 
 import ca.michalwozniak.jiraflow.R;
 import ca.michalwozniak.jiraflow.features.board.BoardFragment;
-import ca.michalwozniak.jiraflow.model.SprintData;
+import ca.michalwozniak.jiraflow.model.SprintState;
 import ca.michalwozniak.jiraflow.utility.SessionManager;
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -29,7 +29,7 @@ public class CardViewActiveSprintAdapter extends RecyclerView.Adapter<CardViewAc
 
 
     private FragmentManager fragmentManager;
-    private List<SprintData> sprints;
+    private List<SprintState> sprints;
     private SparseIntArray sprintIds;
     private SparseIntArray boardIds;
     private int favoriteBoardPosition;
@@ -37,7 +37,7 @@ public class CardViewActiveSprintAdapter extends RecyclerView.Adapter<CardViewAc
     private SessionManager sm;
 
 
-    public CardViewActiveSprintAdapter(List<SprintData> sprints, FragmentManager fragmentManager, SessionManager sessionManager) {
+    public CardViewActiveSprintAdapter(List<SprintState> sprints, FragmentManager fragmentManager, SessionManager sessionManager) {
         this.sprints = sprints;
         this.fragmentManager = fragmentManager;
         this.sprintIds = new SparseIntArray();

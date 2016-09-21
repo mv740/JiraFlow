@@ -4,6 +4,8 @@ import java.util.List;
 
 import ca.michalwozniak.jiraflow.model.BoardConfiguration;
 import ca.michalwozniak.jiraflow.model.BoardList;
+import ca.michalwozniak.jiraflow.model.Comment;
+import ca.michalwozniak.jiraflow.model.CommentResponse;
 import ca.michalwozniak.jiraflow.model.CreateIssueMetaField;
 import ca.michalwozniak.jiraflow.model.CreateIssueModel;
 import ca.michalwozniak.jiraflow.model.EmptyResponse;
@@ -13,8 +15,9 @@ import ca.michalwozniak.jiraflow.model.Issue.issueType;
 import ca.michalwozniak.jiraflow.model.Issue.userIssues;
 import ca.michalwozniak.jiraflow.model.Project;
 import ca.michalwozniak.jiraflow.model.Sprint;
-import ca.michalwozniak.jiraflow.model.transition.TransitionModel;
+import ca.michalwozniak.jiraflow.model.SprintState;
 import ca.michalwozniak.jiraflow.model.User;
+import ca.michalwozniak.jiraflow.model.transition.TransitionModel;
 import ca.michalwozniak.jiraflow.model.transition.TransitionPossible;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -76,6 +79,9 @@ public interface JiraSoftwareService {
     @GET("rest/agile/1.0/sprint/{sprintId}/issue")
     Observable<Sprint> getIssuesForSprint(@Path("sprintId") int id, @Query("state") String state, @Query("maxResults") Integer max);
 
+    @GET("/rest/agile/1.0/sprint/{sprintId}")
+    Observable<SprintState> getSprintState(@Path("sprintId") int id);
+
     @GET("/rest/api/2/search")
     Observable<Sprint> getIssuesForActiveSprint(@Query("jql") String project);
 
@@ -100,5 +106,11 @@ public interface JiraSoftwareService {
 
     @GET("/rest/api/2/issue/{issueIdOrKey}/transitions")
     Observable<TransitionPossible> getTransitions(@Path("issueIdOrKey") String issueIdOrKey);
+    
+
+    //https://docs.atlassian.com/jira/REST/cloud/#api/2/issue-addComment
+    @POST("/rest/api/2/issue/{issueIdOrKey}/comment")
+    Observable<CommentResponse> addComment(@Path("issueIdOrKey") String issueIdOrKey, @Body Comment CommentModel);
+
 
 }

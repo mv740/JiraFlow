@@ -36,6 +36,7 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import ca.michalwozniak.jiraflow.R;
 import ca.michalwozniak.jiraflow.features.boardSelection.BoardSelectionFragment;
+import ca.michalwozniak.jiraflow.features.dashboard.DashboardActivity;
 import ca.michalwozniak.jiraflow.helper.DragCardData;
 import ca.michalwozniak.jiraflow.model.BoardConfiguration;
 import ca.michalwozniak.jiraflow.model.Issue.Issue;
@@ -62,6 +63,7 @@ public class BoardFragment extends Fragment {
     private int sprintID;
     private Map<String, ImageView> issueTypeIcons;
     private CompositeSubscription subscriptions = new CompositeSubscription();
+
 
 
     public static BoardFragment newInstance() {
@@ -192,16 +194,27 @@ public class BoardFragment extends Fragment {
 
     private void getBoardConfiguration() {
 
-        subscriptions.add(networkManager.getBoardConfiguration(boardID)
-                .subscribe(boardConfig -> {
+        subscriptions.add(networkManager.getSprintState(boardID)
+                .subscribe(sprintState ->
+                {
+                    if (sprintState.getState().equalsIgnoreCase("active")) {
+                        subscriptions.add(networkManager.getBoardConfiguration(boardID)
+                                .subscribe(boardConfig -> {
 
-                    subscriptions.add(networkManager.getIssuesForSprint(sprintID)
-                            .subscribe(sprint -> generateBoard(boardConfig, sprint)));
-                }));
+                                    subscriptions.add(networkManager.getIssuesForSprint(sprintID)
+                                            .subscribe(sprint -> generateBoard(boardConfig, sprint)));
+                                }));
+                    }else {
+                        ((DashboardActivity)getActivity()).showFragment(new BoardSelectionFragment());
+                    }
+
+                })
+
+        );
+
     }
 
     private void generateBoard(BoardConfiguration boardConfig, Sprint sprint) {
-
 
         if (getActivity() != null) {
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Dashboard");
@@ -239,8 +252,7 @@ public class BoardFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_change_board:
-            {
+            case R.id.action_change_board: {
                 FragmentTransaction transaction = getFragmentManager().beginTransaction();
                 getActivity().invalidateOptionsMenu();
                 transaction.replace(R.id.container, new BoardSelectionFragment(), "fragment").commit();
@@ -253,7 +265,6 @@ public class BoardFragment extends Fragment {
     private View addCustomColumnList(Column current, Sprint sprint) {
         final ArrayList<Pair<Long, DragCardData>> mItemArray = new ArrayList<>();
 
-
         int addItems = 0;
         for (Issue issue : sprint.getIssues()) {
             if (issue.getFields().getStatus().getName().equals(current.getName())) {
@@ -263,21 +274,11 @@ public class BoardFragment extends Fragment {
             }
         }
 
-        final int column = mColumns;
         final dragItemAdapter listAdapter = new dragItemAdapter(mItemArray, R.layout.test_column_item, R.id.item_layout, true, issueTypeIcons);
         final View header = View.inflate(getActivity(), R.layout.test_column_header, null);
         ((TextView) header.findViewById(R.id.text)).setText(current.getName());
         ((TextView) header.findViewById(R.id.item_count)).setText("" + addItems);
-        header.setOnClickListener(v -> {
-            long id = sCreatedItems++;
-            Pair item = new Pair<>(id, "FieldCustom " + id);
-            mBoardView.addItem(column, 0, item, true);
-            //mBoardView.moveItem(4, 0, 0, true);
-            //mBoardView.removeItem(column, 0);
-            //mBoardView.moveItem(0, 0, 1, 3, false);
-            //mBoardView.replaceItem(0, 0, item1, true);
-            ((TextView) header.findViewById(R.id.item_count)).setText("" + mItemArray.size());
-        });
+
 
         mBoardView.addColumnList(listAdapter, header, false);
         mColumns++;
@@ -360,7 +361,6 @@ public class BoardFragment extends Fragment {
         super.onDestroyView();
         unbinder.unbind();
         subscriptions.unsubscribe();
-        getActivity().invalidateOptionsMenu();
     }
 
 }

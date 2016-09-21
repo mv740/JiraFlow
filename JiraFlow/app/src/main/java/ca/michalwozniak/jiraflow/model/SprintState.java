@@ -3,7 +3,7 @@ package ca.michalwozniak.jiraflow.model;
 /**
  * Created by Michal Wozniak on 9/5/2016.
  */
-public class SprintData {
+public class SprintState {
 
     private int id;
     private String self;

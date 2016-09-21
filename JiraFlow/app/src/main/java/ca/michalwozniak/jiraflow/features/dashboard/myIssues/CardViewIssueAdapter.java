@@ -34,11 +34,13 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ca.michalwozniak.jiraflow.R;
 import ca.michalwozniak.jiraflow.model.Issue.Issue;
+import ca.michalwozniak.jiraflow.utility.CommentUtil;
 import ca.michalwozniak.jiraflow.utility.ResourceManager;
 
 
 public class CardViewIssueAdapter extends RecyclerView.Adapter<CardViewIssueAdapter.IssueViewHolder> implements Filterable {
 
+    private static List<String> issuesKeys;
     private List<Issue> backup;
     private List<Issue> issueList;
     private CustomFilter filter = new CustomFilter();
@@ -46,6 +48,7 @@ public class CardViewIssueAdapter extends RecyclerView.Adapter<CardViewIssueAdap
     public CardViewIssueAdapter(List<Issue> original) {
         this.issueList = original;
         this.backup = original;
+        issuesKeys = new ArrayList<>();
     }
 
     @Override
@@ -71,10 +74,11 @@ public class CardViewIssueAdapter extends RecyclerView.Adapter<CardViewIssueAdap
 
         String status = issueList.get(position).getFields().getStatus().getName();
 
-
-        Log.e("statusText", status);
         holder.statusText.setTextColor(ResourceManager.getStatusTextColor(issueList.get(position).getFields().getStatus().getStatusCategory().getColorName()));
         holder.statusText.setText(status);
+
+        //save keyOrid
+        issuesKeys.add(position, issueList.get(position).getKey());
 
     }
 
@@ -111,19 +115,23 @@ public class CardViewIssueAdapter extends RecyclerView.Adapter<CardViewIssueAdap
             ButterKnife.bind(this, itemView);
             this.context = itemView.getContext();
 
-            Drawable icon = ContextCompat.getDrawable(context, R.drawable.zzz_message);
+            Drawable icon = ContextCompat.getDrawable(context, R.drawable.zzz_message_reply_text);
             icon.setColorFilter(Color.GRAY, PorterDuff.Mode.SRC_ATOP);
 
             //button.setCompoundDrawables(null,icon,null,null);
             button.setImageDrawable(icon);
-            button.setOnClickListener(v -> Log.d("buttonMesg", "click"));
+            button.setOnClickListener(v -> {
+                Log.d("buttonMesg", "click");
+
+                String key = issuesKeys.get(getAdapterPosition());
+                CommentUtil.showCommentDialog(itemView.getContext(),key);
+            });
 
         }
 
     }
 
-    public void reset()
-    {
+    public void reset() {
         issueList = backup;
         notifyDataSetChanged();
     }
@@ -136,21 +144,19 @@ public class CardViewIssueAdapter extends RecyclerView.Adapter<CardViewIssueAdap
             FilterResults results = new FilterResults();
             // We implement here the filter logic
 
-            if(constraint.length() > 0)
-            {
+            if (constraint.length() > 0) {
                 // We perform filtering operation
                 List<Issue> newIssueList = new ArrayList<>();
 
                 //always filter from original backup list
                 for (Issue i : backup) {
-                    if(constraint.toString().toUpperCase().contains(i.getFields().getStatus().getName().toUpperCase()))
+                    if (constraint.toString().toUpperCase().contains(i.getFields().getStatus().getName().toUpperCase()))
                         newIssueList.add(i);
                 }
 
                 results.values = newIssueList;
                 results.count = newIssueList.size();
-            }else
-            {
+            } else {
                 results.values = backup;
                 results.count = backup.size();
             }
@@ -164,7 +170,7 @@ public class CardViewIssueAdapter extends RecyclerView.Adapter<CardViewIssueAdap
 
             issueList = (List<Issue>) results.values;
             notifyDataSetChanged();
-            
+
         }
 
     }

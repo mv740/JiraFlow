@@ -164,6 +164,14 @@ public class SessionManager {
         return NOT_FOUND_INT;
     }
 
+    public void deleteFavoriteBoardId()
+    {
+        SharedPreferences preferences = context.getSharedPreferences(USER_PREFERENCE, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.remove(BOARD_ID);
+        editor.apply();
+    }
+
     public void saveFavoriteSprintId(int boardId) {
         SharedPreferences sharedPref = context.getSharedPreferences(USER_PREFERENCE, Context.MODE_PRIVATE);
         if (sharedPref != null) {
@@ -173,21 +181,30 @@ public class SessionManager {
         }
     }
 
+
     public int getFavoriteSprintId() {
         SharedPreferences sharedPref = context.getSharedPreferences(USER_PREFERENCE, Context.MODE_PRIVATE);
         if (sharedPref != null) {
             return sharedPref.getInt(SPRINT_ID, NOT_FOUND_INT);
-
         }
         return NOT_FOUND_INT;
+    }
+
+    public void deleteFavoriteSprintId()
+    {
+        SharedPreferences preferences = context.getSharedPreferences(USER_PREFERENCE, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.remove(SPRINT_ID);
+        editor.apply();
     }
 
     public boolean hasFavoriteBoard() {
         SharedPreferences sharedPref = context.getSharedPreferences(USER_PREFERENCE, Context.MODE_PRIVATE);
         if (sharedPref != null) {
             return NOT_FOUND_INT != sharedPref.getInt(BOARD_ID, NOT_FOUND_INT);
-
         }
         return false;
     }
+
+
 }

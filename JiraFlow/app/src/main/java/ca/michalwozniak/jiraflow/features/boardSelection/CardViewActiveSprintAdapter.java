@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,6 +34,7 @@ public class CardViewActiveSprintAdapter extends RecyclerView.Adapter<CardViewAc
     private int favoriteBoardPosition;
     private int currentSavedSprintId;
     private SessionManager sm;
+    private static final int NO_FAVORITE = -1;
 
 
     public CardViewActiveSprintAdapter(List<SprintState> sprints, FragmentManager fragmentManager, SessionManager sessionManager) {
@@ -43,7 +43,7 @@ public class CardViewActiveSprintAdapter extends RecyclerView.Adapter<CardViewAc
         this.sprintIds = new SparseIntArray();
         this.boardIds = new SparseIntArray();
         this.sm = sessionManager;
-        this.favoriteBoardPosition =-1;
+        this.favoriteBoardPosition =NO_FAVORITE;
         this.currentSavedSprintId = sessionManager.getFavoriteSprintId();
 
 
@@ -74,9 +74,6 @@ public class CardViewActiveSprintAdapter extends RecyclerView.Adapter<CardViewAc
                 BoardFragment boardFragment = BoardFragment.newInstance();
                 Bundle bundle = new Bundle();
 
-                bundle.putInt("boardID", boardIds.get(getAdapterPosition()));
-                bundle.putInt("sprintID", sprintIds.get(getAdapterPosition()));
-
                 boardFragment.setArguments(bundle);
 
                 fragmentManager.beginTransaction()
@@ -87,17 +84,21 @@ public class CardViewActiveSprintAdapter extends RecyclerView.Adapter<CardViewAc
             });
 
             favoriteBoardButton.setOnFavoriteChangeListener((buttonView, favorite) -> {
+
                 if (favorite) {
                     favoriteBoardPosition = getAdapterPosition();
-                    currentSavedSprintId = sprintIds.get(getAdapterPosition());;
+                    currentSavedSprintId = sprintIds.get(getAdapterPosition());
                     sm.saveFavoriteBoardId(boardIds.get(getAdapterPosition()));
                     sm.saveFavoriteSprintId(currentSavedSprintId);
+                }else
+                {
+                    favoriteBoardPosition = NO_FAVORITE;
+                    currentSavedSprintId  = NO_FAVORITE;
+                    sm.deleteFavoriteBoardId();
+                    sm.deleteFavoriteSprintId();
                 }
             });
-            favoriteBoardButton.setOnFavoriteAnimationEndListener((buttonView, favorite) -> {
-                if (favorite)
-                    notifyDataSetChanged();
-            });
+            favoriteBoardButton.setOnFavoriteAnimationEndListener((buttonView, favorite) -> notifyDataSetChanged());
 
         }
 
@@ -117,27 +118,21 @@ public class CardViewActiveSprintAdapter extends RecyclerView.Adapter<CardViewAc
     @Override
     public void onBindViewHolder(ProjectViewHolder holder, int position) {
 
-        holder.title.setText(sprints.get(position).getName());
+        SprintState sprintState = sprints.get(position);
+        holder.title.setText(sprintState.getName());
 
-
-        boardIds.append(position, sprints.get(position).getOriginBoardId());
-        sprintIds.append(position, sprints.get(position).getId());
-
-        Log.e("favoriteBoardPosition", String.valueOf(favoriteBoardPosition));
-        Log.e("currentSavedSprintId", String.valueOf(currentSavedSprintId));
-        Log.e("sprints.get(position)", String.valueOf(sprints.get(position).getId()));
+        boardIds.append(position, sprintState.getOriginBoardId());
+        sprintIds.append(position, sprintState.getId());
 
         if(favoriteBoardPosition != -1)
         {
             holder.favoriteBoardButton.setFavorite(position == favoriteBoardPosition);
         }else
         {
-            holder.favoriteBoardButton.setFavorite(sprints.get(position).getId() == currentSavedSprintId);
+            holder.favoriteBoardButton.setFavorite(sprintState.getId() == currentSavedSprintId);
         }
 
-
-
-
+        
 //        if (sprint.get(position).getImageType() == ImageType.SVG) {
 //
 //            ResourceManager.loadImageSVG(holder.context, projects.get(position).getAvatarUrls().getSmall(), holder.circleImageView);

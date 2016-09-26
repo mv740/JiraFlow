@@ -3,7 +3,6 @@ package ca.michalwozniak.jiraflow.features.login;
 import android.content.Context;
 
 import ca.michalwozniak.jiraflow.model.User;
-import ca.michalwozniak.jiraflow.utility.NetworkManager;
 import ca.michalwozniak.jiraflow.utility.SessionManager;
 
 /**
@@ -18,8 +17,7 @@ public class LoginPresenterImpl implements LoginPresenter, LoginInteractor.OnLog
 
     public LoginPresenterImpl(LoginView loginView) {
         this.loginView = loginView;
-        NetworkManager networkManager = NetworkManager.getInstance(loginView.getViewContext());
-        this.loginInteractor = new LoginInteractorImpl(networkManager);
+        this.loginInteractor = new LoginInteractorImpl();
     }
 
     @Override

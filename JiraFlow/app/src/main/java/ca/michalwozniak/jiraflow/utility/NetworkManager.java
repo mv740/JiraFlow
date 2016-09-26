@@ -43,8 +43,8 @@ import rx.schedulers.Schedulers;
 
 public class NetworkManager {
 
-    private final JiraSoftwareService jiraService;
-    private final JiraSoftwareService jiraServiceXML;
+    private JiraSoftwareService jiraService;
+    private JiraSoftwareService jiraServiceXML;
     private final SessionManager sessionManager;
     private static NetworkManager instance = null;
     private final Context myContext;
@@ -55,6 +55,7 @@ public class NetworkManager {
         this.sessionManager = SessionManager.getInstance(context);
         this.jiraService = ServiceGenerator.createService(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword(), sessionManager.getServerUrl());
         this.jiraServiceXML = ServiceGenerator.createServiceXML(JiraSoftwareService.class, sessionManager.getUsername(), sessionManager.getPassword(), sessionManager.getServerUrl());
+
     }
 
     public static NetworkManager getInstance(Context context) {
@@ -139,14 +140,14 @@ public class NetworkManager {
     }
 
 
-    public Observable<User> logIn(final String username, final String password, final String url) {
-        final JiraSoftwareService jiraSoftwareService = ServiceGenerator.createService(JiraSoftwareService.class, username, password, url);
-
-        return jiraSoftwareService.getUser()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
-
-    }
+//    public Observable<User> logIn(final String username, final String password, final String url) {
+//        final JiraSoftwareService jiraSoftwareService = ServiceGenerator.createService(JiraSoftwareService.class, username, password, url);
+//
+//        return jiraSoftwareService.getUser()
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread());
+//
+//    }
 
     public Observable<List<Entry>> getActivityStream() {
 
@@ -230,24 +231,21 @@ public class NetworkManager {
 //                .toList();
     }
 
-    public Observable<List<User>> findAssignableUsers(String username, String projectKey)
-    {
-        return jiraService.findAssignableUsers(username,projectKey, null,null,null)
+    public Observable<List<User>> findAssignableUsers(String username, String projectKey) {
+        return jiraService.findAssignableUsers(username, projectKey, null, null, null)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(error -> Log.e("findAssignableUsers",error.getMessage()));
+                .doOnError(error -> Log.e("findAssignableUsers", error.getMessage()));
     }
 
-    public Observable<CreateIssueMetaField> getCreateIssueMeta()
-    {
-       return jiraService.getCreateIssueMeta(null, null, null, null)
+    public Observable<CreateIssueMetaField> getCreateIssueMeta() {
+        return jiraService.getCreateIssueMeta(null, null, null, null)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnError(error -> Log.e("getCreateIssueMeta", error.getMessage()));
     }
 
-    public void getProjectIconType(Project project)
-    {
+    public void getProjectIconType(Project project) {
         OkHttpClient httpClient = new OkHttpClient();
         okhttp3.Request request = new okhttp3.Request.Builder().url(project.getAvatarUrls().getExtraSmall()).build();
 
@@ -257,6 +255,7 @@ public class NetworkManager {
             public void onFailure(okhttp3.Call call, IOException e) {
 
             }
+
             @Override
             public void onResponse(final okhttp3.Call call, okhttp3.Response response) throws IOException {
 
@@ -266,12 +265,11 @@ public class NetworkManager {
         });
     }
 
-    public Observable<EmptyResponse> createIssue(CreateIssueModel createIssueModel)
-    {
-       return jiraService.createIssue(createIssueModel)
+    public Observable<EmptyResponse> createIssue(CreateIssueModel createIssueModel) {
+        return jiraService.createIssue(createIssueModel)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(error -> Log.e("createIssue",error.getMessage()));
+                .doOnError(error -> Log.e("createIssue", error.getMessage()));
     }
 
     public Observable<SprintState> getSprintState(int boardID) {
@@ -279,17 +277,16 @@ public class NetworkManager {
         return jiraService.getSprintState(boardID)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(error -> Log.e("getSprintState",error.getMessage()));
+                .doOnError(error -> Log.e("getSprintState", error.getMessage()));
     }
 
-    public Observable<CommentResponse> addComment(String key, final String comment)
-    {
+    public Observable<CommentResponse> addComment(String key, final String comment) {
         Comment newComment = new Comment();
         newComment.setBody(comment);
 
-        return jiraService.addComment(key,newComment)
+        return jiraService.addComment(key, newComment)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(error -> Log.e("addComment",error.getMessage()));
+                .doOnError(error -> Log.e("addComment", error.getMessage()));
     }
 }

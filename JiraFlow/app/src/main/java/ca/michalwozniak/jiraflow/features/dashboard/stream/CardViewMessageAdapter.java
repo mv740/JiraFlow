@@ -184,7 +184,7 @@ public class CardViewMessageAdapter extends RecyclerView.Adapter<CardViewMessage
 
         int currPosition = messages.indexOf(entryToRemove);
         messages.remove(currPosition);
-        if (currPosition <= messagesIssueIds.size()) {
+        if (currPosition < messagesIssueIds.size()) {
             messagesIssueIds.remove(currPosition);
         }
         notifyItemRemoved(currPosition);

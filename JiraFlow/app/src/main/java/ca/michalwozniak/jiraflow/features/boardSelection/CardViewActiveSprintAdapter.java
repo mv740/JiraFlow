@@ -132,7 +132,7 @@ public class CardViewActiveSprintAdapter extends RecyclerView.Adapter<CardViewAc
             holder.favoriteBoardButton.setFavorite(sprintState.getId() == currentSavedSprintId);
         }
 
-        
+
 //        if (sprint.get(position).getImageType() == ImageType.SVG) {
 //
 //            ResourceManager.loadImageSVG(holder.context, projects.get(position).getAvatarUrls().getSmall(), holder.circleImageView);

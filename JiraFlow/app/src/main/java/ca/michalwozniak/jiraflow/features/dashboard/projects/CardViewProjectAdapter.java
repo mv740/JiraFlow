@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +11,8 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import ca.michalwozniak.jiraflow.features.dashboard.projects.issues.ProjectActivity;
 import ca.michalwozniak.jiraflow.R;
+import ca.michalwozniak.jiraflow.features.dashboard.projects.issues.ProjectActivity;
 import ca.michalwozniak.jiraflow.model.ImageType;
 import ca.michalwozniak.jiraflow.model.Project;
 import ca.michalwozniak.jiraflow.utility.ResourceManager;
@@ -26,40 +25,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class CardViewProjectAdapter extends RecyclerView.Adapter<CardViewProjectAdapter.ProjectViewHolder> {
 
 
-    public static class ProjectViewHolder extends RecyclerView.ViewHolder {
-
-        CardView cardView;
-        CircleImageView circleImageView;
-        TextView title;
-        TextView subTitle;
-        Context context;
-
-
-        public ProjectViewHolder(final View itemView) {
-            super(itemView);
-            this.cardView = (CardView) itemView.findViewById(R.id.cardView);
-            this.circleImageView = (CircleImageView) itemView.findViewById(R.id.image);
-            this.title = (TextView) itemView.findViewById(R.id.title);
-            this.subTitle = (TextView) itemView.findViewById(R.id.subtitle);
-            this.context = itemView.getContext();
-
-            itemView.findViewById(R.id.ripple).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.d("Ripple", "click");
-                    Log.d("Ripple", title.getText().toString());
-
-                    Intent project = new Intent(context, ProjectActivity.class);
-                    project.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                    project.putExtra("title", title.getText().toString());
-                    context.startActivity(project);
-                }
-            });
-        }
-
-    }
-
-    List<Project> projects;
+    private List<Project> projects;
 
     public CardViewProjectAdapter(List<Project> projects) {
         this.projects = projects;
@@ -107,5 +73,33 @@ public class CardViewProjectAdapter extends RecyclerView.Adapter<CardViewProject
     @Override
     public int getItemCount() {
         return projects.size();
+    }
+
+    public static class ProjectViewHolder extends RecyclerView.ViewHolder {
+
+        CardView cardView;
+        CircleImageView circleImageView;
+        TextView title;
+        TextView subTitle;
+        Context context;
+
+
+        public ProjectViewHolder(final View itemView) {
+            super(itemView);
+            this.cardView = (CardView) itemView.findViewById(R.id.cardView);
+            this.circleImageView = (CircleImageView) itemView.findViewById(R.id.image);
+            this.title = (TextView) itemView.findViewById(R.id.title);
+            this.subTitle = (TextView) itemView.findViewById(R.id.subtitle);
+            this.context = itemView.getContext();
+
+            itemView.findViewById(R.id.ripple).setOnClickListener(v -> {
+
+                Intent project = new Intent(context, ProjectActivity.class);
+                project.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                project.putExtra("title", title.getText().toString());
+                context.startActivity(project);
+            });
+        }
+
     }
 }

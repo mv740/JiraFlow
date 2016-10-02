@@ -49,8 +49,6 @@ public class CardViewActiveSprintAdapter extends RecyclerView.Adapter<CardViewAc
 
     }
 
-
-
     public class ProjectViewHolder extends RecyclerView.ViewHolder {
 
         MaterialFavoriteButton favoriteBoardButton;
@@ -73,6 +71,8 @@ public class CardViewActiveSprintAdapter extends RecyclerView.Adapter<CardViewAc
 
                 BoardFragment boardFragment = BoardFragment.newInstance();
                 Bundle bundle = new Bundle();
+                bundle.putInt("boardID", boardIds.get(getAdapterPosition()));
+                bundle.putInt("sprintID", sprintIds.get(getAdapterPosition()));
 
                 boardFragment.setArguments(bundle);
 

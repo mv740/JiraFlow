@@ -79,7 +79,7 @@ public class BoardFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.test_board_layout, container, false);
+        View view = inflater.inflate(R.layout.board_layout, container, false);
         unbinder = ButterKnife.bind(this, view);
 
         networkManager = NetworkManager.getInstance(getContext());
@@ -99,7 +99,7 @@ public class BoardFragment extends Fragment {
         mBoardView.setSnapToColumnsWhenScrolling(true);
         mBoardView.setSnapToColumnWhenDragging(true);
         mBoardView.setSnapDragItemToTouch(true);
-        mBoardView.setCustomDragItem(new MyDragItem(getActivity(), R.layout.test_column_item));
+        mBoardView.setCustomDragItem(new MyDragItem(getActivity(), R.layout.board_column_item));
         mBoardView.setBoardListener(new BoardView.BoardListener() {
             @Override
             public void onItemDragStarted(int column, int row) {
@@ -274,8 +274,8 @@ public class BoardFragment extends Fragment {
             }
         }
 
-        final dragItemAdapter listAdapter = new dragItemAdapter(mItemArray, R.layout.test_column_item, R.id.item_layout, true, issueTypeIcons);
-        final View header = View.inflate(getActivity(), R.layout.test_column_header, null);
+        final dragItemAdapter listAdapter = new dragItemAdapter(mItemArray, R.layout.board_column_item, R.id.item_layout, true, issueTypeIcons);
+        final View header = View.inflate(getActivity(), R.layout.board_column_header, null);
         ((TextView) header.findViewById(R.id.text)).setText(current.getName());
         ((TextView) header.findViewById(R.id.item_count)).setText("" + addItems);
 

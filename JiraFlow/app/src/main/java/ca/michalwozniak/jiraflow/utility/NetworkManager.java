@@ -17,6 +17,7 @@ import ca.michalwozniak.jiraflow.model.EmptyResponse;
 import ca.michalwozniak.jiraflow.model.Feed.ActivityFeed;
 import ca.michalwozniak.jiraflow.model.Feed.Entry;
 import ca.michalwozniak.jiraflow.model.Issue.Issue;
+import ca.michalwozniak.jiraflow.model.Issue.ProjectIssues;
 import ca.michalwozniak.jiraflow.model.Issue.issueType;
 import ca.michalwozniak.jiraflow.model.Issue.userIssues;
 import ca.michalwozniak.jiraflow.model.Project;
@@ -288,5 +289,14 @@ public class NetworkManager {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnError(error -> Log.e("addComment", error.getMessage()));
+    }
+
+    public Observable<ProjectIssues> getProjectIssues(String projectTitle)
+    {
+        JQLHelper jqlHelper = new JQLHelper(JQLHelper.Query.PROJECT, projectTitle);
+        return jiraService.getProjectIssues(jqlHelper.toString())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnError(error -> Log.e("errorSubscriber", error.getMessage()));
     }
 }

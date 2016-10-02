@@ -60,12 +60,7 @@ public class CardViewProjectIssueAdapter extends RecyclerView.Adapter<CardViewPr
 
             //button.setCompoundDrawables(null,icon,null,null);
             button.setImageDrawable(icon);
-            button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.d("buttonMesg","click");
-                }
-            });
+            button.setOnClickListener(v -> Log.d("buttonMesg","click"));
 
         }
 

@@ -4,17 +4,19 @@ import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Namespace;
 import org.simpleframework.xml.NamespaceList;
+import org.simpleframework.xml.Root;
 
 import java.util.List;
 
 /**
- * Created by micha on 6/11/2016.
+ * Created by Michal Wozniak on 6/11/2016.
  */
 @NamespaceList({
         @Namespace(reference = "http://www.w3.org/2005/Atom", prefix = "atom")
 })
-@Element(name = "feed")
+@Root(name = "feed", strict = false)
 public class ActivityFeed {
+
     @Element
     private String id;
     @Element(required = false)
@@ -23,7 +25,7 @@ public class ActivityFeed {
     private String title;
     @Element(name = "timezone-offset")
     private String timezone;
-    @Element
+
     private String updated;
     @ElementList(inline=true)
     private List<Entry> entry;

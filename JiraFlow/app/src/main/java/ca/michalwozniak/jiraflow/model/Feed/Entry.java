@@ -4,6 +4,7 @@ import android.graphics.drawable.Drawable;
 
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
+import org.simpleframework.xml.Root;
 
 import java.util.List;
 
@@ -12,7 +13,7 @@ import ca.michalwozniak.jiraflow.model.ImageType;
 /**
  * Created by Michal Wozniak on 6/11/2016.
  */
-@Element(name = "entry")
+@Root(strict = false)
 public class Entry {
     @Element
     private String id;
@@ -26,8 +27,8 @@ public class Entry {
     private String published;
     @Element
     private String updated;
-    @Element(required=false)
-    private CategoryXML category;
+//    @Element(required=false)
+//    private CategoryXML category;
     @ElementList(inline = true)
     private List<Link> link;
     @Element(name = "in-reply-to", required = false)
@@ -68,9 +69,9 @@ public class Entry {
         return updated;
     }
 
-    public CategoryXML getCategory() {
-        return category;
-    }
+//    public CategoryXML getCategory() {
+//        return category;
+//    }
 
     public List<Link> getLink() {
         return link;
@@ -114,5 +115,13 @@ public class Entry {
 
     public void setImageType(ImageType imageType) {
         this.imageType = imageType;
+    }
+
+    public String getInReplyTo() {
+        return inReplyTo;
+    }
+
+    public Target getTarget() {
+        return target;
     }
 }

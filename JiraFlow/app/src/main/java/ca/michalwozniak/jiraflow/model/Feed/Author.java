@@ -6,13 +6,13 @@ import org.simpleframework.xml.ElementList;
 import java.util.List;
 
 /**
- * Created by micha on 6/11/2016.
+ * Created by Michal Wozniak on 6/11/2016.
  */
 @Element(name = "author")
 public class Author {
     @Element
     private String name;
-    @Element
+    @Element(required = false)
     private String email;
     @Element
     private String uri;
@@ -20,8 +20,6 @@ public class Author {
     private List<Link> link;
     @Element
     private String username;
-    @Element(name = "object-type")
-    private String objectType;
 
     public String getName() {
         return name;
@@ -43,7 +41,4 @@ public class Author {
         return username;
     }
 
-    public String getObjectType() {
-        return objectType;
-    }
 }

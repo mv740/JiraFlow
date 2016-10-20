@@ -7,7 +7,9 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".LoginActivity">
+    tools:context=".features.login.LoginActivity"
+    android:id="@+id/loginLayout"
+    android:focusableInTouchMode="true">
 
 
     <android.support.design.widget.TextInputLayout
@@ -40,7 +42,7 @@
         android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp">
 
-        <com.maksim88.passwordedittext.PasswordEditText
+        <android.support.design.widget.TextInputEditText
             android:id="@+id/input_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -49,12 +51,66 @@
 
     </android.support.design.widget.TextInputLayout>
 
-    <FrameLayout
+    <LinearLayout
+        android:id="@+id/serverLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
+        android:layout_alignStart="@+id/input_layout_password"
+        android:layout_below="@+id/input_layout_password"
+        android:orientation="horizontal"
+        android:layout_alignEnd="@+id/input_layout_password">
+
+
+        <Spinner
+            android:id="@+id/spinnerHttpType"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|center_vertical"
+            android:entries="@array/http_protocols"
+            android:paddingStart="5dp"
+            android:paddingEnd="0dp">
+        </Spinner>
+
+
+
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/input_layout_serverUrl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginRight="0dp"
+            android:layout_marginTop="8dp"
+            android:layout_weight="1"
+            android:focusableInTouchMode="true">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/input_serverUrl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Server Url"
+                android:inputType="textPersonName" />
+        </android.support.design.widget.TextInputLayout>
+    </LinearLayout>
+
+    <CheckBox
+        android:id="@+id/checkBoxRememberMe"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/serverLayout"
+        android:layout_below="@+id/serverLayout"
+        android:checked="false"
+        android:text="Remember me" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/checkBoxRememberMe"
+        android:layout_below="@+id/checkBoxRememberMe"
         android:layout_centerVertical="true"
-        android:layout_margin="16dp">
+        android:layout_marginTop="60dp"
+        android:layout_alignEnd="@+id/input_layout_password">
 
 
         <ProgressBar
@@ -62,9 +118,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:visibility="gone"
-            android:indeterminateDuration="1000"
             android:indeterminateDrawable="@drawable/circular_progressbar"
+            android:indeterminateDuration="1000"
+            android:visibility="gone"
+            android:layout_centerInParent="true"
             />
 
         <Button
@@ -72,19 +129,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/md_white_1000"
-            android:text="LOGIN" />
+            android:text="LOGIN"
+            android:layout_centerInParent="true"/>
 
-        <!--style="?android:attr/progressBarStyleLarge"-->
-    </FrameLayout>
 
-    <CheckBox
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Remember me"
-        android:id="@+id/checkBoxRememberMe"
-        android:layout_below="@+id/input_layout_password"
-        android:layout_alignStart="@+id/input_layout_password"
-        android:checked="false"
-        />
+    </RelativeLayout>
 
 </RelativeLayout>

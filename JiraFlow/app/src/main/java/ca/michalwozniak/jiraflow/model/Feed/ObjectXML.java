@@ -14,8 +14,7 @@ public class ObjectXML {
     private String summary;
     @Element
     private Link link;
-    @Element(name = "object-type")
-    private String objectType;
+
 
     public String getId() {
         return id;
@@ -33,7 +32,4 @@ public class ObjectXML {
         return link;
     }
 
-    public String getObjectType() {
-        return objectType;
-    }
 }

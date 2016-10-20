@@ -1,15 +1,22 @@
 package ca.michalwozniak.jiraflow.utility;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Picture;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.PictureDrawable;
 import android.net.Uri;
+import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
+import android.util.Patterns;
+import android.widget.ImageView;
 
 import com.bumptech.glide.GenericRequestBuilder;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.model.GlideUrl;
+import com.bumptech.glide.load.model.LazyHeaders;
 import com.bumptech.glide.load.model.StreamEncoder;
 import com.bumptech.glide.load.resource.file.FileToStreamDecoder;
 import com.caverock.androidsvg.SVG;
@@ -22,6 +29,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
+import java.util.regex.Matcher;
 
 import ca.michalwozniak.jiraflow.R;
 import ca.michalwozniak.jiraflow.model.ImageType;
@@ -125,10 +138,9 @@ public class ResourceManager {
                 .sourceEncoder(new StreamEncoder())
                 .cacheDecoder(new FileToStreamDecoder<>(new SvgDecoder()))
                 .decoder(new SvgDecoder())
-                .placeholder(R.drawable.ic_check)
-                .error(R.drawable.zzz_controller_xbox)
+                .error(R.drawable.zzz_emoticon_sad)
                 .animate(android.R.anim.fade_in)
-                .listener(new SvgSoftwareLayerSetter<Uri>());
+                .listener(new SvgSoftwareLayerSetter<>());
 
         return requestBuilder;
     }
@@ -143,19 +155,125 @@ public class ResourceManager {
     public static int getIssueTypeIconId(String name) {
         switch (name) {
             case "Bug":
-                return R.drawable.bug;
+                return R.drawable.ic_bug;
 
             case "Story":
-                return R.drawable.story;
+                return R.drawable.ic_story;
 
             case "Task":
                 return R.drawable.task;
 
             case "Epic":
-                return R.drawable.epic;
+                return R.drawable.ic_epic;
+
+            case "Sub-task":
+                return R.drawable.ic_subtask;
 
         }
         return 0;
+    }
+    //http://stackoverflow.com/questions/14853389/how-to-convert-utc-timestamp-to-device-local-time-in-android
+    //http://stackoverflow.com/questions/18483314/unparseable-date-2013-07-11t134122-000z-at-offset-23
+    public static String getDate(String OurDate)
+    {
+        try
+        {
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+            Date value = formatter.parse(OurDate);
+
+            SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm"); //this format changeable
+            dateFormatter.setTimeZone(TimeZone.getDefault());
+            OurDate = dateFormatter.format(value);
+
+            //Log.d("OurDate", OurDate);
+        }
+        catch (Exception e)
+        {
+            Log.e("error",e.getMessage());
+            OurDate = "00-00-0000 00:00";
+        }
+        return OurDate;
+    }
+
+    //http://stackoverflow.com/questions/6384240/how-to-parse-a-url-from-a-string-in-android
+    public static String[] extractLinks(String text) {
+        List<String> links = new ArrayList<>();
+        Matcher m = Patterns.WEB_URL.matcher(text);
+        while (m.find()) {
+            String url = m.group();
+            links.add(url);
+        }
+
+        return links.toArray(new String[links.size()]);
+    }
+
+    public static void loadImage(Context context, String url, ImageView imageView)
+    {
+        GlideUrl glideUrl = new GlideUrl(url, new LazyHeaders.Builder()
+                .addHeader("Authorization", ResourceManager.getEncoredCredentialString(context))
+                .addHeader("Accept", "application/json")
+                .build());
+
+        Glide
+                .with(context)
+                .load(glideUrl)
+                .error(R.drawable.zzz_emoticon_sad)
+                .dontAnimate()
+                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                .into(imageView);
+    }
+
+    public static void loadImageSVG(Context context,String Href, ImageView imageView)
+    {
+        GenericRequestBuilder<Uri, InputStream, SVG, PictureDrawable> requestBuilder = ResourceManager.getGenericRequestBuilderForSVG(context);
+
+        requestBuilder
+                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                .load(Uri.parse(Href))
+                .into(imageView);
+
+    }
+
+
+
+    public static int getStatusTextColor(String colorDescriptor)
+    {
+        if(colorDescriptor.contains("yellow"))
+        {
+            return Color.parseColor("#FFC107");
+        }else if(colorDescriptor.contains("blue"))
+        {
+            return Color.parseColor("#3F51B5");
+        }else if (colorDescriptor.contains("green"))
+        {
+            return Color.parseColor("#4CAF50");
+        }
+        return Color.GRAY;
+    }
+
+    public static int getStatusBackgroundColor(String colorDescriptor)
+    {
+        if(colorDescriptor.contains("yellow"))
+        {
+            return Color.parseColor("#FFF8E1");
+        }else if(colorDescriptor.contains("blue"))
+        {
+            return Color.parseColor("#E8EAF6");
+        }else if (colorDescriptor.contains("green"))
+        {
+            return Color.parseColor("#E8F5E9");
+        }
+        return Color.GRAY;
+    }
+
+    public static Bundle getFavoriteBoardSetting(int boardId, int sprintID)
+    {
+        Bundle bundle = new Bundle();
+        bundle.putInt("boardID", boardId);
+        bundle.putInt("sprintID", sprintID);
+
+        return  bundle;
     }
 
 }

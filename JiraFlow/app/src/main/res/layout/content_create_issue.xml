@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:layout_width="fill_parent"
+    android:id="@+id/search_view"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:paddingTop="8dp">
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:focusableInTouchMode="true">
+
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/issueSummary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:hint="Summary (Required)"
+            android:textSize="14sp"
+            android:inputType="textPersonName"
+            android:minEms="45"
+            android:imeOptions="actionDone"/>
+
+    </android.support.design.widget.TextInputLayout>
+
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:focusableInTouchMode="true">
+
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/issueReporter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:hint="Reporter (Required)"
+            android:inputType="textPersonName"
+            android:textSize="14sp"
+            android:minEms="45"
+            android:cursorVisible="false"
+            />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:focusableInTouchMode="true">
+
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/issueComponent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:hint="Component/s"
+            android:inputType="textPersonName"
+            android:textSize="14sp"
+            android:minEms="45" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:focusableInTouchMode="true">
+
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/issueDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:hint="Description"
+            android:inputType="textPersonName"
+            android:textSize="14sp"
+            android:minEms="45" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:focusableInTouchMode="true">
+
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/issueFixVersion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:hint="Fix Version/s"
+            android:inputType="textPersonName"
+            android:textSize="14sp"
+            android:minEms="45" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:focusableInTouchMode="true">
+
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/issuePriority"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:hint="Priority"
+            android:inputType="textPersonName"
+            android:textSize="14sp"
+            android:minEms="45" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:focusableInTouchMode="true">
+
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/issueLabels"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:hint="Labels"
+            android:inputType="textPersonName"
+            android:textSize="14sp"
+            android:minEms="45" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:focusableInTouchMode="true">
+
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/issueEnvironment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:hint="Environment"
+            android:inputType="textPersonName"
+            android:textSize="14sp"
+            android:minEms="45" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:focusableInTouchMode="true">
+
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/issueAttachment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:hint="Attachment"
+            android:inputType="textPersonName"
+            android:textSize="14sp"
+            android:minEms="45" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:focusableInTouchMode="true">
+
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/issueLinkedIssues"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:hint="Linked Issues"
+            android:inputType="textPersonName"
+            android:textSize="14sp"
+            android:minEms="45" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:focusableInTouchMode="true">
+
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/issueIssue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:hint="Issue"
+            android:inputType="textPersonName"
+            android:textSize="14sp"
+            android:minEms="45" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:focusableInTouchMode="true">
+
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/issueAssignee"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:hint="Assignee"
+            android:inputType="textPersonName"
+            android:textSize="14sp"
+            android:minEms="45" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:focusableInTouchMode="true">
+
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/issueEpicLink"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:hint="Epic Link"
+            android:inputType="textPersonName"
+            android:textSize="14sp"
+            android:minEms="45" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:focusableInTouchMode="true">
+
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/issueSprint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:hint="Sprint"
+            android:inputType="textPersonName"
+            android:textSize="14sp"
+            android:minEms="45" />
+
+    </android.support.design.widget.TextInputLayout>
+
+</LinearLayout>

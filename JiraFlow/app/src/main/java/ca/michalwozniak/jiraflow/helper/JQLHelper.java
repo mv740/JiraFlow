@@ -25,10 +25,16 @@ public class JQLHelper {
 
     private String query;
     private String parameter;
+    private final String quote = "\"";
 
     public JQLHelper(Query query, String parameter) {
         this.query = query.toString();
-        this.parameter = parameter;
+
+        if(query == Query.ASSIGNEE)
+        {
+            this.parameter = quote+parameter+quote;
+        }else
+            this.parameter = parameter;
     }
 
     @Override

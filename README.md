@@ -1,4 +1,4 @@
-# jiraMobile
+# JiraFlow
 
 JiraFlow is a mobile app that provides a great experience for your Attassian's Jira.
 
